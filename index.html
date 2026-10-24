@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOCH - Super Admin Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+    <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -26,7 +27,7 @@
         .nav-links a:hover { color: var(--primary); }
         .btn-login-nav { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white !important; padding: 10px 25px; border-radius: 50px; }
         
-        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 0 8%; background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%); padding-top: 80px; }
+        .hero { min-height: 80vh; display: flex; align-items: center; justify-content: space-between; padding: 120px 8% 40px 8%; background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%); }
         .hero-text { max-width: 500px; }
         .hero-text h1 { font-size: 48px; font-weight: 700; color: var(--text-main); line-height: 1.2; margin-bottom: 20px; }
         .hero-text h1 span { color: var(--primary); }
@@ -35,6 +36,35 @@
         .btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .illustration { width: 400px; height: 400px; background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; animation: morph 8s ease-in-out infinite; display: flex; justify-content: center; align-items: center; color: white; font-size: 80px; }
         @keyframes morph { 0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; } 50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; } 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; } }
+
+        /* ================= VERIFY CERTIFICATE SECTION (PUBLIC) ================= */
+        .verify-section { padding: 60px 8%; background: white; text-align: center; }
+        .verify-section h2 { font-size: 32px; font-weight: 700; color: var(--text-main); margin-bottom: 10px; }
+        .verify-section p { color: var(--text-muted); margin-bottom: 30px; }
+        
+        .verify-form { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .verify-form input { flex: 1; padding: 15px 20px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; outline: none; transition: 0.3s; }
+        .verify-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .verify-form button { background: var(--primary); color: white; border: none; padding: 0 30px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .verify-form button:hover { background: var(--primary-dark); }
+
+        .error-msg { color: var(--danger); margin-top: 15px; display: none; font-size: 14px; font-weight: 600; }
+
+        /* Certificate Design Container */
+        .cert-wrapper { display: none; margin-top: 40px; text-align: center; overflow-x: auto; padding-bottom: 20px;}
+        .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; }
+        
+        .cert-container { 
+            width: 1000px; 
+            background: #fdfbf7; 
+            padding: 20px; 
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 15px solid var(--dark-green);
+            margin: 0 auto;
+            text-align: left;
+        }
+        .cert-inner { border: 2px solid var(--gold); padding: 40px; background: #fdfbf7; }
 
         /* ================= LOGIN MODAL ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -46,7 +76,7 @@
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; }
         .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; cursor: pointer; }
 
-        /* ================= DASHBOARD ================= */
+        /* ================= DASHBOARD (Super Admin) ================= */
         #dashboard-page { display: none; height: 100vh; background: var(--bg-body); }
         .dash-layout { display: flex; height: 100%; }
         .sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; }
@@ -101,6 +131,13 @@
         .msg.sent { background: #d9fdd3; align-self: flex-end; }
         .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid var(--border);}
         .chat-input-area input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 20px; outline: none; }
+
+        /* Print CSS */
+        @media print {
+            body * { visibility: hidden; }
+            #certificate, #certificate * { visibility: visible; }
+            #certificate { position: absolute; left: 0; top: 0; width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -110,7 +147,8 @@
         <nav>
             <div class="logo">🚀 IOCH</div>
             <div class="nav-links">
-                <a>Home</a>
+                <a href="#">Home</a>
+                <a href="#verify-section">Verify Certificate</a>
                 <a class="btn-login-nav" onclick="openLogin()">Login</a>
             </div>
         </nav>
@@ -122,6 +160,64 @@
                 <button class="btn-main" onclick="openLogin()">Super Admin Login</button>
             </div>
             <div class="illustration">💬</div>
+        </section>
+
+        <!-- PUBLIC CERTIFICATE VERIFICATION SECTION -->
+        <section class="verify-section" id="verify-section">
+            <h2>Verify Student Certificate</h2>
+            <p>Enter your Certificate ID to verify its authenticity.</p>
+            
+            <div class="verify-form">
+                <input type="text" id="certNumberPublic" placeholder="Enter Certificate ID (e.g., IOCH-2024-1234)">
+                <button onclick="verifyCertificatePublic()">Verify</button>
+            </div>
+            <p class="error-msg" id="errorMsgPublic">❌ Invalid Certificate Number. Please try again.</p>
+
+            <!-- Print Button -->
+            <div class="cert-wrapper" id="certWrapper">
+                <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Print / Download Certificate</button>
+                
+                <!-- CERTIFICATE DESIGN -->
+                <div class="cert-container" id="certificate">
+                    <div class="cert-inner">
+                        <div style="text-align:center; margin-bottom:20px;">
+                            <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; letter-spacing: 2px; color: #1e293b;">INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
+                        </div>
+                        <div style="text-align:center; margin:20px 0;">
+                            <h1 style="font-family: 'Playfair Display', serif; font-size: 60px; color: var(--dark-green); text-transform:uppercase; margin-bottom:5px;">Certificate</h1>
+                            <h2 style="font-size: 16px; letter-spacing: 8px; color: var(--gold); text-transform:uppercase;">of Achievement</h2>
+                        </div>
+                        <div style="text-align:center; font-style:italic; font-size:18px; color:#475569; margin-bottom:10px;">This certificate is proudly presented to</div>
+                        <div style="text-align:center;">
+                            <div id="displayName" style="font-family: 'Playfair Display', serif; font-size: 45px; color: var(--dark-green); border-bottom: 2px solid #cbd5e1; display: inline-block; padding: 0 40px 10px 40px; margin-bottom: 20px; font-weight:700;">[Student Name]</div>
+                        </div>
+                        <div style="text-align:center; font-size:18px; color:#475569; margin-bottom:15px;">for successfully completing the professional training program in</div>
+                        <div id="displayCourse" style="text-align:center; font-family: 'Playfair Display', serif; font-size:28px; font-weight:700; color:#1e293b; margin-bottom:30px; text-transform:uppercase;">[Course Name]</div>
+                        <div style="display:flex; justify-content:center; gap:50px; font-size:16px; margin-bottom:40px; font-weight:600; color:#475569;">
+                            <div>Start: <span id="displayStartDate">[DD/MM/YYYY]</span></div>
+                            <div>Completion: <span id="displayEndDate">[DD/MM/YYYY]</span></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:40px;">
+                            <div style="text-align:center; width:200px;">
+                                <div style="font-family: 'Great Vibes', cursive; font-size: 36px; color:#1e3a8a; margin-bottom:5px; transform:rotate(-5deg);">Bilal Ahmed</div>
+                                <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
+                                <h4 style="font-size:18px; margin:0;">Bilal Ahmed</h4>
+                                <p style="font-size:13px; color:#64748b; margin:0;">Course Instructor</p>
+                            </div>
+                            <div style="text-align:center; margin-bottom:20px;">
+                                <div id="qrcode" style="background:white; padding:10px; display:inline-block;"></div>
+                                <p style="font-size:12px; color:#64748b; margin-top:5px; font-weight:600;">Scan to Verify</p>
+                            </div>
+                            <div style="text-align:center; width:200px;">
+                                <div style="font-family: 'Great Vibes', cursive; font-size: 28px; color:#1e3a8a; margin-bottom:5px;">Director IOCH</div>
+                                <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
+                                <h4 style="font-size:18px; margin:0;">Director</h4>
+                                <p style="font-size:13px; color:#64748b; margin:0;">Director, IOCH</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </div>
 
@@ -144,7 +240,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- DASHBOARD (Super Admin Only) -->
     <div id="dashboard-page">
         <div class="dash-layout">
             <aside class="sidebar">
@@ -155,9 +251,6 @@
                     <a class="menu-item" onclick="showPage('whatsapp')">💬 WhatsApp Inbox</a>
                     <a class="menu-item" onclick="showPage('users')">👨‍💼 Manage Users</a>
                     <a class="menu-item" onclick="showPage('branches')">🏢 Manage Branches</a>
-                    <!-- Verify Certificate Option in Sidebar -->
-                    <a class="menu-item" onclick="showPage('verify-cert')">📜 Verify Certificate</a>
-                    
                     <a class="menu-item logout-btn" onclick="logout()">🚪 Logout</a>
                 </div>
             </aside>
@@ -258,62 +351,6 @@
                         </div>
                     </div>
 
-                    <!-- CERTIFICATE VERIFICATION PAGE (Now Inside Dashboard) -->
-                    <div id="verify-cert" class="page">
-                        <div class="card" style="padding: 40px; text-align: center;">
-                            <h2 style="margin-bottom: 20px;">Verify Student Certificate</h2>
-                            <div style="display: flex; gap: 10px; max-width: 500px; margin: 0 auto;">
-                                <input type="text" id="certNumber" placeholder="Enter Certificate ID..." style="flex:1; padding:15px; border:1px solid #ccc; border-radius:8px;">
-                                <button class="btn" onclick="verifyCertificate()" style="padding: 15px 30px;">Verify</button>
-                            </div>
-                            <p id="errorMsg" style="color:var(--danger); margin-top: 15px; display:none;">❌ Invalid Certificate Number.</p>
-                        </div>
-                        
-                        <!-- Print Button -->
-                        <button class="btn btn-success" id="printBtn" onclick="window.print()" style="display:none; margin-bottom:20px; width:100%;">🖨️ Print / Download Certificate</button>
-
-                        <!-- CERTIFICATE DESIGN -->
-                        <div class="cert-container" id="certificate" style="display:none; width:100%; max-width:1000px; margin:0 auto; background:#fdfbf7; padding:20px; border:15px solid var(--dark-green); box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-                            <div style="border: 2px solid var(--gold); padding: 40px;">
-                                <div style="text-align:center; margin-bottom:20px;">
-                                    <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; letter-spacing: 2px; color: #1e293b;">INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
-                                </div>
-                                <div style="text-align:center; margin:20px 0;">
-                                    <h1 style="font-family: 'Playfair Display', serif; font-size: 60px; color: var(--dark-green); text-transform:uppercase; margin-bottom:5px;">Certificate</h1>
-                                    <h2 style="font-size: 16px; letter-spacing: 8px; color: var(--gold); text-transform:uppercase;">of Achievement</h2>
-                                </div>
-                                <div style="text-align:center; font-style:italic; font-size:18px; color:#475569; margin-bottom:10px;">This certificate is proudly presented to</div>
-                                <div style="text-align:center;">
-                                    <div id="displayName" style="font-family: 'Playfair Display', serif; font-size: 45px; color: var(--dark-green); border-bottom: 2px solid #cbd5e1; display: inline-block; padding: 0 40px 10px 40px; margin-bottom: 20px; font-weight:700;">[Student Name]</div>
-                                </div>
-                                <div style="text-align:center; font-size:18px; color:#475569; margin-bottom:15px;">for successfully completing the professional training program in</div>
-                                <div id="displayCourse" style="text-align:center; font-family: 'Playfair Display', serif; font-size:28px; font-weight:700; color:#1e293b; margin-bottom:30px; text-transform:uppercase;">[Course Name]</div>
-                                <div style="display:flex; justify-content:center; gap:50px; font-size:16px; margin-bottom:40px; font-weight:600; color:#475569;">
-                                    <div>Start: <span id="displayStartDate">[DD/MM/YYYY]</span></div>
-                                    <div>Completion: <span id="displayEndDate">[DD/MM/YYYY]</span></div>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:40px;">
-                                    <div style="text-align:center; width:200px;">
-                                        <div style="font-family: 'Great Vibes', cursive; font-size: 36px; color:#1e3a8a; margin-bottom:5px; transform:rotate(-5deg);">Bilal Ahmed</div>
-                                        <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
-                                        <h4 style="font-size:18px; margin:0;">Bilal Ahmed</h4>
-                                        <p style="font-size:13px; color:#64748b; margin:0;">Course Instructor</p>
-                                    </div>
-                                    <div style="text-align:center; margin-bottom:20px;">
-                                        <div id="qrcode" style="background:white; padding:10px; display:inline-block;"></div>
-                                        <p style="font-size:12px; color:#64748b; margin-top:5px; font-weight:600;">Scan to Verify</p>
-                                    </div>
-                                    <div style="text-align:center; width:200px;">
-                                        <div style="font-family: 'Great Vibes', cursive; font-size: 28px; color:#1e3a8a; margin-bottom:5px;">Director IOCH</div>
-                                        <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
-                                        <h4 style="font-size:18px; margin:0;">Director</h4>
-                                        <p style="font-size:13px; color:#64748b; margin:0;">Director, IOCH</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </main>
         </div>
@@ -321,7 +358,65 @@
 
     <!-- ================= SCRIPTS ================= -->
     <script>
-        // --- DASHBOARD DATA ---
+        // --- PUBLIC CERTIFICATE VERIFICATION LOGIC ---
+        const certificatesDB = {
+            "IOCH-2024-1234": { name: "UMER RIAZ", course: "FIRST AIDER", startDate: "01/10/2024", endDate: "15/11/2024" },
+            "IOCH-2024-5678": { name: "ALI KHAN", course: "NEBOSH IGC", startDate: "05/08/2024", endDate: "10/10/2024" }
+        };
+
+        let qrCodeObj = null;
+
+        function verifyCertificatePublic() {
+            const input = document.getElementById('certNumberPublic').value.trim().toUpperCase();
+            const errorMsg = document.getElementById('errorMsgPublic');
+            const certWrapper = document.getElementById('certWrapper');
+            const printBtn = document.getElementById('printBtn');
+
+            if(certificatesDB[input]) {
+                const data = certificatesDB[input];
+                errorMsg.style.display = 'none';
+                
+                document.getElementById('displayName').innerText = data.name;
+                document.getElementById('displayCourse').innerText = data.course;
+                document.getElementById('displayStartDate').innerText = data.startDate;
+                document.getElementById('displayEndDate').innerText = data.endDate;
+
+                certWrapper.style.display = 'block';
+                printBtn.style.display = 'inline-block';
+
+                document.getElementById('qrcode').innerHTML = "";
+                const verifyUrl = `https://iffi.cc.cd/?verify=${input}`;
+                
+                qrCodeObj = new QRCode(document.getElementById("qrcode"), {
+                    text: verifyUrl,
+                    width: 80, height: 80,
+                    colorDark : "#064e3b", colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+
+                // Scroll to certificate
+                certWrapper.scrollIntoView({ behavior: 'smooth' });
+
+            } else {
+                errorMsg.style.display = 'block';
+                certWrapper.style.display = 'none';
+                printBtn.style.display = 'none';
+            }
+        }
+
+        // Auto-verify if QR Code is scanned (URL has ?verify=ID)
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const verifyId = urlParams.get('verify');
+            if(verifyId) {
+                document.getElementById('certNumberPublic').value = verifyId;
+                verifyCertificatePublic();
+            }
+            renderAll();
+        });
+
+
+        // --- DASHBOARD LOGIC (Super Admin) ---
         let branches = JSON.parse(localStorage.getItem('ioch_branches')) || [];
         let users = JSON.parse(localStorage.getItem('ioch_users')) || [];
         let chats = JSON.parse(localStorage.getItem('ioch_chats')) || [];
@@ -351,7 +446,7 @@
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
             event.target.classList.add('active');
-            const titles = { 'dashboard': 'Dashboard Overview', 'leads': 'Leads Management', 'whatsapp': 'WhatsApp Inbox', 'users': 'Manage Users', 'branches': 'Manage Branches', 'verify-cert': 'Certificate Verification' };
+            const titles = { 'dashboard': 'Dashboard Overview', 'leads': 'Leads Management', 'whatsapp': 'WhatsApp Inbox', 'users': 'Manage Users', 'branches': 'Manage Branches' };
             document.getElementById('page-title').innerText = titles[pageId];
         }
 
@@ -542,50 +637,6 @@
                 chats = chats.filter(c => !(c.number === activeChat.number && c.branchName === activeChat.branchName));
                 localStorage.setItem('ioch_chats', JSON.stringify(chats));
                 document.getElementById('chat-box').innerHTML = '<div class="empty-state"><p>Chat cleared.</p></div>';
-            }
-        }
-
-        // --- CERTIFICATE VERIFICATION (Inside Dashboard) ---
-        const certificatesDB = {
-            "IOCH-2024-1234": { name: "UMER RIAZ", course: "FIRST AIDER", startDate: "01/10/2024", endDate: "15/11/2024" },
-            "IOCH-2024-5678": { name: "ALI KHAN", course: "NEBOSH IGC", startDate: "05/08/2024", endDate: "10/10/2024" }
-        };
-
-        let qrCodeObj = null;
-
-        function verifyCertificate() {
-            const input = document.getElementById('certNumber').value.trim().toUpperCase();
-            const errorMsg = document.getElementById('errorMsg');
-            const certContainer = document.getElementById('certificate');
-            const printBtn = document.getElementById('printBtn');
-
-            if(certificatesDB[input]) {
-                const data = certificatesDB[input];
-                errorMsg.style.display = 'none';
-                
-                document.getElementById('displayName').innerText = data.name;
-                document.getElementById('displayCourse').innerText = data.course;
-                document.getElementById('displayStartDate').innerText = data.startDate;
-                document.getElementById('displayEndDate').innerText = data.endDate;
-
-                certContainer.style.display = 'block';
-                printBtn.style.display = 'inline-block';
-
-                document.getElementById('qrcode').innerHTML = "";
-                // QR Code links to the main website with verify parameter
-                const verifyUrl = `https://iffi.cc.cd/?verify=${input}`;
-                
-                qrCodeObj = new QRCode(document.getElementById("qrcode"), {
-                    text: verifyUrl,
-                    width: 80, height: 80,
-                    colorDark : "#064e3b", colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-
-            } else {
-                errorMsg.style.display = 'block';
-                certContainer.style.display = 'none';
-                printBtn.style.display = 'none';
             }
         }
 
