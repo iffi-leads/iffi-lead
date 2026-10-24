@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOCH CRM - Super Admin Portal</title>
+    <title>IOCH - Super Admin Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -19,16 +19,37 @@
         .logo { font-size: 24px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
         .logo span { color: var(--primary); }
         .nav-links { display: flex; gap: 30px; align-items: center; }
-        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; cursor: pointer; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: 0.2s;}
+        .nav-links a:hover { color: var(--primary); }
         .btn-login-nav { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white !important; padding: 10px 25px; border-radius: 50px; }
+        
         .hero { min-height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 0 8%; background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%); padding-top: 80px; }
         .hero-text { max-width: 500px; }
         .hero-text h1 { font-size: 48px; font-weight: 700; color: var(--text-main); line-height: 1.2; margin-bottom: 20px; }
         .hero-text h1 span { color: var(--primary); }
         .hero-text p { font-size: 16px; color: var(--text-muted); margin-bottom: 30px; }
-        .btn-main { background: var(--text-main); color: white; padding: 15px 35px; border-radius: 50px; font-weight: 600; border: none; cursor: pointer; }
+        .btn-main { background: var(--text-main); color: white; padding: 15px 35px; border-radius: 50px; font-weight: 600; border: none; cursor: pointer; transition: 0.3s;}
+        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .illustration { width: 400px; height: 400px; background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; animation: morph 8s ease-in-out infinite; display: flex; justify-content: center; align-items: center; color: white; font-size: 80px; }
         @keyframes morph { 0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; } 50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; } 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; } }
+
+        /* ================= CERTIFICATE SECTION (NEW) ================= */
+        .cert-section { padding: 80px 8%; background: white; text-align: center; }
+        .cert-section h2 { font-size: 36px; font-weight: 700; color: var(--text-main); margin-bottom: 10px; }
+        .cert-section p { color: var(--text-muted); margin-bottom: 40px; }
+        
+        .cert-box { max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 40px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .cert-input-group { display: flex; gap: 10px; }
+        .cert-input-group input { flex: 1; padding: 15px 20px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; outline: none; transition: 0.3s; }
+        .cert-input-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .cert-input-group button { background: var(--primary); color: white; border: none; padding: 0 30px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .cert-input-group button:hover { background: var(--primary-dark); }
+
+        .cert-result { margin-top: 30px; display: none; padding: 20px; border-radius: 10px; text-align: left; }
+        .cert-result.success { display: block; background: #d1fae5; border: 1px solid #10b981; color: #065f46; }
+        .cert-result.error { display: block; background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; }
+        .cert-result h3 { margin-bottom: 10px; font-size: 18px; }
+        .cert-result p { margin-bottom: 5px; font-size: 14px; }
 
         /* ================= LOGIN MODAL ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -102,13 +123,14 @@
     <!-- LANDING PAGE -->
     <div id="landing-page">
         <nav>
-            <div class="logo">🚀 IOCH<span>CRM</span></div>
+            <div class="logo">🚀 IOCH</div>
             <div class="nav-links">
                 <a>Home</a>
-                <a>Features</a>
+                <a href="#verify">Verify Certificate</a>
                 <a class="btn-login-nav" onclick="openLogin()">Login</a>
             </div>
         </nav>
+        
         <section class="hero">
             <div class="hero-text">
                 <h1>Manage <span>Leads</span> & WhatsApps Easily.</h1>
@@ -116,6 +138,26 @@
                 <button class="btn-main" onclick="openLogin()">Super Admin Login</button>
             </div>
             <div class="illustration">💬</div>
+        </section>
+
+        <!-- CERTIFICATE VERIFICATION SECTION -->
+        <section class="cert-section" id="verify">
+            <h2>Verify Your Certificate</h2>
+            <p>Enter your Certificate Number or Roll Number to verify its authenticity.</p>
+            
+            <div class="cert-box">
+                <div class="cert-input-group">
+                    <input type="text" id="certNumber" placeholder="e.g. IOCH-2024-1234">
+                    <button onclick="verifyCertificate()">Verify</button>
+                </div>
+                
+                <div id="certResult" class="cert-result">
+                    <h3 id="certResultTitle">Certificate Verified!</h3>
+                    <p><strong>Student Name:</strong> <span id="certName"></span></p>
+                    <p><strong>Course:</strong> <span id="certCourse"></span></p>
+                    <p><strong>Status:</strong> Valid & Authentic ✅</p>
+                </div>
+            </div>
         </section>
     </div>
 
@@ -141,9 +183,8 @@
     <!-- DASHBOARD -->
     <div id="dashboard-page">
         <div class="dash-layout">
-            <!-- Sidebar -->
             <aside class="sidebar">
-                <div class="sidebar-header">🚀 IOCH CRM</div>
+                <div class="sidebar-header">🚀 IOCH</div>
                 <div class="sidebar-menu">
                     <a class="menu-item active" onclick="showPage('dashboard')">📊 Dashboard</a>
                     <a class="menu-item" onclick="showPage('leads')">👥 Leads Management</a>
@@ -154,7 +195,6 @@
                 </div>
             </aside>
 
-            <!-- Main Content -->
             <main class="main-content">
                 <header class="topbar">
                     <h1 id="page-title">Dashboard Overview</h1>
@@ -166,7 +206,6 @@
 
                 <div class="content-area">
                     
-                    <!-- 1. DASHBOARD PAGE -->
                     <div id="dashboard" class="page active">
                         <div class="stats-grid">
                             <div class="stat-card" style="border-top:4px solid #3b82f6;"><h3>Total Leads</h3><div class="value" id="total-leads">0</div></div>
@@ -175,7 +214,6 @@
                         </div>
                     </div>
 
-                    <!-- 2. LEADS PAGE -->
                     <div id="leads" class="page">
                         <div class="card">
                             <div class="card-header"><h2>All Leads (Static Demo)</h2></div>
@@ -189,12 +227,9 @@
                         </div>
                     </div>
 
-                    <!-- 3. WHATSAPP INBOX -->
                     <div id="whatsapp" class="page">
                         <div class="chat-container">
-                            <div class="chat-sidebar" id="chat-sidebar">
-                                <!-- Branches and Numbers will be loaded here by JS -->
-                            </div>
+                            <div class="chat-sidebar" id="chat-sidebar"></div>
                             <div class="chat-area">
                                 <div class="chat-header">
                                     <div>
@@ -217,7 +252,6 @@
                         </div>
                     </div>
 
-                    <!-- 4. MANAGE USERS PAGE -->
                     <div id="users" class="page">
                         <div class="card">
                             <div class="card-header"><h2>Manage Users</h2></div>
@@ -238,7 +272,6 @@
                         </div>
                     </div>
 
-                    <!-- 5. MANAGE BRANCHES PAGE -->
                     <div id="branches" class="page">
                         <div class="card">
                             <div class="card-header"><h2>Manage Branches</h2></div>
@@ -263,14 +296,42 @@
         </div>
     </div>
 
-    <!-- ================= SCRIPTS ================= -->
     <script>
-        // LocalStorage Data Initialize
+        // --- CERTIFICATE VERIFICATION LOGIC ---
+        function verifyCertificate() {
+            const input = document.getElementById('certNumber').value.trim().toUpperCase();
+            const resultBox = document.getElementById('certResult');
+            const title = document.getElementById('certResultTitle');
+            
+            const dummyDatabase = {
+                "IOCH-2024-1234": { name: "Ali Khan", course: "NEBOSH IGC" },
+                "IOCH-2024-5678": { name: "Sara Ahmed", course: "IOSH Managing Safely" },
+                "IOCH-2023-9999": { name: "Usman Tariq", course: "OSHA 30 Hours" }
+            };
+
+            if(input === "") {
+                alert("Please enter a certificate number.");
+                return;
+            }
+
+            if(dummyDatabase[input]) {
+                resultBox.className = 'cert-result success';
+                title.innerText = "✅ Certificate Verified!";
+                document.getElementById('certName').innerText = dummyDatabase[input].name;
+                document.getElementById('certCourse').innerText = dummyDatabase[input].course;
+            } else {
+                resultBox.className = 'cert-result error';
+                title.innerText = "❌ Invalid Certificate!";
+                document.getElementById('certName').innerText = "N/A";
+                document.getElementById('certCourse').innerText = "N/A";
+            }
+        }
+
+        // --- DASHBOARD LOGIC ---
         let branches = JSON.parse(localStorage.getItem('ioch_branches')) || [];
         let users = JSON.parse(localStorage.getItem('ioch_users')) || [];
         let chats = JSON.parse(localStorage.getItem('ioch_chats')) || [];
 
-        // Login
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
         function handleLogin(e) {
@@ -291,7 +352,6 @@
             }
         }
 
-        // Navigation
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
@@ -301,7 +361,6 @@
             document.getElementById('page-title').innerText = titles[pageId];
         }
 
-        // RENDER FUNCTIONS
         function renderAll() {
             renderBranches();
             renderUsers();
@@ -314,7 +373,6 @@
             document.getElementById('total-branches').innerText = branches.length;
         }
 
-        // --- BRANCHES ---
         function addBranch() {
             const name = document.getElementById('b_name').value;
             const number = document.getElementById('b_number').value;
@@ -356,7 +414,6 @@
             }
         }
 
-        // --- USERS ---
         function addUser() {
             const name = document.getElementById('u_name').value;
             const role = document.getElementById('u_role').value;
@@ -393,7 +450,6 @@
             }
         }
 
-        // --- WHATSAPP INBOX ---
         let activeChat = null;
 
         function renderInbox() {
@@ -407,7 +463,6 @@
 
             branches.forEach(b => {
                 sidebar.innerHTML += `<div class="branch-title">📍 ${b.name} Branch</div>`;
-                // Find chats for this branch number (mocking a chat list)
                 sidebar.innerHTML += `
                     <div class="number-item" onclick="loadChat(this, '${b.name}', '${b.number}')">
                         <div>
@@ -435,12 +490,10 @@
             document.getElementById('chat-title').innerText = element.querySelector('h4').innerText;
             document.getElementById('chat-number').innerText = number + ' | ' + branchName;
             
-            // Enable inputs
             document.getElementById('chat-input').disabled = false;
             document.getElementById('send-btn').disabled = false;
             document.getElementById('toggle-btn').disabled = false;
 
-            // Load messages from LocalStorage
             const savedMessages = chats.filter(c => c.number === number && c.branchName === branchName);
             const chatBox = document.getElementById('chat-box');
             
@@ -498,7 +551,6 @@
             }
         }
 
-        // Load data on start
         renderAll();
     </script>
 </body>
