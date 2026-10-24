@@ -50,19 +50,14 @@
 
         .error-msg { color: var(--danger); margin-top: 15px; display: none; font-size: 14px; font-weight: 600; }
 
-        /* Certificate Design Container */
+        /* Certificate Design Container (Shared) */
         .cert-wrapper { display: none; margin-top: 40px; text-align: center; overflow-x: auto; padding-bottom: 20px;}
         .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; }
         
         .cert-container { 
-            width: 1000px; 
-            background: #fdfbf7; 
-            padding: 20px; 
-            position: relative;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            border: 15px solid var(--dark-green);
-            margin: 0 auto;
-            text-align: left;
+            width: 1000px; background: #fdfbf7; padding: 20px; position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 15px solid var(--dark-green);
+            margin: 0 auto; text-align: left;
         }
         .cert-inner { border: 2px solid var(--gold); padding: 40px; background: #fdfbf7; }
 
@@ -251,6 +246,9 @@
                     <a class="menu-item" onclick="showPage('whatsapp')">💬 WhatsApp Inbox</a>
                     <a class="menu-item" onclick="showPage('users')">👨‍💼 Manage Users</a>
                     <a class="menu-item" onclick="showPage('branches')">🏢 Manage Branches</a>
+                    <!-- NAYA TAB: Certificate Banane ke liye -->
+                    <a class="menu-item" onclick="showPage('generate-cert')">📜 Generate Certificate</a>
+                    
                     <a class="menu-item logout-btn" onclick="logout()">🚪 Logout</a>
                 </div>
             </aside>
@@ -351,6 +349,94 @@
                         </div>
                     </div>
 
+                    <!-- NAYA PAGE: GENERATE CERTIFICATE (Dashboard ke andar) -->
+                    <div id="generate-cert" class="page">
+                        <div class="card" style="padding: 30px;">
+                            <h2 style="margin-bottom: 20px;">Generate New Certificate</h2>
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group">
+                                    <label>Student Name</label>
+                                    <input type="text" id="genName" placeholder="e.g. Umer Riaz">
+                                </div>
+                                <div class="form-group">
+                                    <label>Date of Birth</label>
+                                    <input type="date" id="genDob">
+                                </div>
+                                <div class="form-group">
+                                    <label>National ID (CNIC)</label>
+                                    <input type="text" id="genCnic" placeholder="12345-6789012-3">
+                                </div>
+                                <div class="form-group">
+                                    <label>Course Name</label>
+                                    <input type="text" id="genCourse" placeholder="e.g. FIRST AIDER">
+                                </div>
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="date" id="genStartDate">
+                                </div>
+                                <div class="form-group">
+                                    <label>Completion Date</label>
+                                    <input type="date" id="genEndDate">
+                                </div>
+                                <div class="form-group">
+                                    <label>Payment Receipt No.</label>
+                                    <input type="text" id="genReceipt" placeholder="e.g. REC-2024-001">
+                                </div>
+                                <div style="display:flex; align-items:flex-end;">
+                                    <button class="btn btn-success" onclick="generateCertificate()" style="width:100%; padding:12px;">Generate & Preview Certificate</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Print Button -->
+                        <button class="print-btn" id="printBtnGen" onclick="window.print()" style="display:none;">🖨️ Print / Download Certificate</button>
+
+                        <!-- CERTIFICATE DESIGN (FOR GENERATION) -->
+                        <div class="cert-wrapper" id="certWrapperGen">
+                            <div class="cert-container" id="certificateGen">
+                                <div class="cert-inner">
+                                    <div style="text-align:center; margin-bottom:20px;">
+                                        <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; letter-spacing: 2px; color: #1e293b;">INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
+                                    </div>
+                                    <div style="text-align:center; margin:20px 0;">
+                                        <h1 style="font-family: 'Playfair Display', serif; font-size: 60px; color: var(--dark-green); text-transform:uppercase; margin-bottom:5px;">Certificate</h1>
+                                        <h2 style="font-size: 16px; letter-spacing: 8px; color: var(--gold); text-transform:uppercase;">of Achievement</h2>
+                                    </div>
+                                    <div style="text-align:center; font-style:italic; font-size:18px; color:#475569; margin-bottom:10px;">This certificate is proudly presented to</div>
+                                    <div style="text-align:center;">
+                                        <div id="displayNameGen" style="font-family: 'Playfair Display', serif; font-size: 45px; color: var(--dark-green); border-bottom: 2px solid #cbd5e1; display: inline-block; padding: 0 40px 10px 40px; margin-bottom: 20px; font-weight:700;">[Student Name]</div>
+                                    </div>
+                                    <div style="text-align:center; font-size:18px; color:#475569; margin-bottom:15px;">for successfully completing the professional training program in</div>
+                                    <div id="displayCourseGen" style="text-align:center; font-family: 'Playfair Display', serif; font-size:28px; font-weight:700; color:#1e293b; margin-bottom:30px; text-transform:uppercase;">[Course Name]</div>
+                                    
+                                    <div style="display:flex; justify-content:center; gap:50px; font-size:16px; margin-bottom:40px; font-weight:600; color:#475569;">
+                                        <div>Start: <span id="displayStartDateGen">[DD/MM/YYYY]</span></div>
+                                        <div>Completion: <span id="displayEndDateGen">[DD/MM/YYYY]</span></div>
+                                    </div>
+
+                                    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:40px;">
+                                        <div style="text-align:center; width:200px;">
+                                            <div style="font-family: 'Great Vibes', cursive; font-size: 36px; color:#1e3a8a; margin-bottom:5px; transform:rotate(-5deg);">Bilal Ahmed</div>
+                                            <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
+                                            <h4 style="font-size:18px; margin:0;">Bilal Ahmed</h4>
+                                            <p style="font-size:13px; color:#64748b; margin:0;">Course Instructor</p>
+                                        </div>
+                                        <div style="text-align:center; margin-bottom:20px;">
+                                            <div id="qrcodeGen" style="background:white; padding:10px; display:inline-block;"></div>
+                                            <p style="font-size:12px; color:#64748b; margin-top:5px; font-weight:600;">Scan to Verify</p>
+                                        </div>
+                                        <div style="text-align:center; width:200px;">
+                                            <div style="font-family: 'Great Vibes', cursive; font-size: 28px; color:#1e3a8a; margin-bottom:5px;">Director IOCH</div>
+                                            <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
+                                            <h4 style="font-size:18px; margin:0;">Director</h4>
+                                            <p style="font-size:13px; color:#64748b; margin:0;">Director, IOCH</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </main>
         </div>
@@ -364,7 +450,7 @@
             "IOCH-2024-5678": { name: "ALI KHAN", course: "NEBOSH IGC", startDate: "05/08/2024", endDate: "10/10/2024" }
         };
 
-        let qrCodeObj = null;
+        let qrCodeObjPublic = null;
 
         function verifyCertificatePublic() {
             const input = document.getElementById('certNumberPublic').value.trim().toUpperCase();
@@ -387,14 +473,11 @@
                 document.getElementById('qrcode').innerHTML = "";
                 const verifyUrl = `https://iffi.cc.cd/?verify=${input}`;
                 
-                qrCodeObj = new QRCode(document.getElementById("qrcode"), {
-                    text: verifyUrl,
-                    width: 80, height: 80,
-                    colorDark : "#064e3b", colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
+                qrCodeObjPublic = new QRCode(document.getElementById("qrcode"), {
+                    text: verifyUrl, width: 80, height: 80,
+                    colorDark : "#064e3b", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
                 });
 
-                // Scroll to certificate
                 certWrapper.scrollIntoView({ behavior: 'smooth' });
 
             } else {
@@ -404,7 +487,7 @@
             }
         }
 
-        // Auto-verify if QR Code is scanned (URL has ?verify=ID)
+        // Auto-verify if QR Code is scanned
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const verifyId = urlParams.get('verify');
@@ -446,10 +529,63 @@
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
             event.target.classList.add('active');
-            const titles = { 'dashboard': 'Dashboard Overview', 'leads': 'Leads Management', 'whatsapp': 'WhatsApp Inbox', 'users': 'Manage Users', 'branches': 'Manage Branches' };
+            const titles = { 
+                'dashboard': 'Dashboard Overview', 'leads': 'Leads Management', 
+                'whatsapp': 'WhatsApp Inbox', 'users': 'Manage Users', 
+                'branches': 'Manage Branches', 'generate-cert': 'Generate Certificate' 
+            };
             document.getElementById('page-title').innerText = titles[pageId];
         }
 
+        // --- GENERATE CERTIFICATE LOGIC ---
+        let qrCodeObjGen = null;
+
+        function generateCertificate() {
+            const name = document.getElementById('genName').value.trim();
+            const dob = document.getElementById('genDob').value;
+            const cnic = document.getElementById('genCnic').value.trim();
+            const course = document.getElementById('genCourse').value.trim();
+            const startDate = document.getElementById('genStartDate').value;
+            const endDate = document.getElementById('genEndDate').value;
+            const receipt = document.getElementById('genReceipt').value.trim();
+
+            if(!name || !course || !startDate || !endDate) {
+                alert("Please fill Student Name, Course, and Dates.");
+                return;
+            }
+
+            // Format Dates for display
+            const formatDate = (dateStr) => {
+                if(!dateStr) return "[DD/MM/YYYY]";
+                const [y, m, d] = dateStr.split('-');
+                return `${d}/${m}/${y}`;
+            };
+
+            // Populate Certificate
+            document.getElementById('displayNameGen').innerText = name.toUpperCase();
+            document.getElementById('displayCourseGen').innerText = course.toUpperCase();
+            document.getElementById('displayStartDateGen').innerText = formatDate(startDate);
+            document.getElementById('displayEndDateGen').innerText = formatDate(endDate);
+
+            // Show Preview
+            document.getElementById('certWrapperGen').style.display = 'block';
+            document.getElementById('printBtnGen').style.display = 'inline-block';
+
+            // Generate QR Code (Unique Certificate ID based on Name + Receipt)
+            const certId = `IOCH-${new Date().getFullYear()}-${receipt || Math.floor(Math.random()*10000)}`;
+            document.getElementById('qrcodeGen').innerHTML = "";
+            const verifyUrl = `https://iffi.cc.cd/?verify=${certId}`;
+            
+            qrCodeObjGen = new QRCode(document.getElementById("qrcodeGen"), {
+                text: verifyUrl, width: 80, height: 80,
+                colorDark : "#064e3b", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+            });
+
+            // Scroll to certificate
+            document.getElementById('certWrapperGen').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- BAAQI KA DASHBOARD CODE (Same as before) ---
         function renderAll() {
             renderBranches();
             renderUsers();
