@@ -3,115 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOCH CRM - Premium Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>IOCH CRM - Premium Enterprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1; /* Soft Indigo */
-            --primary-hover: #4f46e5;
-            --bg-body: #f1f5f9;
-            --sidebar-bg: #0f172a;
-            --white: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --bg-dark: #09090b;
+            --bg-card: #18181b;
+            --primary: #f59e0b; /* Golden/Amber */
+            --primary-hover: #d97706;
+            --text-main: #f8fafc;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
             --success: #10b981;
             --danger: #ef4444;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg-body); height: 100vh; overflow: hidden; color: var(--text-main); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; overflow: hidden; }
 
-        /* --- LOGIN MODAL --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .login-box { background: var(--white); padding: 40px; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); text-align: center; animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .login-box h2 { font-size: 24px; margin-bottom: 5px; color: var(--text-main); font-weight: 700; }
-        .login-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
+        /* --- PREMIUM LOGIN MODAL --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { 
+            background: linear-gradient(145deg, #18181b, #09090b); 
+            padding: 50px 40px; 
+            border-radius: 24px; 
+            width: 100%; 
+            max-width: 420px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.05); 
+            text-align: center; 
+            position: relative;
+            overflow: hidden;
+        }
+        .login-box::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 60%);
+            z-index: 0; pointer-events: none;
+        }
+        .login-content { position: relative; z-index: 1; }
         
-        .form-group { margin-bottom: 15px; text-align: left; }
-        .form-group label { display: block; font-size: 13px; margin-bottom: 8px; font-weight: 500; color: var(--text-main); }
-        .form-group input, .form-group select { width: 100%; padding: 14px 15px; border: 1px solid var(--border); border-radius: 12px; outline: none; background: #f8fafc; transition: 0.3s; font-size: 14px;}
-        .form-group input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        .login-box h2 { font-size: 32px; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+        .login-box h2 span { color: var(--primary); }
+        .login-box p { color: var(--text-muted); font-size: 15px; margin-bottom: 35px; }
         
-        .btn-submit { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; padding: 14px; border-radius: 12px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 10px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transition: 0.3s;}
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-size: 13px; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
+        .form-group input { 
+            width: 100%; padding: 16px; 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            color: white; 
+            font-size: 15px; 
+            transition: 0.3s; 
+            outline: none;
+        }
+        .form-group input:focus { border-color: var(--primary); background: rgba(255,255,255,0.05); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15); }
+        
+        .btn-submit { 
+            width: 100%; 
+            background: linear-gradient(to right, var(--primary), #fbbf24); 
+            color: #000; 
+            padding: 16px; 
+            border-radius: 12px; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 800; 
+            margin-top: 10px; 
+            transition: 0.3s;
+            box-shadow: 0 10px 20px -10px rgba(245, 158, 11, 0.5);
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -10px rgba(245, 158, 11, 0.6); }
 
         /* --- DASHBOARD LAYOUT --- */
         #dashboard-page { display: none; height: 100vh; }
         .dash-layout { display: flex; height: 100%; }
         
         /* Sidebar */
-        .sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink:0; color: #94a3b8; }
-        .sidebar-header { padding: 24px; font-size: 22px; color: white; font-weight: 700; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1e293b; }
+        .sidebar { width: 280px; background: var(--bg-card); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink:0; }
+        .sidebar-header { padding: 30px; font-size: 22px; color: white; font-weight: 800; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;}
         .sidebar-header span { color: var(--primary); }
-        .menu-item { padding: 16px 24px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 500; transition: 0.2s; border-left: 4px solid transparent; }
-        .menu-item:hover, .menu-item.active { background: #1e293b; color: white; border-left-color: var(--primary); }
+        .menu-item { padding: 16px 30px; cursor: pointer; display: flex; align-items: center; gap: 15px; font-size: 15px; font-weight: 600; color: var(--text-muted); transition: 0.2s; border-left: 3px solid transparent; }
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.03); color: white; border-left-color: var(--primary); }
         
         /* Main Content */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: #f8fafc; }
-        .topbar { background: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
-        .topbar h1 { font-size: 20px; font-weight: 600; color: var(--text-main); }
-        .user-profile { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
-        .avatar { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), #8b5cf6); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);}
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
+        .topbar { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(10px); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+        .topbar h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px;}
+        .user-profile { display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 600; }
+        .avatar { width: 45px; height: 45px; background: linear-gradient(135deg, var(--primary), #d97706); color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);}
         
-        .content-area { padding: 30px; height: calc(100vh - 70px); overflow-y: auto; }
-        .page { display: none; animation: fadeIn 0.3s ease; }
+        .content-area { padding: 40px; height: calc(100vh - 85px); overflow-y: auto; }
+        .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Cards */
-        .card { background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 20px; overflow: hidden; }
-        .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-        .card-header h2 { font-size: 16px; font-weight: 600; color: var(--text-main); }
+        .card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.2); margin-bottom: 25px; overflow: hidden; }
+        .card-header { padding: 25px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
+        .card-header h2 { font-size: 18px; font-weight: 700; color: white; }
         
-        .btn { background: var(--primary); color: white; padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn { background: var(--primary); color: #000; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
         .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
-        .btn-danger { background: #fee2e2; color: var(--danger); }
-        .btn-danger:hover { background: #fecaca; color: #b91c1c; transform: none; }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);}
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); transform: none; }
         
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 24px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; padding: 30px; }
         
         /* Tables */
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 16px 24px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
-        th { background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; }
-        tr:hover td { background: #f8fafc; }
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: #d1fae5; color: #065f46; }
+        th, td { padding: 20px 30px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { background: rgba(255,255,255,0.02); font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; }
+        tr:hover td { background: rgba(255,255,255,0.01); }
+        .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2);}
         
         /* --- WHATSAPP INBOX UI (Premium) --- */
-        .chat-container { display: flex; height: 75vh; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .chat-sidebar { width: 320px; background: white; border-right: 1px solid var(--border); overflow-y: auto; flex-shrink:0; }
+        .chat-container { display: flex; height: 75vh; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--bg-card); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .chat-sidebar { width: 350px; background: var(--bg-card); border-right: 1px solid var(--border); overflow-y: auto; flex-shrink:0; }
         
-        .number-title { background: #f1f5f9; padding: 12px 20px; font-weight: 600; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; margin-right: 8px; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);}
+        .number-title { background: rgba(255,255,255,0.03); padding: 15px 25px; font-weight: 700; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; margin-right: 10px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);}
         
-        .chat-user { padding: 15px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
-        .chat-user:hover, .chat-user.active { background: #eff6ff; border-left: 4px solid var(--primary); }
-        .chat-user h4 { font-size: 15px; margin-bottom: 4px; color: var(--text-main); font-weight: 600; }
+        .chat-user { padding: 20px 25px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+        .chat-user:hover, .chat-user.active { background: rgba(255,255,255,0.05); border-left: 4px solid var(--primary); }
+        .chat-user h4 { font-size: 15px; margin-bottom: 5px; color: white; font-weight: 600; }
         .chat-user p { font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: #efeae2; /* WhatsApp Bg Color */ }
-        .chat-header { padding: 15px 25px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .chat-box { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: #0f0f11; }
+        .chat-header { padding: 20px 30px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .chat-box { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         
-        .msg { padding: 12px 18px; border-radius: 12px; max-width: 65%; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); line-height: 1.5;}
-        .msg.received { background: white; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .msg.sent { background: #d9fdd3; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg { padding: 14px 20px; border-radius: 16px; max-width: 65%; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.6;}
+        .msg.received { background: var(--bg-card); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+        .msg.sent { background: linear-gradient(135deg, var(--primary), #d97706); color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500;}
         
-        .chat-input-area { padding: 15px 25px; background: white; display: flex; gap: 15px; border-top: 1px solid var(--border); align-items: center;}
-        .chat-input-area input { flex: 1; padding: 14px 20px; border: 1px solid var(--border); border-radius: 30px; outline: none; background: #f8fafc; font-size: 14px; transition: 0.3s;}
-        .chat-input-area input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-        .chat-input-area .btn { border-radius: 30px; padding: 14px 25px; }
+        .chat-input-area { padding: 20px 30px; background: var(--bg-card); display: flex; gap: 15px; border-top: 1px solid var(--border); align-items: center;}
+        .chat-input-area input { flex: 1; padding: 16px 25px; border: 1px solid var(--border); border-radius: 30px; outline: none; background: rgba(255,255,255,0.03); font-size: 15px; color: white; transition: 0.3s;}
+        .chat-input-area input:focus { border-color: var(--primary); background: rgba(255,255,255,0.05); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1); }
+        .chat-input-area .btn { border-radius: 30px; padding: 16px 30px; }
         
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); text-align: center; padding: 20px;}
-        .empty-state h3 { font-size: 18px; color: var(--text-main); margin-bottom: 10px; }
+        .empty-state h3 { font-size: 20px; color: white; margin-bottom: 10px; font-weight: 700; }
+        .empty-state p { font-size: 14px; }
         
         /* Dashboard Stats */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .stat-card { background: white; padding: 25px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px;}
-        .stat-card h3 { font-size: 14px; color: var(--text-muted); font-weight: 500;}
-        .stat-card .value { font-size: 32px; font-weight: 700; color: var(--primary); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .stat-card { background: var(--bg-card); padding: 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden;}
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary); }
+        .stat-card h3 { font-size: 14px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+        .stat-card .value { font-size: 42px; font-weight: 800; color: white; }
+        .stat-card p { font-size: 13px; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -119,19 +160,21 @@
     <!-- LOGIN MODAL -->
     <div class="modal-overlay" id="loginModal" style="display: flex;">
         <div class="login-box">
-            <h2>Welcome Back</h2>
-            <p>Login to IOCH CRM Portal</p>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="username" placeholder="superadmin" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="password" placeholder="admin123" required>
-                </div>
-                <button type="submit" class="btn-submit">Login Now</button>
-            </form>
+            <div class="login-content">
+                <h2>IOCH <span>CRM</span></h2>
+                <p>Enter your credentials to access the premium portal.</p>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="username" placeholder="superadmin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -161,17 +204,22 @@
                     
                     <!-- 1. DASHBOARD -->
                     <div id="dashboard" class="page active">
-                        <h2 style="margin-bottom: 25px; font-weight: 600; color: #1e293b;">Welcome Back, Super Admin! 👋</h2>
+                        <h2 style="margin-bottom: 30px; font-weight: 700; color: white; font-size: 24px;">Welcome Back, Super Admin! 👋</h2>
                         <div class="stats-grid">
-                            <div class="stat-card" style="border-top: 4px solid var(--primary);">
+                            <div class="stat-card">
                                 <h3>Connected Numbers</h3>
-                                <div class="value" id="dash-num-count">0</div>
-                                <p style="font-size:12px; color:#64748b;">Active WhatsApp APIs</p>
+                                <div class="value" id="dash-num-count" style="color: var(--primary);">0</div>
+                                <p>Active WhatsApp APIs</p>
                             </div>
-                            <div class="stat-card" style="border-top: 4px solid var(--success);">
+                            <div class="stat-card" style="--primary: #10b981;">
                                 <h3>Total Incoming Chats</h3>
                                 <div class="value" style="color: var(--success);">0</div>
-                                <p style="font-size:12px; color:#64748b;">Messages received today</p>
+                                <p>Messages received today</p>
+                            </div>
+                            <div class="stat-card" style="--primary: #3b82f6;">
+                                <h3>Total Leads</h3>
+                                <div class="value" style="color: #3b82f6;">1,248</div>
+                                <p>Active prospects in system</p>
                             </div>
                         </div>
                     </div>
@@ -195,8 +243,8 @@
                                 <div id="active-chat-ui" style="display:none; flex-direction:column; height:100%;">
                                     <div class="chat-header">
                                         <div>
-                                            <h3 id="chat-title" style="font-size:16px; font-weight:600; color:#1e293b;">Customer Name</h3>
-                                            <p id="chat-number" style="font-size:12px; color:#10b981; font-weight:500;">🟢 Online</p>
+                                            <h3 id="chat-title" style="font-size:18px; font-weight:700; color:white;">Customer Name</h3>
+                                            <p id="chat-number" style="font-size:13px; color:var(--success); font-weight:600; margin-top:2px;">🟢 Online</p>
                                         </div>
                                         <button class="btn btn-danger" onclick="deleteChat()">🗑️ Delete</button>
                                     </div>
@@ -251,7 +299,6 @@
 
     <!-- SCRIPTS -->
     <script>
-        // Data Storage (Temporary in JS)
         let connectedNumbers = []; 
 
         // Auth
@@ -262,6 +309,7 @@
                 document.getElementById('dashboard-page').style.display = 'block';
             } else { alert('❌ Ghalat Username ya Password!'); }
         }
+        
         function logout() {
             document.getElementById('dashboard-page').style.display = 'none';
             document.getElementById('loginModal').style.display = 'flex';
@@ -296,8 +344,8 @@
             const tbody = document.querySelector('#numbersTable tbody');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><b>${number}</b></td>
-                <td>${phoneId}</td>
+                <td><b style="color:white;">${number}</b></td>
+                <td style="color:var(--text-muted);">${phoneId}</td>
                 <td><span class="badge">🟢 Connected</span></td>
                 <td><button class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="removeNumber(this)">Remove</button></td>
             `;
