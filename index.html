@@ -1,353 +1,140 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOCH CRM - Super Admin (WhatsApp API)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #3b82f6; --primary-dark: #2563eb; --bg-body: #f8fafc; --text-main: #0f172a;
-            --text-muted: #64748b; --white: #ffffff; --border: #e2e8f0; --success: #10b981;
-            --warning: #f59e0b; --danger: #ef4444; --sidebar-bg: #0f172a;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: var(--bg-body); height: 100vh; overflow: hidden; }
+// STUDENT REGISTRATION (Updated with Dynamic ID Fields)
+app.get('/student-register', (req, res) => {
+const today = new Date().toISOString().split('T')[0];
+const regContent = `
+<div style="max-width: 800px; margin: 40px auto; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e2e8f0;">
+<div style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%); padding: 30px; color: white; text-align: center;">
+<h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 5px;">Student Registration Form</h2>
+<p style="font-size: 1rem; opacity: 0.8;">Please fill out the form below to apply for admission.</p>
+</div>
+<div style="padding: 40px;">
+<form action="/student-register" method="POST" enctype="multipart/form-data">
+<h4 style="color:var(--primary); margin-bottom:15px; text-transform:uppercase; border-bottom:2px solid #eee; padding-bottom:5px;">Personal Details</h4>
+<div class="grid-2">
+<div class="form-group"><label>First Name</label><input type="text" name="first_name" required placeholder="Enter first name"></div>
+<div class="form-group"><label>Surname</label><input type="text" name="surname" required placeholder="Enter surname"></div>
+</div>
+<div class="grid-2">
+<div class="form-group"><label>Gender</label><select name="gender"><option>Male</option><option>Female</option></select></div>
+<div class="form-group"><label>Date of Birth</label><input type="date" name="dob" required></div>
+</div>
+<div class="grid-2">
+<div class="form-group"><label>WhatsApp Contact</label><input type="text" name="contact" required placeholder="923001234567"></div>
+<div class="form-group"><label>Email Address</label><input type="email" name="email" required placeholder="student@example.com"></div>
+</div>
+<div class="form-group"><label>Full Address</label><input type="text" name="address" required placeholder="House #, Street, Area"></div>
+<div class="grid-2">
+<div class="form-group"><label>City</label><input type="text" name="city" required placeholder="e.g. Rawalpindi"></div>
+<div class="form-group"><label>Country</label><input type="text" name="country" required placeholder="e.g. Pakistan"></div>
+</div>
+<div class="form-group">
+<label>Nearest Branch (Type Manually)</label>
+<input type="text" name="branch" placeholder="e.g. Rawalpindi, Multan, etc." required>
+</div>
 
-        /* --- LOGIN --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .login-box { background: var(--white); padding: 40px; border-radius: 15px; width: 100%; max-width: 400px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: 500; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; outline: none; }
-        .btn-submit { width: 100%; background: var(--primary); color: white; padding: 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; }
+<h4 style="color:var(--primary); margin:30px 0 15px 0; text-transform:uppercase; border-bottom:2px solid #eee; padding-bottom:5px;">Identification Details</h4>
+<div class="form-group">
+<label>ID Document Type</label>
+<select name="id_type" id="id_type" onchange="toggleIdFields()" required>
+<option value="">Select ID Type...</option>
+<option value="CNIC">National Identification Card</option>
+<option value="Passport">Passport</option>
+</select>
+</div>
 
-        /* --- LAYOUT --- */
-        #dashboard-page { display: none; height: 100vh; }
-        .dash-layout { display: flex; height: 100%; }
-        .sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink:0; }
-        .sidebar-header { padding: 20px; font-size: 20px; color: white; font-weight: bold; border-bottom: 1px solid #334155; }
-        .menu-item { padding: 15px 20px; color: #94a3b8; cursor: pointer; display: block; text-decoration: none; border-left: 3px solid transparent; transition: 0.2s;}
-        .menu-item:hover, .menu-item.active { background: #1e293b; color: white; border-left-color: var(--primary); }
-        
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        .topbar { background: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); align-items: center;}
-        .content-area { padding: 30px; height: calc(100vh - 70px); overflow-y: auto;}
-        
-        .page { display: none; height: 100%; }
-        .page.active { display: block; }
+<!-- Dynamic Fields Container -->
+<div id="id_fields_container" style="display: none;">
+<div class="grid-2">
+<div class="form-group">
+<label id="id_number_label">ID Number</label>
+<input type="text" name="id_number" id="id_number" placeholder="Enter ID number">
+</div>
+<div class="form-group"><label>Nationality</label><input type="text" name="nationality" placeholder="e.g. Pakistani"></div>
+</div>
+<div class="grid-2">
+<div class="form-group">
+<label id="id_front_label">ID Front</label>
+<input type="file" name="id_front">
+</div>
+<div class="form-group">
+<label id="id_back_label">ID Back</label>
+<input type="file" name="id_back">
+</div>
+</div>
+</div>
 
-        /* --- CARDS & FORMS --- */
-        .card { background: white; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .card-header { padding: 20px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .btn { background: var(--primary); color: white; padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-size:14px; transition: 0.2s; font-weight: 500;}
-        .btn:hover { opacity: 0.9; }
-        .btn-danger { background: var(--danger); }
-        
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
-        th { background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
-        
-        /* --- WHATSAPP INBOX UI --- */
-        .chat-container { display: flex; height: 75vh; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: white;}
-        .chat-sidebar { width: 320px; background: #f8fafc; border-right: 1px solid var(--border); overflow-y: auto; flex-shrink:0;}
-        
-        .number-title { background: #e2e8f0; padding: 10px 15px; font-weight: bold; font-size: 12px; color: #334155; display: flex; justify-content: space-between;}
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; margin-right: 5px;}
-        
-        .chat-user { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s;}
-        .chat-user:hover, .chat-user.active { background: #eff6ff; border-left: 3px solid var(--primary); }
-        .chat-user h4 { font-size: 14px; margin-bottom: 3px; }
-        .chat-user p { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: #efeae2; }
-        .chat-header { padding: 15px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 15px; border-radius: 8px; max-width: 70%; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);}
-        .msg.received { background: white; align-self: flex-start; }
-        .msg.sent { background: #d9fdd3; align-self: flex-end; }
-        .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid var(--border);}
-        .chat-input-area input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 20px; outline: none; }
-        
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); }
-    </style>
-</head>
-<body>
+<h4 style="color:var(--primary); margin:30px 0 15px 0; text-transform:uppercase; border-bottom:2px solid #eee; padding-bottom:5px;">Academic & Course Details</h4>
+<div class="grid-2">
+<div class="form-group"><label>Academic Qualification</label><input type="text" name="qualification" required placeholder="e.g. FSc, BA"></div>
+<div class="form-group"><label>Interested Course</label><input type="text" name="course" required placeholder="e.g. NEBOSH IGC"></div>
+</div>
+<div class="form-group"><label>Qualification Document</label><input type="file" name="qualification_upload"></div>
 
-    <!-- LOGIN MODAL -->
-    <div class="modal-overlay" id="loginModal" style="display: flex;">
-        <div class="login-box">
-            <h2 style="margin-bottom:20px; text-align:center;">Super Admin Login</h2>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="username" placeholder="superadmin" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="password" placeholder="admin123" required>
-                </div>
-                <button type="submit" class="btn-submit">Login</button>
-            </form>
-        </div>
-    </div>
+<h4 style="color:var(--primary); margin:30px 0 15px 0; text-transform:uppercase; border-bottom:2px solid #eee; padding-bottom:5px;">Fee & Payment</h4>
+<div class="grid-2">
+<div class="form-group"><label>Fee Amount (Paying Now)</label><input type="number" name="fee_amount" required placeholder="e.g. 15000"></div>
+<div class="form-group"><label>Fee Slip / Receipt Upload</label><input type="file" name="fee_slip_upload"></div>
+</div>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard-page">
-        <div class="dash-layout">
-            <aside class="sidebar">
-                <div class="sidebar-header">🚀 IOCH CRM</div>
-                <a class="menu-item active" onclick="showPage('dashboard', this)">📊 Dashboard</a>
-                <a class="menu-item" onclick="showPage('inbox', this)">💬 WhatsApp Inbox</a>
-                <a class="menu-item" onclick="showPage('numbers', this)">📱 My Numbers & API</a>
-                <a class="menu-item" style="margin-top:auto; color:#ef4444;" onclick="logout()">🚪 Logout</a>
-            </aside>
+<h4 style="color:var(--primary); margin:30px 0 15px 0; text-transform:uppercase; border-bottom:2px solid #eee; padding-bottom:5px;">Additional Info</h4>
+<div class="form-group">
+<label>Where did you hear about us?</label>
+<select name="source" required>
+<option value="">Select Option...</option><option value="Facebook">Facebook</option><option value="Website">Website</option><option value="Friend & Family">Friend & Family</option><option value="Other">Other</option>
+</select>
+</div>
+<div class="form-group"><label>Other Source</label><input type="text" name="other_source" placeholder="Enter source"></div>
+<div class="grid-2">
+<div class="form-group"><label>Chat Screenshot</label><input type="file" name="chat_upload"></div>
+<div class="form-group"><label>Recent Photo</label><input type="file" name="photo" required></div>
+</div>
 
-            <main class="main-content">
-                <header class="topbar">
-                    <h1 id="page-title">Dashboard</h1>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span>Super Admin</span>
-                        <div style="width:35px;height:35px;background:#3b82f6;color:white;border-radius:50%;display:flex;justify-content:center;align-items:center;">SA</div>
-                    </div>
-                </header>
+<h4 style="color:var(--primary); margin:30px 0 15px 0; text-transform:uppercase; border-bottom:2px solid #eee; padding-bottom:5px;">Portal Login Credentials</h4>
+<div class="grid-2">
+<div class="form-group"><label>Create Password</label><input type="password" name="password" required minlength="6" placeholder="Min 6 characters"></div>
+<div class="form-group"><label>Confirm Password</label><input type="password" name="confirm_password" required minlength="6"></div>
+</div>
 
-                <div class="content-area">
-                    
-                    <!-- 1. DASHBOARD -->
-                    <div id="dashboard" class="page active">
-                        <h2 style="margin-bottom: 20px;">Welcome, Super Admin!</h2>
-                        <p style="color: var(--text-muted); margin-bottom: 30px;">Yahan se aap apne WhatsApp numbers connect karenge aur marketing messages bhejenge.</p>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                            <div class="card" style="padding:20px;">
-                                <h3 style="margin-bottom:10px;">Connected Numbers</h3>
-                                <p style="font-size:30px; font-weight:bold; color:var(--primary);" id="dash-num-count">0</p>
-                            </div>
-                            <div class="card" style="padding:20px;">
-                                <h3 style="margin-bottom:10px;">Total Incoming Chats</h3>
-                                <p style="font-size:30px; font-weight:bold; color:var(--success);">0</p>
-                            </div>
-                        </div>
-                    </div>
+<h4 style="color:var(--primary); margin:30px 0 15px 0; text-transform:uppercase; border-bottom:2px solid #eee; padding-bottom:5px;">Declaration</h4>
+<div style="background:#f8fafc; padding:20px; border-radius:8px; border:1px solid #e2e8f0;">
+<p style="font-size:0.95rem; color:var(--text-muted); margin-bottom:15px;">I hereby declare that I have read, understood, and agree to the above terms & conditions.</p>
+<label style="display:inline-block; margin-right:20px; font-weight:600;"><input type="radio" name="declaration" value="Yes" required style="width:auto;"> Yes, I Agree</label>
+<label style="display:inline-block; font-weight:600;"><input type="radio" name="declaration" value="No" style="width:auto;"> No</label>
+<div class="form-group" style="margin-top:15px;"><label>Date</label><input type="date" name="declaration_date" value="${today}"></div>
+</div>
 
-                    <!-- 2. WHATSAPP INBOX -->
-                    <div id="inbox" class="page">
-                        <div class="chat-container">
-                            <div class="chat-sidebar" id="inbox-sidebar">
-                                <!-- Numbers and Chats will be loaded here dynamically -->
-                                <div class="empty-state" style="padding:20px;">
-                                    <p>Koi chat nahi hai.</p>
-                                    <p style="font-size:12px; margin-top:5px;">Pehle "My Numbers" mein ja kar number connect karein.</p>
-                                </div>
-                            </div>
+<button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 30px; padding: 15px; font-size:1.1rem;">Submit Registration</button>
+</form>
+</div>
+</div>
 
-                            <div class="chat-area">
-                                <div id="no-chat-selected" class="empty-state">
-                                    <h3>No Chat Selected</h3>
-                                    <p>Select a chat from the left sidebar to view messages.</p>
-                                </div>
+<!-- Script for Dynamic Fields -->
+<script>
+function toggleIdFields() {
+var idType = document.getElementById("id_type").value;
+var container = document.getElementById("id_fields_container");
+var numLabel = document.getElementById("id_number_label");
+var numInput = document.getElementById("id_number");
+var frontLabel = document.getElementById("id_front_label");
+var backLabel = document.getElementById("id_back_label");
 
-                                <div id="active-chat-ui" style="display:none; flex-direction:column; height:100%;">
-                                    <div class="chat-header">
-                                        <div>
-                                            <h3 id="chat-title" style="font-size:16px;">Customer Name</h3>
-                                            <p id="chat-number" style="font-size:12px; color:var(--text-muted);">+92 300 0000000</p>
-                                        </div>
-                                        <button class="btn btn-danger" onclick="deleteChat()">🗑️ Delete Chat</button>
-                                    </div>
-                                    <div class="chat-box" id="chat-box"></div>
-                                    <div class="chat-input-area">
-                                        <input type="text" id="chat-input" placeholder="Type a message...">
-                                        <button class="btn" onclick="sendMsg()">Send</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. MY NUMBERS & API SETUP -->
-                    <div id="numbers" class="page">
-                        <div class="card">
-                            <div class="card-header"><h2>Connect New WhatsApp Number (Meta API)</h2></div>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label>WhatsApp Number</label>
-                                    <input type="text" id="wa_number" placeholder="+92 300 1234567">
-                                </div>
-                                <div class="form-group">
-                                    <label>Meta API Token</label>
-                                    <input type="password" id="wa_token" placeholder="Enter Long-Lived Token">
-                                </div>
-                                <div class="form-group">
-                                    <label>Phone Number ID</label>
-                                    <input type="text" id="wa_phone_id" placeholder="e.g. 10987654321">
-                                </div>
-                                <div style="display:flex; align-items:flex-end;">
-                                    <button class="btn" onclick="connectNumber()" style="width:100%;">Connect Number</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header"><h2>My Connected Numbers</h2></div>
-                            <table id="numbersTable">
-                                <thead><tr><th>WhatsApp Number</th><th>Phone Number ID</th><th>Status</th><th>Action</th></tr></thead>
-                                <tbody>
-                                    <!-- Connected numbers will appear here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <!-- SCRIPTS -->
-    <script>
-        // Data Storage (Temporary in JS)
-        let connectedNumbers = []; // { number, token, phoneId, chats: [] }
-
-        // Auth
-        function handleLogin(e) {
-            e.preventDefault();
-            if (document.getElementById('username').value === 'superadmin' && document.getElementById('password').value === 'admin123') {
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('dashboard-page').style.display = 'block';
-            } else { alert('❌ Ghalat Username ya Password!'); }
-        }
-        function logout() {
-            document.getElementById('dashboard-page').style.display = 'none';
-            document.getElementById('loginModal').style.display = 'flex';
-        }
-
-        // Navigation
-        function showPage(pageId, element) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-            if(element) element.classList.add('active');
-            
-            const titles = { 'dashboard': 'Dashboard', 'inbox': 'WhatsApp Inbox', 'numbers': 'My Numbers & API' };
-            document.getElementById('page-title').innerText = titles[pageId];
-            
-            if(pageId === 'inbox') updateInboxView();
-        }
-
-        // --- CONNECT NUMBER (API) ---
-        function connectNumber() {
-            const number = document.getElementById('wa_number').value;
-            const token = document.getElementById('wa_token').value;
-            const phoneId = document.getElementById('wa_phone_id').value;
-
-            if(!number || !token || !phoneId) {
-                alert('Meherbani kar ke saari details bharein!');
-                return;
-            }
-
-            // Save to array (Frontend demo)
-            connectedNumbers.push({ number, token, phoneId, chats: [] });
-            
-            // Add to Table
-            const tbody = document.querySelector('#numbersTable tbody');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${number}</b></td>
-                <td>${phoneId}</td>
-                <td><span style="color:var(--success); font-weight:bold;">🟢 Connected</span></td>
-                <td><button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="removeNumber(this)">Remove</button></td>
-            `;
-            tbody.appendChild(tr);
-
-            // Update Dashboard Count
-            document.getElementById('dash-num-count').innerText = connectedNumbers.length;
-
-            // Clear form
-            document.getElementById('wa_number').value = '';
-            document.getElementById('wa_token').value = '';
-            document.getElementById('wa_phone_id').value = '';
-
-            alert('✅ Number Connected Successfully! Ab aap iss number par messages receive kar sakte hain.');
-        }
-
-        function removeNumber(btn) {
-            if(confirm('Kya aap yeh number remove karna chahte hain?')) {
-                btn.closest('tr').remove();
-                // In real app, remove from array and database
-                document.getElementById('dash-num-count').innerText = document.querySelectorAll('#numbersTable tbody tr').length;
-            }
-        }
-
-        // --- INBOX VIEW (Group by Numbers) ---
-        function updateInboxView() {
-            const sidebar = document.getElementById('inbox-sidebar');
-            
-            if (connectedNumbers.length === 0) {
-                sidebar.innerHTML = `<div class="empty-state" style="padding:20px;"><p>Koi number connect nahi hai.</p><p style="font-size:12px; margin-top:5px;">Pehle "My Numbers" mein ja kar number connect karein.</p></div>`;
-                return;
-            }
-
-            let html = '';
-            // Loop through connected numbers and create headings
-            connectedNumbers.forEach(num => {
-                html += `<div class="number-title"><span><span class="status-dot"></span>${num.number}</span></div>`;
-                
-                // Dummy Chats for this number (In real app, these will come from API)
-                html += `
-                    <div class="chat-user" onclick="loadChat(this, 'Customer 1', '${num.number}')">
-                        <h4>Customer 1</h4>
-                        <p>Mujhe details chahiye...</p>
-                    </div>
-                    <div class="chat-user" onclick="loadChat(this, 'Customer 2', '${num.number}')">
-                        <h4>Customer 2</h4>
-                        <p>Fee kitni hai?</p>
-                    </div>
-                `;
-            });
-
-            sidebar.innerHTML = html;
-        }
-
-        // --- CHAT UI ---
-        function loadChat(element, name, number) {
-            // Set active class
-            document.querySelectorAll('.chat-user').forEach(u => u.classList.remove('active'));
-            element.classList.add('active');
-
-            // Show active chat UI
-            document.getElementById('no-chat-selected').style.display = 'none';
-            document.getElementById('active-chat-ui').style.display = 'flex';
-
-            document.getElementById('chat-title').innerText = name;
-            document.getElementById('chat-number').innerText = `To: ${number}`;
-
-            document.getElementById('chat-box').innerHTML = `
-                <div class="msg received">Assalam o Alaikum, mujhe course ki details chahiye.</div>
-                <div class="msg sent">Walaikum Assalam! Details bhej rahe hain.</div>
-            `;
-        }
-
-        function sendMsg() {
-            const input = document.getElementById('chat-input');
-            if(input.value.trim() !== '') {
-                const chatBox = document.getElementById('chat-box');
-                const div = document.createElement('div');
-                div.className = 'msg sent';
-                div.innerText = input.value;
-                chatBox.appendChild(div);
-                input.value = '';
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
-
-        function deleteChat() {
-            if(confirm('⚠️ Chat delete karni hai?')) {
-                document.getElementById('active-chat-ui').style.display = 'none';
-                document.getElementById('no-chat-selected').style.display = 'flex';
-            }
-        }
-    </script>
-</body>
-</html>
+if (idType === "CNIC") {
+container.style.display = "block";
+numLabel.innerText = "National Identification Card Number";
+numInput.placeholder = "e.g. 12345-1234567-1";
+frontLabel.innerText = "Upload Identification Card Front Side";
+backLabel.innerText = "Upload Identification Card Back Side";
+} else if (idType === "Passport") {
+container.style.display = "block";
+numLabel.innerText = "Passport Number";
+numInput.placeholder = "e.g. AB1234567";
+frontLabel.innerText = "Upload Passport First Page";
+backLabel.innerText = "Upload Passport Signature Page";
+} else {
+container.style.display = "none";
+}
+}
+</script>
+`;
+res.send(publicHeaderFooter(regContent));
+});
