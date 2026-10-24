@@ -3,24 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOCH CRM & LMS - Home</title>
-    <!-- Google Fonts for beautiful typography -->
+    <title>IOCH CRM - Super Admin Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --bg-body: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --sidebar-bg: #0f172a;
         }
 
-        body {
-            background-color: #f8fafc;
-            color: #334155;
-            overflow-x: hidden;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        /* ================= LANDING PAGE ================= */
+        #landing-page {
+            background-color: var(--bg-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* --- Navigation Bar --- */
         nav {
             display: flex;
             justify-content: space-between;
@@ -31,252 +40,299 @@
             position: fixed;
             width: 100%;
             top: 0;
-            z-index: 1000;
+            z-index: 100;
             box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .logo { font-size: 24px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .logo span { color: var(--primary); }
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; transition: 0.3s; cursor: pointer; }
+        .nav-links a:hover { color: var(--primary); }
+        .btn-login-nav { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white !important; padding: 10px 25px; border-radius: 50px; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
 
-        .logo span {
-            color: #3b82f6; /* Blue accent */
-        }
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 0 8%; background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%); padding-top: 80px; }
+        .hero-text { max-width: 500px; }
+        .hero-text h1 { font-size: 48px; font-weight: 700; color: var(--text-main); line-height: 1.2; margin-bottom: 20px; }
+        .hero-text h1 span { color: var(--primary); }
+        .hero-text p { font-size: 16px; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
+        .btn-main { background: var(--text-main); color: white; padding: 15px 35px; border-radius: 50px; text-decoration: none; font-weight: 600; display: inline-block; transition: 0.3s; border: none; cursor: pointer; }
+        .btn-main:hover { background: #1e293b; transform: translateY(-2px); }
+        
+        .illustration { width: 400px; height: 400px; background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; animation: morph 8s ease-in-out infinite; box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3); display: flex; justify-content: center; align-items: center; color: white; font-size: 80px; }
+        @keyframes morph { 0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; } 50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; } 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; } }
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
+        /* ================= LOGIN MODAL ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: var(--white); padding: 40px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center; position: relative; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--text-muted); background: none; border: none; }
+        .login-box h2 { font-size: 24px; color: var(--text-main); margin-bottom: 10px; }
+        .login-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
+        
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; color: var(--text-main); }
+        .form-group input { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; transition: 0.2s; }
+        .form-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-submit:hover { background: var(--primary-dark); }
 
-        .nav-links a {
-            text-decoration: none;
-            color: #64748b;
-            font-weight: 500;
-            transition: 0.3s;
-        }
+        /* ================= DASHBOARD ================= */
+        #dashboard-page { display: none; height: 100vh; overflow: hidden; background: var(--bg-body); }
+        
+        .dash-layout { display: flex; height: 100%; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; }
+        .sidebar-header { padding: 24px; font-size: 20px; font-weight: 700; color: var(--white); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #374151; }
+        .sidebar-menu { padding: 20px 0; display: flex; flex-direction: column; gap: 5px; }
+        .menu-item { padding: 12px 24px; color: #9ca3af; text-decoration: none; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: all 0.2s; border-left: 3px solid transparent; cursor: pointer; }
+        .menu-item:hover, .menu-item.active { background: #1f2937; color: var(--white); border-left-color: var(--primary); }
+        
+        /* Main Content */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .topbar { background: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+        .topbar h1 { font-size: 20px; font-weight: 600; }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 600; font-size: 16px; }
+        
+        .content-area { padding: 30px; display: flex; flex-direction: column; gap: 25px; }
+        
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .stat-card { background: var(--white); padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--border); }
+        .stat-card h3 { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .stat-card .value { font-size: 28px; font-weight: 700; color: var(--text-main); }
+        .stat-card.blue { border-top: 4px solid #3b82f6; }
+        .stat-card.green { border-top: 4px solid var(--success); }
+        .stat-card.orange { border-top: 4px solid var(--warning); }
 
-        .nav-links a:hover {
-            color: #3b82f6;
-        }
+        /* Tables & Cards */
+        .card { background: var(--white); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); overflow: hidden; }
+        .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h2 { font-size: 18px; font-weight: 600; }
+        .btn { background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: 0.2s; }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-chat { background: #e0e7ff; color: var(--primary); border: none; }
+        .btn-chat:hover { background: #c7d2fe; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 16px 24px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+        th { background: #f9fafb; color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        tr:hover { background: #f9fafb; }
+        
+        .badge { padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .badge-new { background: #dbeafe; color: #1d4ed8; }
+        .badge-follow { background: #fef3c7; color: #b45309; }
+        .badge-connected { background: #d1fae5; color: #047857; }
 
-        .btn-login {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white !important;
-            padding: 10px 25px;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-        }
-
-        /* --- Hero Section --- */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 8%;
-            background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
-            padding-top: 80px;
-        }
-
-        .hero-text {
-            max-width: 500px;
-        }
-
-        .hero-text h1 {
-            font-size: 48px;
-            font-weight: 700;
-            color: #0f172a;
-            line-height: 1.2;
-            margin-bottom: 20px;
-        }
-
-        .hero-text h1 span {
-            color: #3b82f6;
-        }
-
-        .hero-text p {
-            font-size: 16px;
-            color: #64748b;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .btn-main {
-            background: #0f172a;
-            color: white;
-            padding: 15px 35px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-block;
-            transition: 0.3s;
-        }
-
-        .btn-main:hover {
-            background: #1e293b;
-            transform: translateY(-2px);
-        }
-
-        .hero-image {
-            max-width: 500px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Beautiful abstract illustration made with CSS */
-        .illustration {
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 8s ease-in-out infinite;
-            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 80px;
-        }
-
-        @keyframes morph {
-            0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
-            50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
-            100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
-        }
-
-        /* --- Features Section --- */
-        .features {
-            padding: 100px 8%;
-            text-align: center;
-            background: white;
-        }
-
-        .features h2 {
-            font-size: 36px;
-            color: #0f172a;
-            margin-bottom: 50px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
-
-        .card {
-            background: #f8fafc;
-            padding: 40px 30px;
-            border-radius: 20px;
-            transition: 0.3s;
-            border: 1px solid #e2e8f0;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.05);
-            background: white;
-        }
-
-        .icon-box {
-            width: 70px;
-            height: 70px;
-            background: #eff6ff;
-            color: #3b82f6;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 30px;
-            margin: 0 auto 20px auto;
-        }
-
-        .card h3 {
-            font-size: 20px;
-            color: #0f172a;
-            margin-bottom: 15px;
-        }
-
-        .card p {
-            font-size: 15px;
-            color: #64748b;
-            line-height: 1.6;
-        }
-
-        /* --- Footer --- */
-        footer {
-            background: #0f172a;
-            color: #94a3b8;
-            text-align: center;
-            padding: 30px;
-            font-size: 14px;
-        }
+        .wa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 24px; }
+        .wa-card { border: 1px solid var(--border); border-radius: 10px; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .wa-info h4 { font-size: 16px; margin-bottom: 4px; }
+        .wa-info p { font-size: 14px; color: var(--text-muted); }
+        
+        .logout-btn { margin-top: auto; color: var(--danger) !important; border-top: 1px solid #374151; }
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav>
-        <div class="logo">
-            🚀 IOCH<span>CRM</span>
-        </div>
-        <div class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Features</a>
-            <a href="#">About Us</a>
-            <a href="#" class="btn-login">Login</a>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-text">
-            <h1>Manage <span>Leads</span> & WhatsApps Easily.</h1>
-            <p>The ultimate portal for IOCH. Control multiple WhatsApp accounts, track student leads, and manage your entire workflow from one beautiful dashboard.</p>
-            <a href="#" class="btn-main">Get Started Now</a>
-        </div>
-        <div class="hero-image">
-            <div class="illustration">💬</div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features">
-        <h2>Why Choose Our Portal?</h2>
-        <div class="grid">
-            <div class="card">
-                <div class="icon-box">🎯</div>
-                <h3>Lead Management</h3>
-                <p>Keep track of every student inquiry with a smart and organized CRM system.</p>
+    <!-- ================= LANDING PAGE ================= -->
+    <div id="landing-page">
+        <nav>
+            <div class="logo">🚀 IOCH<span>CRM</span></div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">Features</a>
+                <a href="#">About Us</a>
+                <a class="btn-login-nav" onclick="openLogin()">Login</a>
             </div>
-            <div class="card">
-                <div class="icon-box">💬</div>
-                <h3>Multi-WhatsApp Control</h3>
-                <p>Connect multiple WhatsApp numbers and reply to all your clients from one inbox.</p>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-text">
+                <h1>Manage <span>Leads</span> & WhatsApps Easily.</h1>
+                <p>The ultimate portal for IOCH. Control multiple WhatsApp accounts, track student leads, and manage your entire workflow from one beautiful dashboard.</p>
+                <button class="btn-main" onclick="openLogin()">Super Admin Login</button>
             </div>
-            <div class="card">
-                <div class="icon-box">🎓</div>
-                <h3>Student Portal</h3>
-                <p>Give your students access to courses, assignments, and grades seamlessly.</p>
+            <div class="hero-image">
+                <div class="illustration">💬</div>
             </div>
+        </section>
+    </div>
+
+    <!-- ================= LOGIN MODAL ================= -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-box">
+            <button class="close-btn" onclick="closeLogin()">&times;</button>
+            <h2>Super Admin Login</h2>
+            <p>Please enter your credentials to access the dashboard.</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn-submit">Login to Dashboard</button>
+            </form>
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2026 IOCH CRM & LMS. All Rights Reserved. | iffi.cc.cd</p>
-    </footer>
+    <!-- ================= DASHBOARD ================= -->
+    <div id="dashboard-page">
+        <div class="dash-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header"><span>🚀 IOCH CRM</span></div>
+                <div class="sidebar-menu">
+                    <a class="menu-item active">📊 Dashboard</a>
+                    <a class="menu-item">👥 Leads Management</a>
+                    <a class="menu-item">💬 WhatsApp Inbox</a>
+                    <a class="menu-item">⚙️ WhatsApp Setup</a>
+                    <a class="menu-item">🎓 Students Portal</a>
+                    <a class="menu-item logout-btn" onclick="logout()">🚪 Logout</a>
+                </div>
+            </aside>
 
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="topbar">
+                    <h1>Overview</h1>
+                    <div class="user-profile">
+                        <span style="font-size: 14px; font-weight: 500;">Super Admin</span>
+                        <div class="avatar">SA</div>
+                    </div>
+                </header>
+
+                <div class="content-area">
+                    <div class="stats-grid">
+                        <div class="stat-card blue">
+                            <h3>Total Leads</h3>
+                            <div class="value">1,248</div>
+                        </div>
+                        <div class="stat-card green">
+                            <h3>New Leads Today</h3>
+                            <div class="value">45</div>
+                        </div>
+                        <div class="stat-card orange">
+                            <h3>Active WhatsApps</h3>
+                            <div class="value">3</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Recent Leads</h2>
+                            <button class="btn">+ Add New Lead</button>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Course Interest</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 500;">Ali Khan</td>
+                                    <td>+92 300 1234567</td>
+                                    <td>NEBOSH IGC</td>
+                                    <td><span class="badge badge-new">New</span></td>
+                                    <td><button class="btn btn-sm btn-chat">💬 Chat</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500;">Sara Ahmed</td>
+                                    <td>+92 321 9876543</td>
+                                    <td>IOSH Managing Safely</td>
+                                    <td><span class="badge badge-follow">Follow-up</span></td>
+                                    <td><button class="btn btn-sm btn-chat">💬 Chat</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500;">Usman Tariq</td>
+                                    <td>+92 333 5556677</td>
+                                    <td>OSHA 30 Hours</td>
+                                    <td><span class="badge badge-new">New</span></td>
+                                    <td><button class="btn btn-sm btn-chat">💬 Chat</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Connected WhatsApp Accounts</h2>
+                            <button class="btn">+ Connect Number</button>
+                        </div>
+                        <div class="wa-grid">
+                            <div class="wa-card">
+                                <div class="wa-info">
+                                    <h4>Sales Team</h4>
+                                    <p>+92 300 1112223</p>
+                                </div>
+                                <span class="badge badge-connected">Connected</span>
+                            </div>
+                            <div class="wa-card">
+                                <div class="wa-info">
+                                    <h4>Support Team</h4>
+                                    <p>+92 321 4445556</p>
+                                </div>
+                                <span class="badge badge-connected">Connected</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script>
+        // Open Login Modal
+        function openLogin() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        // Close Login Modal
+        function closeLogin() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        // Handle Login Submit
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            // SUPER ADMIN CREDENTIALS CHECK
+            if (user === 'superadmin' && pass === 'admin123') {
+                // Hide login & landing page
+                closeLogin();
+                document.getElementById('landing-page').style.display = 'none';
+                
+                // Show Dashboard
+                document.getElementById('dashboard-page').style.display = 'block';
+            } else {
+                alert('❌ Ghalat Username ya Password! Dobara try karein.');
+            }
+        }
+
+        // Logout Function
+        function logout() {
+            if(confirm('Kya aap logout karna chahte hain?')) {
+                document.getElementById('dashboard-page').style.display = 'none';
+                document.getElementById('landing-page').style.display = 'flex';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            }
+        }
+    </script>
 </body>
 </html>
