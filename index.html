@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOCH - Super Admin Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
-    <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -13,7 +12,6 @@
             --primary: #3b82f6; --primary-dark: #2563eb; --bg-body: #f8fafc; --text-main: #0f172a;
             --text-muted: #64748b; --white: #ffffff; --border: #e2e8f0; --success: #10b981;
             --warning: #f59e0b; --danger: #ef4444; --sidebar-bg: #0f172a;
-            --gold: #d4af37; --dark-green: #064e3b;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
@@ -50,68 +48,39 @@
 
         .error-msg { color: var(--danger); margin-top: 15px; display: none; font-size: 14px; font-weight: 600; }
 
-        /* Certificate Design Container (Shared) */
+        /* ================= CUSTOM BACKGROUND CERTIFICATE DESIGN ================= */
         .cert-wrapper { display: none; margin-top: 40px; text-align: center; overflow-x: auto; padding-bottom: 20px;}
         .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; }
         
-        /* Certificate Layout */
         .cert-container { 
-            width: 1000px; background: #fdfbf7; padding: 15px; position: relative;
-            border: 12px solid var(--dark-green); margin: 0 auto; text-align: left;
-            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            width: 1000px; 
+            height: 707px; /* A4 Landscape Ratio */
+            position: relative;
+            margin: 0 auto;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            /* Yahan apni image ka link dalein */
+            background-image: url('https://raw.githubusercontent.com/.../certificate-bg.jpg'); 
         }
-        .cert-inner { border: 2px solid var(--gold); padding: 30px 40px; position: relative; background: rgba(253, 251, 247, 0.95); }
-        
-        /* Watermark */
-        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.03; font-size: 200px; font-family: 'Playfair Display', serif; font-weight: bold; color: var(--dark-green); pointer-events: none; z-index: 0;}
 
-        /* Corner Decor */
-        .corner-decor { position: absolute; width: 80px; height: 80px; border: 2px solid var(--gold); z-index: 1;}
-        .top-left { top: 10px; left: 10px; border-right: none; border-bottom: none; }
-        .top-right { top: 10px; right: 10px; border-left: none; border-bottom: none; }
-        .bot-left { bottom: 10px; left: 10px; border-right: none; border-top: none; }
-        .bot-right { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+        /* Dynamic Text Positioning (Aap inko adjust kar sakte hain) */
+        .dyn-text {
+            position: absolute;
+            font-family: 'Playfair Display', serif;
+            color: #000;
+            text-align: center;
+            width: 100%;
+            left: 0;
+        }
 
-        /* Content */
-        .cert-content { position: relative; z-index: 2; text-align: center; }
+        .cert-no-pos { top: 30px; right: 50px; width: auto; left: auto; font-family: 'Poppins', sans-serif; font-size: 14px; color: #333; font-weight: 600;}
+        .student-name-pos { top: 310px; font-size: 42px; color: #064e3b; font-weight: 700; text-transform: uppercase; }
+        .course-name-pos { top: 430px; font-size: 28px; color: #1e293b; font-weight: 700; text-transform: uppercase; }
+        .date-pos { top: 510px; font-family: 'Poppins', sans-serif; font-size: 16px; color: #333; font-weight: 600; }
         
-        .cert-header h3 { font-family: 'Playfair Display', serif; font-size: 18px; letter-spacing: 2px; color: var(--dark-green); font-weight: 700; margin-bottom: 10px; }
-        .cert-title h1 { font-family: 'Playfair Display', serif; font-size: 60px; color: var(--dark-green); text-transform:uppercase; margin-bottom:5px; font-weight: 800; letter-spacing: 2px;}
-        .cert-title h2 { font-size: 14px; letter-spacing: 6px; color: var(--gold); text-transform:uppercase; font-weight: 600;}
-        
-        .presented-text { font-style:italic; font-size:16px; color:#475569; margin: 20px 0 10px 0; }
-        .student-name-box { border-bottom: 1px solid var(--gold); display: inline-block; padding: 0 40px 10px 40px; margin-bottom: 15px; }
-        .student-name-text { font-family: 'Playfair Display', serif; font-size: 42px; color: var(--dark-green); font-weight:700; }
-        
-        .course-text { font-size:16px; color:#475569; margin-bottom:10px; }
-        .course-name-text { font-family: 'Playfair Display', serif; font-size:26px; font-weight:700; color:var(--dark-green); margin-bottom: 15px; text-transform:uppercase; }
-        
-        .issue-date { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 30px; }
-
-        /* Icons */
-        .icons-row { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; }
-        .icon-box { text-align: center; }
-        .icon-circle { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--dark-green); display: flex; justify-content: center; align-items: center; font-size: 28px; margin: 0 auto 5px auto; background: white; }
-        .icon-box p { font-size: 11px; font-weight: 700; color: var(--dark-green); text-transform: uppercase; }
-
-        /* Signatures & Seal */
-        .bottom-area { display: flex; justify-content: space-between; align-items: flex-end; position: relative; margin-top: 20px;}
-        
-        .signature { text-align: center; width: 220px; }
-        .sig-name { font-family: 'Great Vibes', cursive; font-size: 34px; color: #1e3a8a; margin-bottom: 5px; transform: rotate(-5deg); }
-        .sig-line { border-top: 1px solid #1e293b; margin-bottom: 5px; width: 100%; }
-        .signature h4 { font-size: 16px; margin: 0; color: #1e293b; font-weight: 700;}
-        .signature p { font-size: 12px; color: var(--text-muted); margin: 0; font-style: italic;}
-
-        .center-seal { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); text-align: center; }
-        .seal-img { width: 110px; margin-bottom: -15px; }
-
-        /* QR Code & Cert Number */
-        .qr-section { text-align: center; width: 150px;}
-        #qrcode { background:white; padding:5px; display:inline-block; border: 1px solid #ccc;}
-        .qr-text { font-size:10px; color:var(--text-muted); margin-top:3px; font-weight: 600;}
-        
-        .cert-number { position: absolute; top: 10px; right: 20px; font-size: 12px; font-weight: 700; color: var(--dark-green); border-bottom: 1px solid #ccc; padding-bottom: 2px;}
+        .qr-pos { position: absolute; bottom: 50px; right: 80px; display: inline-block; background: white; padding: 5px; border: 1px solid #ccc;}
 
         /* ================= LOGIN MODAL ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -183,7 +152,7 @@
         @media print {
             body * { visibility: hidden; }
             .cert-container, .cert-container * { visibility: visible; }
-            .cert-container { position: absolute; left: 0; top: 0; width: 100%; border-width: 10px; }
+            .cert-container { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
             .print-btn, .close-btn { display: none !important; }
         }
     </style>
@@ -225,79 +194,14 @@
             <div class="cert-wrapper" id="certWrapper">
                 <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Print / Download Certificate</button>
                 
-                <!-- CERTIFICATE DESIGN (PUBLIC VIEW) -->
+                <!-- CUSTOM CERTIFICATE DESIGN (PUBLIC VIEW) -->
                 <div class="cert-container" id="certificate">
-                    <div class="cert-inner">
-                        <!-- Watermark -->
-                        <div class="watermark">IOCH</div>
-                        
-                        <!-- Certificate Number -->
-                        <div class="cert-number" id="displayCertNoPublic">Certificate No: IOCH-XXXX-XXXX</div>
-
-                        <div class="cert-content">
-                            <div class="cert-header">
-                                <h3>INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
-                            </div>
-                            <div class="cert-title">
-                                <h1>Certificate</h1>
-                                <h2>of Achievement</h2>
-                            </div>
-                            <div class="presented-text">This certificate is proudly presented to</div>
-                            
-                            <div class="student-name-box">
-                                <div class="student-name-text" id="displayName">[Student Name]</div>
-                            </div>
-                            
-                            <div class="course-text">for successfully completing the professional training program in</div>
-                            <div class="course-name-text" id="displayCourse">[Course Name]</div>
-                            
-                            <div class="issue-date">Issued on: <span id="displayDate">[DD/MM/YYYY]</span></div>
-
-                            <!-- Icons Row -->
-                            <div class="icons-row">
-                                <div class="icon-box">
-                                    <div class="icon-circle">🔥</div>
-                                    <p>Fire Safety</p>
-                                </div>
-                                <div class="icon-box">
-                                    <div class="icon-circle">➕</div>
-                                    <p>First Aid</p>
-                                </div>
-                                <div class="icon-box">
-                                    <div class="icon-circle">📟</div>
-                                    <p>Gas Monitor</p>
-                                </div>
-                            </div>
-
-                            <!-- Signatures & Seal -->
-                            <div class="bottom-area">
-                                <div class="signature">
-                                    <div class="sig-name">Bilal Ahmed</div>
-                                    <div class="sig-line"></div>
-                                    <h4>Bilal Ahmed</h4>
-                                    <p>Course Instructor</p>
-                                </div>
-
-                                <!-- Center Seal (Gold) -->
-                                <div class="center-seal">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="Seal" class="seal-img" style="filter: sepia(1) hue-rotate(90deg);">
-                                </div>
-
-                                <!-- QR Code -->
-                                <div class="qr-section">
-                                    <div id="qrcode"></div>
-                                    <p class="qr-text">Scan to Verify</p>
-                                </div>
-
-                                <div class="signature">
-                                    <div class="sig-name" style="font-size:28px;">Director IOCH</div>
-                                    <div class="sig-line"></div>
-                                    <h4>Director</h4>
-                                    <p>Director, IOCH</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="displayCertNoPublic" class="dyn-text cert-no-pos">Certificate No: IOCH-XXXX-XXXX</div>
+                    <div id="displayName" class="dyn-text student-name-pos">[Student Name]</div>
+                    <div id="displayCourse" class="dyn-text course-name-pos">[Course Name]</div>
+                    <div id="displayDate" class="dyn-text date-pos">Issued on: [DD/MM/YYYY]</div>
+                    
+                    <div class="qr-pos" id="qrcode"></div>
                 </div>
             </div>
         </section>
@@ -333,9 +237,7 @@
                     <a class="menu-item" onclick="showPage('whatsapp')">💬 WhatsApp Inbox</a>
                     <a class="menu-item" onclick="showPage('users')">👨‍💼 Manage Users</a>
                     <a class="menu-item" onclick="showPage('branches')">🏢 Manage Branches</a>
-                    <!-- NAYA TAB: Certificate Banane ke liye -->
                     <a class="menu-item" onclick="showPage('generate-cert')">📜 Generate Certificate</a>
-                    <!-- NAYA TAB: Certificate Records ke liye -->
                     <a class="menu-item" onclick="showPage('cert-records')">📂 Certificate Records</a>
                     
                     <a class="menu-item logout-btn" onclick="logout()">🚪 Logout</a>
@@ -480,80 +382,15 @@
                         <!-- Print Button -->
                         <button class="print-btn" id="printBtnGen" onclick="window.print()" style="display:none;">🖨️ Print / Download Certificate</button>
 
-                        <!-- CERTIFICATE DESIGN (FOR GENERATION) -->
+                        <!-- CUSTOM CERTIFICATE DESIGN (FOR GENERATION) -->
                         <div class="cert-wrapper" id="certWrapperGen">
                             <div class="cert-container" id="certificateGen">
-                                <div class="cert-inner">
-                                    <!-- Watermark -->
-                                    <div class="watermark">IOCH</div>
-                                    
-                                    <!-- Certificate Number -->
-                                    <div class="cert-number" id="displayCertNoGen">Certificate No: IOCH-XXXX-XXXX</div>
-
-                                    <div class="cert-content">
-                                        <div class="cert-header">
-                                            <h3>INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
-                                        </div>
-                                        <div class="cert-title">
-                                            <h1>Certificate</h1>
-                                            <h2>of Achievement</h2>
-                                        </div>
-                                        <div class="presented-text">This certificate is proudly presented to</div>
-                                        
-                                        <div class="student-name-box">
-                                            <div class="student-name-text" id="displayNameGen">[Student Name]</div>
-                                        </div>
-                                        
-                                        <div class="course-text">for successfully completing the professional training program in</div>
-                                        <div class="course-name-text" id="displayCourseGen">[Course Name]</div>
-                                        
-                                        <div class="issue-date">Issued on: <span id="displayDateGen">[DD/MM/YYYY]</span></div>
-
-                                        <!-- Icons Row -->
-                                        <div class="icons-row">
-                                            <div class="icon-box">
-                                                <div class="icon-circle">🔥</div>
-                                                <p>Fire Safety</p>
-                                            </div>
-                                            <div class="icon-box">
-                                                <div class="icon-circle">➕</div>
-                                                <p>First Aid</p>
-                                            </div>
-                                            <div class="icon-box">
-                                                <div class="icon-circle">📟</div>
-                                                <p>Gas Monitor</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Signatures & Seal -->
-                                        <div class="bottom-area">
-                                            <div class="signature">
-                                                <div class="sig-name">Bilal Ahmed</div>
-                                                <div class="sig-line"></div>
-                                                <h4>Bilal Ahmed</h4>
-                                                <p>Course Instructor</p>
-                                            </div>
-
-                                            <!-- Center Seal (Gold) -->
-                                            <div class="center-seal">
-                                                <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="Seal" class="seal-img" style="filter: sepia(1) hue-rotate(90deg);">
-                                            </div>
-
-                                            <!-- QR Code -->
-                                            <div class="qr-section">
-                                                <div id="qrcodeGen"></div>
-                                                <p class="qr-text">Scan to Verify</p>
-                                            </div>
-
-                                            <div class="signature">
-                                                <div class="sig-name" style="font-size:28px;">Director IOCH</div>
-                                                <div class="sig-line"></div>
-                                                <h4>Director</h4>
-                                                <p>Director, IOCH</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div id="displayCertNoGen" class="dyn-text cert-no-pos">Certificate No: IOCH-XXXX-XXXX</div>
+                                <div id="displayNameGen" class="dyn-text student-name-pos">[Student Name]</div>
+                                <div id="displayCourseGen" class="dyn-text course-name-pos">[Course Name]</div>
+                                <div id="displayDateGen" class="dyn-text date-pos">Issued on: [DD/MM/YYYY]</div>
+                                
+                                <div class="qr-pos" id="qrcodeGen"></div>
                             </div>
                         </div>
                     </div>
@@ -609,7 +446,6 @@
             const certWrapper = document.getElementById('certWrapper');
             const printBtn = document.getElementById('printBtn');
 
-            // Search in Saved Records instead of hardcoded DB
             const certData = savedCertificates.find(c => c.certNo === input);
 
             if(certData) {
@@ -618,7 +454,7 @@
                 document.getElementById('displayCertNoPublic').innerText = `Certificate No: ${certData.certNo}`;
                 document.getElementById('displayName').innerText = certData.name;
                 document.getElementById('displayCourse').innerText = certData.course;
-                document.getElementById('displayDate').innerText = certData.issueDate;
+                document.getElementById('displayDate').innerText = `Issued on: ${certData.issueDate}`;
 
                 certWrapper.style.display = 'block';
                 printBtn.style.display = 'inline-block';
@@ -704,35 +540,29 @@
                 return;
             }
 
-            // Check if Cert No already exists
             if(savedCertificates.some(c => c.certNo === certNo)) {
                 alert("Yeh Certificate Number pehle se record mein mojood hai! Koi naya number likhein.");
                 return;
             }
 
-            // Format Dates for display
             const formatDate = (dateStr) => {
                 if(!dateStr) return "[DD/MM/YYYY]";
                 const [y, m, d] = dateStr.split('-');
                 return `${d}/${m}/${y}`;
             };
 
-            // Save Record to LocalStorage
             const newRecord = { certNo, name, dob, cnic, course, issueDate: formatDate(issueDate), receipt };
             savedCertificates.push(newRecord);
             localStorage.setItem('ioch_certificates', JSON.stringify(savedCertificates));
 
-            // Populate Certificate for Preview
             document.getElementById('displayCertNoGen').innerText = `Certificate No: ${certNo}`;
             document.getElementById('displayNameGen').innerText = name.toUpperCase();
             document.getElementById('displayCourseGen').innerText = course.toUpperCase();
-            document.getElementById('displayDateGen').innerText = formatDate(issueDate);
+            document.getElementById('displayDateGen').innerText = `Issued on: ${formatDate(issueDate)}`;
 
-            // Show Preview
             document.getElementById('certWrapperGen').style.display = 'block';
             document.getElementById('printBtnGen').style.display = 'inline-block';
 
-            // Generate QR Code
             document.getElementById('qrcodeGen').innerHTML = "";
             const verifyUrl = `https://iffi.cc.cd/?verify=${certNo}`;
             
@@ -741,12 +571,7 @@
                 colorDark : "#064e3b", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
             });
 
-            // Scroll to certificate
             document.getElementById('certWrapperGen').scrollIntoView({ behavior: 'smooth' });
-
-            // Clear form fields after generation (optional)
-            // document.getElementById('genCertNo').value = ''; ... etc
-
             renderRecords();
         }
 
