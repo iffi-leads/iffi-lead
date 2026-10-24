@@ -54,23 +54,13 @@
         .cert-wrapper { display: none; margin-top: 40px; text-align: center; overflow-x: auto; padding-bottom: 20px;}
         .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; }
         
-        /* Certificate Layout (Matches your format exactly) */
+        /* Certificate Layout */
         .cert-container { 
-            width: 1000px; 
-            background: #fdfbf7; 
-            padding: 15px; 
-            position: relative;
-            border: 12px solid var(--dark-green);
-            margin: 0 auto;
-            text-align: left;
+            width: 1000px; background: #fdfbf7; padding: 15px; position: relative;
+            border: 12px solid var(--dark-green); margin: 0 auto; text-align: left;
             background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
         }
-        .cert-inner { 
-            border: 2px solid var(--gold); 
-            padding: 30px 40px; 
-            position: relative;
-            background: rgba(253, 251, 247, 0.95);
-        }
+        .cert-inner { border: 2px solid var(--gold); padding: 30px 40px; position: relative; background: rgba(253, 251, 247, 0.95); }
         
         /* Watermark */
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.03; font-size: 200px; font-family: 'Playfair Display', serif; font-weight: bold; color: var(--dark-green); pointer-events: none; z-index: 0;}
@@ -345,6 +335,8 @@
                     <a class="menu-item" onclick="showPage('branches')">🏢 Manage Branches</a>
                     <!-- NAYA TAB: Certificate Banane ke liye -->
                     <a class="menu-item" onclick="showPage('generate-cert')">📜 Generate Certificate</a>
+                    <!-- NAYA TAB: Certificate Records ke liye -->
+                    <a class="menu-item" onclick="showPage('cert-records')">📂 Certificate Records</a>
                     
                     <a class="menu-item logout-btn" onclick="logout()">🚪 Logout</a>
                 </div>
@@ -446,7 +438,7 @@
                         </div>
                     </div>
 
-                    <!-- NAYA PAGE: GENERATE CERTIFICATE (Dashboard ke andar) -->
+                    <!-- NAYA PAGE: GENERATE CERTIFICATE -->
                     <div id="generate-cert" class="page">
                         <div class="card" style="padding: 30px;">
                             <h2 style="margin-bottom: 20px;">Generate New Certificate</h2>
@@ -480,7 +472,7 @@
                                     <input type="text" id="genReceipt" placeholder="e.g. REC-2024-001">
                                 </div>
                                 <div style="display:flex; align-items:flex-end;">
-                                    <button class="btn btn-success" onclick="generateCertificate()" style="width:100%; padding:12px;">Generate & Preview Certificate</button>
+                                    <button class="btn btn-success" onclick="generateCertificate()" style="width:100%; padding:12px;">Generate & Save Record</button>
                                 </div>
                             </div>
                         </div>
@@ -566,6 +558,35 @@
                         </div>
                     </div>
 
+                    <!-- NAYA PAGE: CERTIFICATE RECORDS -->
+                    <div id="cert-records" class="page">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Saved Certificate Records</h2>
+                                <div style="display:flex; gap:10px;">
+                                    <input type="text" id="searchRecord" placeholder="Search Certificate No or Name..." onkeyup="renderRecords()" style="padding:8px 12px; border:1px solid #ccc; border-radius:6px; width:250px;">
+                                    <button class="btn btn-success" onclick="exportRecordsCSV()">⬇️ Export to CSV</button>
+                                </div>
+                            </div>
+                            <div style="overflow-x:auto;">
+                                <table id="recordsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Cert No.</th>
+                                            <th>Student Name</th>
+                                            <th>Course</th>
+                                            <th>Issue Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Records will load here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </main>
         </div>
@@ -573,12 +594,13 @@
 
     <!-- ================= SCRIPTS ================= -->
     <script>
-        // --- PUBLIC CERTIFICATE VERIFICATION LOGIC ---
-        const certificatesDB = {
-            "IOCH-2024-1234": { name: "UMER RIAZ", course: "FIRST AIDER", date: "15/11/2024" },
-            "IOCH-2024-5678": { name: "ALI KHAN", course: "NEBOSH IGC", date: "10/10/2024" }
-        };
+        // --- DATA STORAGE ---
+        let branches = JSON.parse(localStorage.getItem('ioch_branches')) || [];
+        let users = JSON.parse(localStorage.getItem('ioch_users')) || [];
+        let chats = JSON.parse(localStorage.getItem('ioch_chats')) || [];
+        let savedCertificates = JSON.parse(localStorage.getItem('ioch_certificates')) || [];
 
+        // --- PUBLIC CERTIFICATE VERIFICATION LOGIC ---
         let qrCodeObjPublic = null;
 
         function verifyCertificatePublic() {
@@ -587,14 +609,16 @@
             const certWrapper = document.getElementById('certWrapper');
             const printBtn = document.getElementById('printBtn');
 
-            if(certificatesDB[input]) {
-                const data = certificatesDB[input];
+            // Search in Saved Records instead of hardcoded DB
+            const certData = savedCertificates.find(c => c.certNo === input);
+
+            if(certData) {
                 errorMsg.style.display = 'none';
                 
-                document.getElementById('displayCertNoPublic').innerText = `Certificate No: ${input}`;
-                document.getElementById('displayName').innerText = data.name;
-                document.getElementById('displayCourse').innerText = data.course;
-                document.getElementById('displayDate').innerText = data.date;
+                document.getElementById('displayCertNoPublic').innerText = `Certificate No: ${certData.certNo}`;
+                document.getElementById('displayName').innerText = certData.name;
+                document.getElementById('displayCourse').innerText = certData.course;
+                document.getElementById('displayDate').innerText = certData.issueDate;
 
                 certWrapper.style.display = 'block';
                 printBtn.style.display = 'inline-block';
@@ -629,10 +653,6 @@
 
 
         // --- DASHBOARD LOGIC (Super Admin) ---
-        let branches = JSON.parse(localStorage.getItem('ioch_branches')) || [];
-        let users = JSON.parse(localStorage.getItem('ioch_users')) || [];
-        let chats = JSON.parse(localStorage.getItem('ioch_chats')) || [];
-
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
         function handleLogin(e) {
@@ -661,23 +681,32 @@
             const titles = { 
                 'dashboard': 'Dashboard Overview', 'leads': 'Leads Management', 
                 'whatsapp': 'WhatsApp Inbox', 'users': 'Manage Users', 
-                'branches': 'Manage Branches', 'generate-cert': 'Generate Certificate' 
+                'branches': 'Manage Branches', 'generate-cert': 'Generate Certificate',
+                'cert-records': 'Certificate Records'
             };
             document.getElementById('page-title').innerText = titles[pageId];
         }
 
-        // --- GENERATE CERTIFICATE LOGIC ---
+        // --- GENERATE & SAVE CERTIFICATE LOGIC ---
         let qrCodeObjGen = null;
 
         function generateCertificate() {
-            const certNo = document.getElementById('genCertNo').value.trim();
+            const certNo = document.getElementById('genCertNo').value.trim().toUpperCase();
             const name = document.getElementById('genName').value.trim();
+            const dob = document.getElementById('genDob').value;
+            const cnic = document.getElementById('genCnic').value.trim();
             const course = document.getElementById('genCourse').value.trim();
             const issueDate = document.getElementById('genIssueDate').value;
             const receipt = document.getElementById('genReceipt').value.trim();
 
             if(!certNo || !name || !course || !issueDate) {
                 alert("Please fill Certificate Number, Student Name, Course, and Issue Date.");
+                return;
+            }
+
+            // Check if Cert No already exists
+            if(savedCertificates.some(c => c.certNo === certNo)) {
+                alert("Yeh Certificate Number pehle se record mein mojood hai! Koi naya number likhein.");
                 return;
             }
 
@@ -688,8 +717,13 @@
                 return `${d}/${m}/${y}`;
             };
 
-            // Populate Certificate
-            document.getElementById('displayCertNoGen').innerText = `Certificate No: ${certNo.toUpperCase()}`;
+            // Save Record to LocalStorage
+            const newRecord = { certNo, name, dob, cnic, course, issueDate: formatDate(issueDate), receipt };
+            savedCertificates.push(newRecord);
+            localStorage.setItem('ioch_certificates', JSON.stringify(savedCertificates));
+
+            // Populate Certificate for Preview
+            document.getElementById('displayCertNoGen').innerText = `Certificate No: ${certNo}`;
             document.getElementById('displayNameGen').innerText = name.toUpperCase();
             document.getElementById('displayCourseGen').innerText = course.toUpperCase();
             document.getElementById('displayDateGen').innerText = formatDate(issueDate);
@@ -700,7 +734,7 @@
 
             // Generate QR Code
             document.getElementById('qrcodeGen').innerHTML = "";
-            const verifyUrl = `https://iffi.cc.cd/?verify=${certNo.toUpperCase()}`;
+            const verifyUrl = `https://iffi.cc.cd/?verify=${certNo}`;
             
             qrCodeObjGen = new QRCode(document.getElementById("qrcodeGen"), {
                 text: verifyUrl, width: 70, height: 70,
@@ -709,14 +743,82 @@
 
             // Scroll to certificate
             document.getElementById('certWrapperGen').scrollIntoView({ behavior: 'smooth' });
+
+            // Clear form fields after generation (optional)
+            // document.getElementById('genCertNo').value = ''; ... etc
+
+            renderRecords();
         }
 
-        // --- BAAQI KA DASHBOARD CODE (Same as before) ---
+        // --- RENDER RECORDS ---
+        function renderRecords() {
+            const tbody = document.querySelector('#recordsTable tbody');
+            tbody.innerHTML = '';
+            
+            const searchInput = document.getElementById('searchRecord').value.toLowerCase();
+
+            const filteredRecords = savedCertificates.filter(c => 
+                c.certNo.toLowerCase().includes(searchInput) || 
+                c.name.toLowerCase().includes(searchInput)
+            );
+
+            filteredRecords.forEach(c => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${c.certNo}</b></td>
+                        <td>${c.name}</td>
+                        <td>${c.course}</td>
+                        <td>${c.issueDate}</td>
+                        <td>
+                            <button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="deleteRecord('${c.certNo}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            if(filteredRecords.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">Koi record nahi mila.</td></tr>`;
+            }
+        }
+
+        function deleteRecord(certNo) {
+            if(confirm(`Kya aap certificate ${certNo} ka record delete karna chahte hain?`)) {
+                savedCertificates = savedCertificates.filter(c => c.certNo !== certNo);
+                localStorage.setItem('ioch_certificates', JSON.stringify(savedCertificates));
+                renderRecords();
+            }
+        }
+
+        // --- EXPORT RECORDS TO CSV ---
+        function exportRecordsCSV() {
+            if (savedCertificates.length === 0) {
+                alert("Koi record mojood nahi hai export karne ke liye!");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Certificate Number,Student Name,Date of Birth,CNIC,Course,Issue Date,Receipt No\n";
+
+            savedCertificates.forEach(c => {
+                csvContent += `"${c.certNo}","${c.name}","${c.dob || ''}","${c.cnic || ''}","${c.course}","${c.issueDate}","${c.receipt || ''}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "ioch_certificates.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- BAAQI KA DASHBOARD CODE ---
         function renderAll() {
             renderBranches();
             renderUsers();
             renderInbox();
             updateDashboard();
+            renderRecords();
         }
 
         function updateDashboard() {
