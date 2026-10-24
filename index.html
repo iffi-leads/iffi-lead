@@ -46,14 +46,14 @@
         .sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; }
         .sidebar-header { padding: 24px; font-size: 20px; font-weight: 700; color: var(--white); border-bottom: 1px solid #374151; }
         .sidebar-menu { padding: 20px 0; display: flex; flex-direction: column; gap: 5px; }
-        .menu-item { padding: 12px 24px; color: #9ca3af; font-size: 15px; display: flex; cursor: pointer; border-left: 3px solid transparent; }
+        .menu-item { padding: 12px 24px; color: #9ca3af; font-size: 15px; display: flex; cursor: pointer; border-left: 3px solid transparent; transition: 0.2s;}
         .menu-item:hover, .menu-item.active { background: #1f2937; color: var(--white); border-left-color: var(--primary); }
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         .topbar { background: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
         .content-area { padding: 30px; display: flex; flex-direction: column; gap: 25px; }
         
         /* Pages inside Dashboard */
-        .page { display: none; }
+        .page { display: none; height: 100%; }
         .page.active { display: block; }
 
         /* Stats */
@@ -65,7 +65,8 @@
         /* Forms & Tables */
         .card { background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
         .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-        .btn { background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; }
+        .btn { background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; transition: 0.2s;}
+        .btn:hover { opacity: 0.9; }
         .btn-danger { background: var(--danger); }
         .btn-edit { background: var(--warning); }
         .btn-success { background: var(--success); }
@@ -79,20 +80,29 @@
         .badge-admin { background: #dbeafe; color: #1d4ed8; }
         .badge-sales { background: #fef3c7; color: #b45309; }
         .badge-connected { background: #d1fae5; color: #065f46; }
+        .badge-stopped { background: #fee2e2; color: #991b1b; }
         .logout-btn { margin-top: auto; color: var(--danger) !important; border-top: 1px solid #374151; }
 
         /* WhatsApp Chat UI */
-        .chat-container { display: flex; height: 70vh; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: white;}
-        .chat-sidebar { width: 300px; background: #f8fafc; border-right: 1px solid var(--border); overflow-y: auto; flex-shrink:0;}
-        .chat-user { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; }
-        .chat-user:hover, .chat-user.active { background: #eff6ff; border-left: 3px solid var(--primary); }
+        .chat-container { display: flex; height: 75vh; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: white;}
+        .chat-sidebar { width: 320px; background: #f8fafc; border-right: 1px solid var(--border); overflow-y: auto; flex-shrink:0;}
+        
+        .branch-title { background: #e2e8f0; padding: 10px 20px; font-weight: 700; font-size: 13px; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; }
+        .number-item { padding: 15px 20px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .number-item:hover, .number-item.active { background: #eff6ff; border-left: 3px solid var(--primary); }
+        .number-item h4 { font-size: 14px; margin-bottom: 3px; color: var(--text-main); }
+        .number-item p { font-size: 12px; color: var(--text-muted); }
+        
         .chat-area { flex: 1; display: flex; flex-direction: column; background: #efeae2; }
         .chat-header { padding: 15px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 15px; border-radius: 8px; max-width: 70%; font-size: 14px; }
+        .msg { padding: 10px 15px; border-radius: 8px; max-width: 70%; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
         .msg.received { background: white; align-self: flex-start; }
         .msg.sent { background: #d9fdd3; align-self: flex-end; }
-        .chat-input-area { padding: 10px; background: white; display: flex; gap: 10px; border-top: 1px solid var(--border);}
+        .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid var(--border);}
+        .chat-input-area input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 20px; outline: none; }
+        
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -171,14 +181,6 @@
                             <div class="stat-card" style="border-top:4px solid #10b981;"><h3>New Leads Today</h3><div class="value">45</div></div>
                             <div class="stat-card" style="border-top:4px solid #f59e0b;"><h3>Active WhatsApps</h3><div class="value">3</div></div>
                         </div>
-                        <div class="card">
-                            <div class="card-header"><h2>Recent Leads</h2><button class="btn">+ Add Lead</button></div>
-                            <table>
-                                <tr><th>Name</th><th>Phone</th><th>Course</th><th>Status</th></tr>
-                                <tr><td>Ali Khan</td><td>0300 1234567</td><td>NEBOSH IGC</td><td><span class="badge badge-admin">New</span></td></tr>
-                                <tr><td>Sara Ahmed</td><td>0321 9876543</td><td>IOSH</td><td><span class="badge badge-sales">Follow-up</span></td></tr>
-                            </table>
-                        </div>
                     </div>
 
                     <!-- 2. LEADS PAGE -->
@@ -186,41 +188,67 @@
                         <div class="card">
                             <div class="card-header"><h2>All Leads</h2><button class="btn">+ Add New Lead</button></div>
                             <table>
-                                <tr><th>Student Name</th><th>Phone</th><th>Course Interest</th><th>Branch</th><th>Action</th></tr>
-                                <tr><td>Ali Khan</td><td>0300 1234567</td><td>NEBOSH IGC</td><td>Rawalpindi</td><td><button class="btn btn-edit" style="padding:5px 10px;font-size:12px;">Edit</button></td></tr>
-                                <tr><td>Usman Tariq</td><td>0333 5556677</td><td>OSHA 30</td><td>Lahore</td><td><button class="btn btn-edit" style="padding:5px 10px;font-size:12px;">Edit</button></td></tr>
+                                <thead><tr><th>Student Name</th><th>Phone</th><th>Course Interest</th><th>Branch</th><th>Action</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Ali Khan</td><td>0300 1234567</td><td>NEBOSH IGC</td><td>Rawalpindi</td><td><button class="btn btn-edit" style="padding:5px 10px;font-size:12px;">Edit</button></td></tr>
+                                    <tr><td>Usman Tariq</td><td>0333 5556677</td><td>OSHA 30</td><td>Lahore</td><td><button class="btn btn-edit" style="padding:5px 10px;font-size:12px;">Edit</button></td></tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- 3. WHATSAPP INBOX -->
+                    <!-- 3. WHATSAPP INBOX (UPDATED WITH BRANCHES & NUMBERS) -->
                     <div id="whatsapp" class="page">
                         <div class="chat-container">
+                            <!-- Sidebar with Branches & Numbers -->
                             <div class="chat-sidebar">
-                                <div style="padding:15px; background:white; font-weight:bold; border-bottom:1px solid var(--border);">Active Chats</div>
-                                <div class="chat-user active" onclick="loadChat(this, 'Customer 1')">
-                                    <h4 style="font-size:14px; margin-bottom:3px;">Customer 1</h4>
-                                    <p style="font-size:12px; color:#64748b;">Mujhe details chahiye...</p>
+                                <!-- Rawalpindi Branch -->
+                                <div class="branch-title">📍 Rawalpindi Branch</div>
+                                <div class="number-item active" onclick="loadChat(this, 'Sales Team', '+92 300 1112223', 'Rawalpindi')">
+                                    <div>
+                                        <h4>Sales Team</h4>
+                                        <p>+92 300 1112223</p>
+                                    </div>
+                                    <span class="badge badge-connected" id="status-badge-1">Active</span>
                                 </div>
-                                <div class="chat-user" onclick="loadChat(this, 'Customer 2')">
-                                    <h4 style="font-size:14px; margin-bottom:3px;">Customer 2</h4>
-                                    <p style="font-size:12px; color:#64748b;">Fee kitni hai?</p>
+                                <div class="number-item" onclick="loadChat(this, 'Admin Team', '+92 300 4445556', 'Rawalpindi')">
+                                    <div>
+                                        <h4>Admin Team</h4>
+                                        <p>+92 300 4445556</p>
+                                    </div>
+                                    <span class="badge badge-connected" id="status-badge-2">Active</span>
+                                </div>
+
+                                <!-- Lahore Branch -->
+                                <div class="branch-title">📍 Lahore Branch</div>
+                                <div class="number-item" onclick="loadChat(this, 'Sales Team', '+92 321 7778889', 'Lahore')">
+                                    <div>
+                                        <h4>Sales Team</h4>
+                                        <p>+92 321 7778889</p>
+                                    </div>
+                                    <span class="badge badge-connected" id="status-badge-3">Active</span>
                                 </div>
                             </div>
+
+                            <!-- Chat Area -->
                             <div class="chat-area">
                                 <div class="chat-header">
-                                    <h3 id="chat-title" style="font-size:16px;">Customer 1</h3>
+                                    <div>
+                                        <h3 id="chat-title" style="font-size:16px;">Sales Team</h3>
+                                        <p id="chat-number" style="font-size:12px; color:var(--text-muted);">+92 300 1112223 | Rawalpindi</p>
+                                    </div>
                                     <div style="display:flex; gap:10px;">
-                                        <button class="btn btn-danger" onclick="alert('Chat Deleted')">Delete</button>
-                                        <button class="btn" style="background:var(--warning);" onclick="toggleAccess(this)">Stop Access</button>
+                                        <button class="btn btn-danger" onclick="deleteChat()">🗑️ Delete Chat</button>
+                                        <button class="btn" style="background:var(--warning);" onclick="toggleAccess(this)">⏸️ Hang Chat</button>
                                     </div>
                                 </div>
                                 <div class="chat-box" id="chat-box">
-                                    <div class="msg received">Assalam o Alaikum, mujhe course ki details chahiye.</div>
-                                    <div class="msg sent">Walaikum Assalam! Details bhej rahe hain.</div>
+                                    <div class="msg received">Assalam o Alaikum, mujhe NEBOSH course ki details chahiye.</div>
+                                    <div class="msg sent">Walaikum Assalam! Fee 25,000 hai. Kab start karna chahte hain?</div>
+                                    <div class="msg received">Next week se start karni hai.</div>
                                 </div>
                                 <div class="chat-input-area">
-                                    <input type="text" id="chat-input" placeholder="Type a message..." style="flex:1; padding:10px; border:1px solid var(--border); border-radius:20px; outline:none;">
+                                    <input type="text" id="chat-input" placeholder="Type a message as Super Admin...">
                                     <button class="btn" onclick="sendMsg()">Send</button>
                                 </div>
                             </div>
@@ -250,13 +278,13 @@
                                 </div>
                             </div>
                             <table id="usersTable">
-                                <tr><th>Name</th><th>Role</th><th>Branch</th><th>Action</th></tr>
-                                <!-- Users will be added here -->
+                                <thead><tr><th>Name</th><th>Role</th><th>Branch</th><th>Action</th></tr></thead>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- 5. MANAGE BRANCHES PAGE (UPDATED) -->
+                    <!-- 5. MANAGE BRANCHES PAGE -->
                     <div id="branches" class="page">
                         <div class="card">
                             <div class="card-header"><h2>Manage Branches & Users</h2></div>
@@ -270,12 +298,8 @@
                                 </div>
                             </div>
                             <table id="branchesTable">
-                                <thead>
-                                    <tr><th>User Name</th><th>User Number</th><th>User City</th><th>User Email</th><th>Action</th></tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Branches will be added here -->
-                                </tbody>
+                                <thead><tr><th>User Name</th><th>User Number</th><th>User City</th><th>User Email</th><th>Action</th></tr></thead>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </div>
@@ -324,10 +348,29 @@
         }
 
         // --- CHAT UI ---
-        function loadChat(element, name) {
-            document.querySelectorAll('.chat-user').forEach(u => u.classList.remove('active'));
+        let currentChatStatus = 'active'; // 'active' or 'stopped'
+
+        function loadChat(element, name, number, branch) {
+            // Remove active class from all
+            document.querySelectorAll('.number-item').forEach(u => u.classList.remove('active'));
             element.classList.add('active');
+
+            // Update Header
             document.getElementById('chat-title').innerText = name;
+            document.getElementById('chat-number').innerText = `${number} | ${branch}`;
+
+            // Reset Toggle Button
+            const toggleBtn = document.querySelector('.chat-header .btn[style*="warning"]');
+            if(toggleBtn) {
+                toggleBtn.innerText = '⏸️ Hang Chat';
+                toggleBtn.style.background = 'var(--warning)';
+            }
+
+            // Load dummy chat
+            document.getElementById('chat-box').innerHTML = `
+                <div class="msg received">Assalam o Alaikum, mujhe ${name} ki details chahiye.</div>
+                <div class="msg sent">Walaikum Assalam! Details bhej rahe hain.</div>
+            `;
         }
 
         function sendMsg() {
@@ -343,15 +386,35 @@
             }
         }
 
+        // --- HANG & RESUME CHAT (Super Admin Feature) ---
         function toggleAccess(btn) {
-            if(btn.innerText === 'Stop Access') {
-                btn.innerText = 'Start Access';
-                btn.style.background = 'var(--success)';
-                alert('Access Stopped!');
+            if(btn.innerText.includes('Hang')) {
+                if(confirm('Kya aap iss branch ki team ka access rokna chahte hain?')) {
+                    btn.innerText = '▶️ Resume Chat';
+                    btn.style.background = 'var(--success)';
+                    alert('Chat Hang ho gayi! Ab sales/admin reply nahi kar sakte.');
+                }
             } else {
-                btn.innerText = 'Stop Access';
-                btn.style.background = 'var(--warning)';
-                alert('Access Started!');
+                if(confirm('Kya aap dobara access start karna chahte hain?')) {
+                    btn.innerText = '⏸️ Hang Chat';
+                    btn.style.background = 'var(--warning)';
+                    alert('Chat Resume ho gayi! Ab team reply kar sakti hai.');
+                }
+            }
+        }
+
+        // --- DELETE CHAT (Only Super Admin) ---
+        function deleteChat() {
+            if(confirm('⚠️ Kya aap waqai yeh chat delete karna chahte hain? (Sirf Super Admin)')) {
+                const activeItem = document.querySelector('.number-item.active');
+                if(activeItem) {
+                    activeItem.remove();
+                    alert('Chat Deleted!');
+                    // Reset Chat Box
+                    document.getElementById('chat-title').innerText = "Select a Chat";
+                    document.getElementById('chat-number').innerText = "No Chat Selected";
+                    document.getElementById('chat-box').innerHTML = `<div class="empty-state"><p>Chat Deleted.</p></div>`;
+                }
             }
         }
 
@@ -363,8 +426,8 @@
 
             if(!name) return alert('Name likhein!');
 
-            const table = document.getElementById('usersTable');
-            const row = table.insertRow(-1);
+            const tbody = document.querySelector('#usersTable tbody');
+            const row = tbody.insertRow(-1);
             const badgeClass = role === 'Admin' ? 'badge-admin' : 'badge-sales';
             
             row.innerHTML = `
@@ -376,7 +439,7 @@
             document.getElementById('u_name').value = '';
         }
 
-        // --- BRANCHES FUNCTIONALITY (UPDATED) ---
+        // --- BRANCHES FUNCTIONALITY ---
         function addBranch() {
             const name = document.getElementById('b_name').value;
             const number = document.getElementById('b_number').value;
