@@ -52,21 +52,17 @@
         .topbar { background: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
         .content-area { padding: 30px; display: flex; flex-direction: column; gap: 25px; }
         
-        /* Pages inside Dashboard */
         .page { display: none; height: 100%; }
         .page.active { display: block; }
 
-        /* Stats */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 20px; }
         .stat-card { background: var(--white); padding: 24px; border-radius: 12px; border: 1px solid var(--border); }
         .stat-card h3 { font-size: 14px; color: var(--text-muted); }
         .stat-card .value { font-size: 28px; font-weight: 700; }
 
-        /* Forms & Tables */
         .card { background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
         .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
         .btn { background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; transition: 0.2s;}
-        .btn:hover { opacity: 0.9; }
         .btn-danger { background: var(--danger); }
         .btn-edit { background: var(--warning); }
         .btn-success { background: var(--success); }
@@ -80,29 +76,25 @@
         .badge-admin { background: #dbeafe; color: #1d4ed8; }
         .badge-sales { background: #fef3c7; color: #b45309; }
         .badge-connected { background: #d1fae5; color: #065f46; }
-        .badge-stopped { background: #fee2e2; color: #991b1b; }
         .logout-btn { margin-top: auto; color: var(--danger) !important; border-top: 1px solid #374151; }
 
         /* WhatsApp Chat UI */
         .chat-container { display: flex; height: 75vh; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: white;}
         .chat-sidebar { width: 320px; background: #f8fafc; border-right: 1px solid var(--border); overflow-y: auto; flex-shrink:0;}
-        
-        .branch-title { background: #e2e8f0; padding: 10px 20px; font-weight: 700; font-size: 13px; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; }
-        .number-item { padding: 15px 20px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+        .branch-title { background: #e2e8f0; padding: 10px 20px; font-weight: 700; font-size: 13px; color: #334155; text-transform: uppercase; }
+        .number-item { padding: 15px 20px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .number-item:hover, .number-item.active { background: #eff6ff; border-left: 3px solid var(--primary); }
-        .number-item h4 { font-size: 14px; margin-bottom: 3px; color: var(--text-main); }
+        .number-item h4 { font-size: 14px; margin-bottom: 3px; }
         .number-item p { font-size: 12px; color: var(--text-muted); }
         
         .chat-area { flex: 1; display: flex; flex-direction: column; background: #efeae2; }
         .chat-header { padding: 15px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 15px; border-radius: 8px; max-width: 70%; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
+        .msg { padding: 10px 15px; border-radius: 8px; max-width: 70%; font-size: 14px; }
         .msg.received { background: white; align-self: flex-start; }
         .msg.sent { background: #d9fdd3; align-self: flex-end; }
         .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid var(--border);}
         .chat-input-area input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 20px; outline: none; }
-        
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -177,79 +169,49 @@
                     <!-- 1. DASHBOARD PAGE -->
                     <div id="dashboard" class="page active">
                         <div class="stats-grid">
-                            <div class="stat-card" style="border-top:4px solid #3b82f6;"><h3>Total Leads</h3><div class="value">1,248</div></div>
-                            <div class="stat-card" style="border-top:4px solid #10b981;"><h3>New Leads Today</h3><div class="value">45</div></div>
-                            <div class="stat-card" style="border-top:4px solid #f59e0b;"><h3>Active WhatsApps</h3><div class="value">3</div></div>
+                            <div class="stat-card" style="border-top:4px solid #3b82f6;"><h3>Total Leads</h3><div class="value" id="total-leads">0</div></div>
+                            <div class="stat-card" style="border-top:4px solid #10b981;"><h3>Total Users</h3><div class="value" id="total-users">0</div></div>
+                            <div class="stat-card" style="border-top:4px solid #f59e0b;"><h3>Active WhatsApps</h3><div class="value" id="total-branches">0</div></div>
                         </div>
                     </div>
 
                     <!-- 2. LEADS PAGE -->
                     <div id="leads" class="page">
                         <div class="card">
-                            <div class="card-header"><h2>All Leads</h2><button class="btn">+ Add New Lead</button></div>
+                            <div class="card-header"><h2>All Leads (Static Demo)</h2></div>
                             <table>
-                                <thead><tr><th>Student Name</th><th>Phone</th><th>Course Interest</th><th>Branch</th><th>Action</th></tr></thead>
+                                <thead><tr><th>Student Name</th><th>Phone</th><th>Course Interest</th><th>Branch</th></tr></thead>
                                 <tbody>
-                                    <tr><td>Ali Khan</td><td>0300 1234567</td><td>NEBOSH IGC</td><td>Rawalpindi</td><td><button class="btn btn-edit" style="padding:5px 10px;font-size:12px;">Edit</button></td></tr>
-                                    <tr><td>Usman Tariq</td><td>0333 5556677</td><td>OSHA 30</td><td>Lahore</td><td><button class="btn btn-edit" style="padding:5px 10px;font-size:12px;">Edit</button></td></tr>
+                                    <tr><td>Ali Khan</td><td>0300 1234567</td><td>NEBOSH IGC</td><td>Rawalpindi</td></tr>
+                                    <tr><td>Usman Tariq</td><td>0333 5556677</td><td>OSHA 30</td><td>Lahore</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- 3. WHATSAPP INBOX (UPDATED WITH BRANCHES & NUMBERS) -->
+                    <!-- 3. WHATSAPP INBOX -->
                     <div id="whatsapp" class="page">
                         <div class="chat-container">
-                            <!-- Sidebar with Branches & Numbers -->
-                            <div class="chat-sidebar">
-                                <!-- Rawalpindi Branch -->
-                                <div class="branch-title">📍 Rawalpindi Branch</div>
-                                <div class="number-item active" onclick="loadChat(this, 'Sales Team', '+92 300 1112223', 'Rawalpindi')">
-                                    <div>
-                                        <h4>Sales Team</h4>
-                                        <p>+92 300 1112223</p>
-                                    </div>
-                                    <span class="badge badge-connected" id="status-badge-1">Active</span>
-                                </div>
-                                <div class="number-item" onclick="loadChat(this, 'Admin Team', '+92 300 4445556', 'Rawalpindi')">
-                                    <div>
-                                        <h4>Admin Team</h4>
-                                        <p>+92 300 4445556</p>
-                                    </div>
-                                    <span class="badge badge-connected" id="status-badge-2">Active</span>
-                                </div>
-
-                                <!-- Lahore Branch -->
-                                <div class="branch-title">📍 Lahore Branch</div>
-                                <div class="number-item" onclick="loadChat(this, 'Sales Team', '+92 321 7778889', 'Lahore')">
-                                    <div>
-                                        <h4>Sales Team</h4>
-                                        <p>+92 321 7778889</p>
-                                    </div>
-                                    <span class="badge badge-connected" id="status-badge-3">Active</span>
-                                </div>
+                            <div class="chat-sidebar" id="chat-sidebar">
+                                <!-- Branches and Numbers will be loaded here by JS -->
                             </div>
-
-                            <!-- Chat Area -->
                             <div class="chat-area">
                                 <div class="chat-header">
                                     <div>
-                                        <h3 id="chat-title" style="font-size:16px;">Sales Team</h3>
-                                        <p id="chat-number" style="font-size:12px; color:var(--text-muted);">+92 300 1112223 | Rawalpindi</p>
+                                        <h3 id="chat-title" style="font-size:16px;">Select a Chat</h3>
+                                        <p id="chat-number" style="font-size:12px; color:var(--text-muted);"></p>
                                     </div>
                                     <div style="display:flex; gap:10px;">
-                                        <button class="btn btn-danger" onclick="deleteChat()">🗑️ Delete Chat</button>
-                                        <button class="btn" style="background:var(--warning);" onclick="toggleAccess(this)">⏸️ Hang Chat</button>
+                                        <button class="btn btn-danger" onclick="deleteChat()">🗑️ Delete</button>
+                                        <button class="btn" style="background:var(--warning);" id="toggle-btn" onclick="toggleAccess(this)" disabled>⏸️ Hang Chat</button>
                                     </div>
                                 </div>
                                 <div class="chat-box" id="chat-box">
-                                    <div class="msg received">Assalam o Alaikum, mujhe NEBOSH course ki details chahiye.</div>
-                                    <div class="msg sent">Walaikum Assalam! Fee 25,000 hai. Kab start karna chahte hain?</div>
-                                    <div class="msg received">Next week se start karni hai.</div>
+                                    <div class="empty-state"><p>Select a chat to view messages.</p></div>
                                 </div>
                                 <div class="chat-input-area">
-                                    <input type="text" id="chat-input" placeholder="Type a message as Super Admin...">
-                                    <button class="btn" onclick="sendMsg()">Send</button>
+                                    <input type="text" id="chat-input" placeholder="Type a message..." disabled>
+                                    <button class="btn" id="send-btn" onclick="sendMsg()" disabled>Send</button>
                                 </div>
                             </div>
                         </div>
@@ -262,17 +224,9 @@
                             <div class="form-grid">
                                 <div class="form-group" style="margin:0;"><label>Full Name</label><input type="text" id="u_name" placeholder="John Doe"></div>
                                 <div class="form-group" style="margin:0;"><label>Role</label>
-                                    <select id="u_role">
-                                        <option value="Admin">Admin</option>
-                                        <option value="Sales Staff">Sales Staff</option>
-                                    </select>
+                                    <select id="u_role"><option value="Admin">Admin</option><option value="Sales Staff">Sales Staff</option></select>
                                 </div>
-                                <div class="form-group" style="margin:0;"><label>Branch</label>
-                                    <select id="u_branch">
-                                        <option>Rawalpindi</option>
-                                        <option>Lahore</option>
-                                    </select>
-                                </div>
+                                <div class="form-group" style="margin:0;"><label>Branch</label><input type="text" id="u_branch" placeholder="Rawalpindi"></div>
                                 <div style="display:flex; align-items:flex-end;">
                                     <button class="btn" onclick="addUser()" style="width:100%;">+ Add User</button>
                                 </div>
@@ -287,18 +241,18 @@
                     <!-- 5. MANAGE BRANCHES PAGE -->
                     <div id="branches" class="page">
                         <div class="card">
-                            <div class="card-header"><h2>Manage Branches & Users</h2></div>
+                            <div class="card-header"><h2>Manage Branches</h2></div>
                             <div class="form-grid">
-                                <div class="form-group" style="margin:0;"><label>User Name</label><input type="text" id="b_name" placeholder="Enter User Name"></div>
-                                <div class="form-group" style="margin:0;"><label>User Number</label><input type="text" id="b_number" placeholder="Enter User Number"></div>
-                                <div class="form-group" style="margin:0;"><label>User City</label><input type="text" id="b_city" placeholder="Enter User City"></div>
-                                <div class="form-group" style="margin:0;"><label>User Email</label><input type="email" id="b_email" placeholder="Enter User Email"></div>
+                                <div class="form-group" style="margin:0;"><label>Branch Name</label><input type="text" id="b_name" placeholder="e.g. Islamabad"></div>
+                                <div class="form-group" style="margin:0;"><label>Phone Number</label><input type="text" id="b_number" placeholder="e.g. 0300 1234567"></div>
+                                <div class="form-group" style="margin:0;"><label>City</label><input type="text" id="b_city" placeholder="e.g. Islamabad"></div>
+                                <div class="form-group" style="margin:0;"><label>Email</label><input type="email" id="b_email" placeholder="e.g. isb@ioch.com"></div>
                                 <div style="display:flex; align-items:flex-end; grid-column: span 2;">
-                                    <button class="btn" onclick="addBranch()" style="width:100%;">+ Add Branch User</button>
+                                    <button class="btn" onclick="addBranch()" style="width:100%;">+ Add Branch</button>
                                 </div>
                             </div>
                             <table id="branchesTable">
-                                <thead><tr><th>User Name</th><th>User Number</th><th>User City</th><th>User Email</th><th>Action</th></tr></thead>
+                                <thead><tr><th>Branch Name</th><th>Phone</th><th>City</th><th>Email</th><th>Action</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
@@ -311,33 +265,33 @@
 
     <!-- ================= SCRIPTS ================= -->
     <script>
-        // Open/Close Login
+        // LocalStorage Data Initialize
+        let branches = JSON.parse(localStorage.getItem('ioch_branches')) || [];
+        let users = JSON.parse(localStorage.getItem('ioch_users')) || [];
+        let chats = JSON.parse(localStorage.getItem('ioch_chats')) || [];
+
+        // Login
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
-
-        // Handle Login
         function handleLogin(e) {
             e.preventDefault();
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            if (user === 'superadmin' && pass === 'admin123') {
+            if (document.getElementById('username').value === 'superadmin' && document.getElementById('password').value === 'admin123') {
                 closeLogin();
                 document.getElementById('landing-page').style.display = 'none';
                 document.getElementById('dashboard-page').style.display = 'block';
-            } else {
-                alert('❌ Ghalat Username ya Password!');
-            }
+                renderAll();
+            } else { alert('❌ Ghalat Username ya Password!'); }
         }
-
-        // Logout
         function logout() {
-            if(confirm('Logout karna chahte hain?')) {
+            if(confirm('Logout?')) {
                 document.getElementById('dashboard-page').style.display = 'none';
                 document.getElementById('landing-page').style.display = 'flex';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
             }
         }
 
-        // Navigation (Switch Pages)
+        // Navigation
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
@@ -347,35 +301,173 @@
             document.getElementById('page-title').innerText = titles[pageId];
         }
 
-        // --- CHAT UI ---
-        let currentChatStatus = 'active'; // 'active' or 'stopped'
+        // RENDER FUNCTIONS
+        function renderAll() {
+            renderBranches();
+            renderUsers();
+            renderInbox();
+            updateDashboard();
+        }
 
-        function loadChat(element, name, number, branch) {
-            // Remove active class from all
-            document.querySelectorAll('.number-item').forEach(u => u.classList.remove('active'));
-            element.classList.add('active');
+        function updateDashboard() {
+            document.getElementById('total-users').innerText = users.length;
+            document.getElementById('total-branches').innerText = branches.length;
+        }
 
-            // Update Header
-            document.getElementById('chat-title').innerText = name;
-            document.getElementById('chat-number').innerText = `${number} | ${branch}`;
+        // --- BRANCHES ---
+        function addBranch() {
+            const name = document.getElementById('b_name').value;
+            const number = document.getElementById('b_number').value;
+            const city = document.getElementById('b_city').value;
+            const email = document.getElementById('b_email').value;
+            if(!name || !number) return alert('Branch Name aur Phone zaroori hai!');
+            
+            branches.push({ id: Date.now(), name, number, city, email });
+            localStorage.setItem('ioch_branches', JSON.stringify(branches));
+            
+            document.getElementById('b_name').value = '';
+            document.getElementById('b_number').value = '';
+            document.getElementById('b_city').value = '';
+            document.getElementById('b_email').value = '';
+            renderAll();
+        }
 
-            // Reset Toggle Button
-            const toggleBtn = document.querySelector('.chat-header .btn[style*="warning"]');
-            if(toggleBtn) {
-                toggleBtn.innerText = '⏸️ Hang Chat';
-                toggleBtn.style.background = 'var(--warning)';
+        function renderBranches() {
+            const tbody = document.querySelector('#branchesTable tbody');
+            tbody.innerHTML = '';
+            branches.forEach(b => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${b.name}</b></td>
+                        <td>${b.number}</td>
+                        <td>${b.city}</td>
+                        <td>${b.email}</td>
+                        <td><button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="deleteBranch(${b.id})">Delete</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteBranch(id) {
+            if(confirm('Delete this branch?')) {
+                branches = branches.filter(b => b.id !== id);
+                localStorage.setItem('ioch_branches', JSON.stringify(branches));
+                renderAll();
+            }
+        }
+
+        // --- USERS ---
+        function addUser() {
+            const name = document.getElementById('u_name').value;
+            const role = document.getElementById('u_role').value;
+            const branch = document.getElementById('u_branch').value;
+            if(!name) return alert('Name likhein!');
+
+            users.push({ id: Date.now(), name, role, branch });
+            localStorage.setItem('ioch_users', JSON.stringify(users));
+            document.getElementById('u_name').value = '';
+            renderAll();
+        }
+
+        function renderUsers() {
+            const tbody = document.querySelector('#usersTable tbody');
+            tbody.innerHTML = '';
+            users.forEach(u => {
+                const badgeClass = u.role === 'Admin' ? 'badge-admin' : 'badge-sales';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${u.name}</b></td>
+                        <td><span class="badge ${badgeClass}">${u.role}</span></td>
+                        <td>${u.branch}</td>
+                        <td><button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="deleteUser(${u.id})">Delete</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteUser(id) {
+            if(confirm('Delete this user?')) {
+                users = users.filter(u => u.id !== id);
+                localStorage.setItem('ioch_users', JSON.stringify(users));
+                renderAll();
+            }
+        }
+
+        // --- WHATSAPP INBOX ---
+        let activeChat = null;
+
+        function renderInbox() {
+            const sidebar = document.getElementById('chat-sidebar');
+            sidebar.innerHTML = '';
+            
+            if(branches.length === 0) {
+                sidebar.innerHTML = `<div class="empty-state"><p>Koi branch nahi hai. Pehle branch add karein.</p></div>`;
+                return;
             }
 
-            // Load dummy chat
-            document.getElementById('chat-box').innerHTML = `
-                <div class="msg received">Assalam o Alaikum, mujhe ${name} ki details chahiye.</div>
-                <div class="msg sent">Walaikum Assalam! Details bhej rahe hain.</div>
-            `;
+            branches.forEach(b => {
+                sidebar.innerHTML += `<div class="branch-title">📍 ${b.name} Branch</div>`;
+                // Find chats for this branch number (mocking a chat list)
+                sidebar.innerHTML += `
+                    <div class="number-item" onclick="loadChat(this, '${b.name}', '${b.number}')">
+                        <div>
+                            <h4>${b.name} Sales</h4>
+                            <p>${b.number}</p>
+                        </div>
+                        <span class="badge badge-connected">Active</span>
+                    </div>
+                    <div class="number-item" onclick="loadChat(this, '${b.name}', '${b.number}')">
+                        <div>
+                            <h4>${b.name} Admin</h4>
+                            <p>${b.number}</p>
+                        </div>
+                        <span class="badge badge-connected">Active</span>
+                    </div>
+                `;
+            });
+        }
+
+        function loadChat(element, branchName, number) {
+            document.querySelectorAll('.number-item').forEach(n => n.classList.remove('active'));
+            element.classList.add('active');
+            
+            activeChat = { branchName, number };
+            document.getElementById('chat-title').innerText = element.querySelector('h4').innerText;
+            document.getElementById('chat-number').innerText = number + ' | ' + branchName;
+            
+            // Enable inputs
+            document.getElementById('chat-input').disabled = false;
+            document.getElementById('send-btn').disabled = false;
+            document.getElementById('toggle-btn').disabled = false;
+
+            // Load messages from LocalStorage
+            const savedMessages = chats.filter(c => c.number === number && c.branchName === branchName);
+            const chatBox = document.getElementById('chat-box');
+            
+            if(savedMessages.length === 0) {
+                chatBox.innerHTML = `<div class="msg received">Assalam o Alaikum, mujhe details chahiye.</div>`;
+            } else {
+                chatBox.innerHTML = savedMessages.map(m => `
+                    <div class="msg ${m.sender}">${m.text}</div>
+                `).join('');
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function sendMsg() {
+            if(!activeChat) return;
             const input = document.getElementById('chat-input');
             if(input.value.trim() !== '') {
+                const newMsg = { 
+                    id: Date.now(), 
+                    branchName: activeChat.branchName, 
+                    number: activeChat.number, 
+                    sender: 'sent', 
+                    text: input.value 
+                };
+                chats.push(newMsg);
+                localStorage.setItem('ioch_chats', JSON.stringify(chats));
+                
                 const chatBox = document.getElementById('chat-box');
                 const div = document.createElement('div');
                 div.className = 'msg sent';
@@ -386,100 +478,28 @@
             }
         }
 
-        // --- HANG & RESUME CHAT (Super Admin Feature) ---
         function toggleAccess(btn) {
             if(btn.innerText.includes('Hang')) {
-                if(confirm('Kya aap iss branch ki team ka access rokna chahte hain?')) {
+                if(confirm('Team access band karein?')) {
                     btn.innerText = '▶️ Resume Chat';
                     btn.style.background = 'var(--success)';
-                    alert('Chat Hang ho gayi! Ab sales/admin reply nahi kar sakte.');
                 }
             } else {
-                if(confirm('Kya aap dobara access start karna chahte hain?')) {
-                    btn.innerText = '⏸️ Hang Chat';
-                    btn.style.background = 'var(--warning)';
-                    alert('Chat Resume ho gayi! Ab team reply kar sakti hai.');
-                }
+                btn.innerText = '⏸️ Hang Chat';
+                btn.style.background = 'var(--warning)';
             }
         }
 
-        // --- DELETE CHAT (Only Super Admin) ---
         function deleteChat() {
-            if(confirm('⚠️ Kya aap waqai yeh chat delete karna chahte hain? (Sirf Super Admin)')) {
-                const activeItem = document.querySelector('.number-item.active');
-                if(activeItem) {
-                    activeItem.remove();
-                    alert('Chat Deleted!');
-                    // Reset Chat Box
-                    document.getElementById('chat-title').innerText = "Select a Chat";
-                    document.getElementById('chat-number').innerText = "No Chat Selected";
-                    document.getElementById('chat-box').innerHTML = `<div class="empty-state"><p>Chat Deleted.</p></div>`;
-                }
+            if(confirm('Delete this chat?')) {
+                chats = chats.filter(c => !(c.number === activeChat.number && c.branchName === activeChat.branchName));
+                localStorage.setItem('ioch_chats', JSON.stringify(chats));
+                document.getElementById('chat-box').innerHTML = '<div class="empty-state"><p>Chat cleared.</p></div>';
             }
         }
 
-        // --- USERS FUNCTIONALITY ---
-        function addUser() {
-            const name = document.getElementById('u_name').value;
-            const role = document.getElementById('u_role').value;
-            const branch = document.getElementById('u_branch').value;
-
-            if(!name) return alert('Name likhein!');
-
-            const tbody = document.querySelector('#usersTable tbody');
-            const row = tbody.insertRow(-1);
-            const badgeClass = role === 'Admin' ? 'badge-admin' : 'badge-sales';
-            
-            row.innerHTML = `
-                <td style="font-weight:500;">${name}</td>
-                <td><span class="badge ${badgeClass}">${role}</span></td>
-                <td>${branch}</td>
-                <td><button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="this.closest('tr').remove()">Delete</button></td>
-            `;
-            document.getElementById('u_name').value = '';
-        }
-
-        // --- BRANCHES FUNCTIONALITY ---
-        function addBranch() {
-            const name = document.getElementById('b_name').value;
-            const number = document.getElementById('b_number').value;
-            const city = document.getElementById('b_city').value;
-            const email = document.getElementById('b_email').value;
-
-            if(!name || !number || !city || !email) return alert('Saari details bharein!');
-
-            const tbody = document.querySelector('#branchesTable tbody');
-            const row = tbody.insertRow(-1);
-            
-            row.innerHTML = `
-                <td style="font-weight:500;">${name}</td>
-                <td>${number}</td>
-                <td>${city}</td>
-                <td>${email}</td>
-                <td>
-                    <button class="btn btn-edit" style="padding:5px 10px;font-size:12px;" onclick="editBranch(this)">Edit</button>
-                    <button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="this.closest('tr').remove()">Delete</button>
-                </td>
-            `;
-            document.getElementById('b_name').value = '';
-            document.getElementById('b_number').value = '';
-            document.getElementById('b_city').value = '';
-            document.getElementById('b_email').value = '';
-        }
-
-        function editBranch(btn) {
-            const row = btn.closest('tr');
-            const name = prompt("Naya User Name likhein:", row.cells[0].innerText);
-            const number = prompt("Naya Number likhein:", row.cells[1].innerText);
-            const city = prompt("Naya City likhein:", row.cells[2].innerText);
-            const email = prompt("Naya Email likhein:", row.cells[3].innerText);
-            if(name && number && city && email) {
-                row.cells[0].innerText = name;
-                row.cells[1].innerText = number;
-                row.cells[2].innerText = city;
-                row.cells[3].innerText = email;
-            }
-        }
+        // Load data on start
+        renderAll();
     </script>
 </body>
 </html>
