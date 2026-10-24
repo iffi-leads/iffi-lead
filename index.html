@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOCH - Super Admin Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -12,6 +12,7 @@
             --primary: #3b82f6; --primary-dark: #2563eb; --bg-body: #f8fafc; --text-main: #0f172a;
             --text-muted: #64748b; --white: #ffffff; --border: #e2e8f0; --success: #10b981;
             --warning: #f59e0b; --danger: #ef4444; --sidebar-bg: #0f172a;
+            --gold: #d4af37; --dark-green: #064e3b;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
@@ -44,31 +45,77 @@
         .verify-form button { background: var(--primary); color: white; border: none; padding: 0 30px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; }
         .error-msg { color: var(--danger); margin-top: 15px; display: none; font-size: 14px; font-weight: 600; }
 
-        /* ================= CUSTOM IMAGE CERTIFICATE ================= */
+        /* ================= PROFESSIONAL CERTIFICATE DESIGN ================= */
         .cert-wrapper { display: none; margin-top: 40px; text-align: center; overflow-x: auto; padding-bottom: 20px;}
-        .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; }
+        .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; transition: 0.3s;}
+        .print-btn:hover { background: #059669; }
         
         .cert-container { 
             width: 1000px; 
-            height: 707px; 
+            background: #fffdf8; 
+            padding: 20px; 
             position: relative;
+            border: 15px solid var(--dark-green);
             margin: 0 auto;
-            background-size: 100% 100%;
-            background-position: center;
-            background-repeat: no-repeat;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            /* 👇 YAHAN APNI NAYI IMAGE KA LINK PASTE KAREIN 👇 */
-            background-image: url('https://github.com/iffi-leads/iffi-lead/blob/main/Screenshot%202026-10-25%20003930.png?raw=true'); 
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
         }
+        .cert-inner { 
+            border: 2px solid var(--gold); 
+            padding: 40px; 
+            position: relative; 
+            background: rgba(255, 253, 248, 0.95); 
+            min-height: 650px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Logo & Heading */
+        .cert-logo-head { text-align: center; margin-bottom: 20px; }
+        .cert-logo-head img { height: 90px; margin-bottom: 10px; }
+        .cert-logo-head h3 { font-family: 'Playfair Display', serif; font-size: 22px; letter-spacing: 2px; color: var(--dark-green); font-weight: 800; }
+        
+        /* Title */
+        .cert-title { text-align: center; margin-bottom: 30px; }
+        .cert-title h1 { font-family: 'Playfair Display', serif; font-size: 60px; color: var(--dark-green); text-transform:uppercase; margin-bottom:5px; font-weight: 800; letter-spacing: 3px;}
+        .cert-title h2 { font-size: 14px; letter-spacing: 8px; color: var(--gold); text-transform:uppercase; font-weight: 700;}
 
-        .dyn-text { position: absolute; text-align: center; left: 0; width: 100%; color: #111827; }
-        .cert-no-pos { top: 40px; right: 50px; width: auto; left: auto; font-size: 14px; color: #333; font-weight: 600; background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 5px;}
-        .student-name-pos { top: 300px; font-family: 'Playfair Display', serif; font-size: 45px; color: #064e3b; font-weight: 700; text-transform: uppercase; }
-        .course-name-pos { top: 420px; font-family: 'Playfair Display', serif; font-size: 28px; color: #1e293b; font-weight: 700; text-transform: uppercase; }
-        .date-pos { top: 500px; font-size: 16px; color: #333; font-weight: 600; }
-        .qr-pos { position: absolute; bottom: 50px; right: 80px; display: inline-block; background: white; padding: 5px; border: 1px solid #ccc;}
+        /* Details Area */
+        .cert-details { text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        
+        .presented-text { font-size: 16px; color: #475569; margin-bottom: 10px; font-style: italic;}
+        
+        .name-blank { 
+            border-bottom: 2px solid #cbd5e1; display: inline-block; padding: 0 50px 5px 50px; margin-bottom: 15px; 
+            font-family: 'Playfair Display', serif; font-size: 42px; color: var(--dark-green); font-weight: 700; text-transform: uppercase; min-width: 400px;
+        }
+        
+        .course-text { font-size: 15px; color: #475569; margin-bottom: 5px; }
+        .course-blank { 
+            border-bottom: 1px solid #cbd5e1; display: inline-block; padding: 0 30px 5px 30px; margin-bottom: 15px;
+            font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--dark-green); text-transform: uppercase; min-width: 300px;
+        }
+        
+        .dates-info { font-size: 14px; color: #475569; margin-bottom: 20px; }
+        .dates-info span { font-weight: 600; color: #1e293b; border-bottom: 1px solid #cbd5e1; padding: 0 10px; }
 
-        /* ================= LOGIN MODAL ================= */
+        /* Bottom Section */
+        .cert-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; }
+        
+        .signature { text-align: center; width: 200px; }
+        .sig-line { border-top: 1px solid #1e293b; margin-bottom: 5px; width: 100%; }
+        .signature h4 { font-size: 15px; margin: 0; color: #1e293b; font-weight: 700;}
+        .signature p { font-size: 12px; color: var(--text-muted); margin: 0; font-style: italic;}
+
+        /* QR & Cert Number */
+        .qr-container { text-align: center; width: 130px; }
+        .qr-container #qrcode, .qr-container #qrcodeGen { background: white; padding: 5px; border: 1px solid #ccc; display: inline-block; }
+        .qr-text { font-size: 10px; font-weight: 700; color: #1e293b; margin-top: 5px; text-transform: uppercase; }
+        
+        .cert-number { position: absolute; top: 20px; right: 20px; font-size: 13px; font-weight: 700; color: var(--dark-green); border-bottom: 1px solid #ccc; padding-bottom: 2px;}
+
+        /* ================= LOGIN MODAL & DASHBOARD ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .login-box { background: var(--white); padding: 40px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; position: relative; }
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; border: none; background: none; }
@@ -78,7 +125,6 @@
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; }
         .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; cursor: pointer; }
 
-        /* ================= DASHBOARD ================= */
         #dashboard-page { display: none; height: 100vh; background: var(--bg-body); }
         .dash-layout { display: flex; height: 100%; }
         .sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; }
@@ -137,13 +183,14 @@
         @media print {
             body * { visibility: hidden; }
             .cert-container, .cert-container * { visibility: visible; }
-            .cert-container { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
+            .cert-container { position: absolute; left: 0; top: 0; width: 100%; border-width: 10px; }
             .print-btn, .close-btn { display: none !important; }
         }
     </style>
 </head>
 <body>
 
+    <!-- LANDING PAGE -->
     <div id="landing-page">
         <nav>
             <div class="logo">🚀 IOCH</div>
@@ -163,12 +210,13 @@
             <div class="illustration">💬</div>
         </section>
 
+        <!-- PUBLIC VERIFY -->
         <section class="verify-section" id="verify-section">
             <h2>Verify Student Certificate</h2>
             <p>Enter your Certificate ID to verify its authenticity.</p>
             
             <div class="verify-form">
-                <input type="text" id="certNumberPublic" placeholder="Enter Certificate ID (e.g., IOCH-2026-001)">
+                <input type="text" id="certNumberPublic" placeholder="Enter Certificate ID (e.g., IOCH-2026-1234)">
                 <button onclick="verifyCertificatePublic()">Verify</button>
             </div>
             <p class="error-msg" id="errorMsgPublic">❌ Invalid Certificate Number. Please try again.</p>
@@ -176,18 +224,60 @@
             <div class="cert-wrapper" id="certWrapper">
                 <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Print / Download Certificate</button>
                 
+                <!-- CERTIFICATE DESIGN (PUBLIC VIEW) -->
                 <div class="cert-container" id="certificate">
-                    <div id="displayCertNoPublic" class="dyn-text cert-no-pos">Certificate ID: IOCH-XXXX-XXXX</div>
-                    <div id="displayName" class="dyn-text student-name-pos">[Student Name]</div>
-                    <div id="displayCourse" class="dyn-text course-name-pos">[Course Name]</div>
-                    <div id="displayDate" class="dyn-text date-pos">Issued on: [DD/MM/YYYY]</div>
-                    
-                    <div class="qr-pos" id="qrcode"></div>
+                    <div class="cert-inner">
+                        <div class="cert-number" id="displayCertNoPublic">Certificate ID: IOCH-XXXX-XXXX</div>
+
+                        <div class="cert-logo-head">
+                            <!-- Yahan apna IOCH logo lagayein -->
+                            <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="IOCH Logo" style="filter: sepia(1) hue-rotate(90deg);">
+                            <h3>INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
+                        </div>
+
+                        <div class="cert-title">
+                            <h1>Certificate</h1>
+                            <h2>of Achievement</h2>
+                        </div>
+                        
+                        <div class="cert-details">
+                            <div class="presented-text">This certificate is proudly presented to</div>
+                            <div class="name-blank" id="displayName">[Recipient Name]</div>
+                            
+                            <div class="course-text">for successfully completing the professional training program in</div>
+                            <div class="course-blank" id="displayCourse">[Course Name]</div>
+                            
+                            <div class="dates-info">
+                                from <span id="displayStartDate">[Start Date]</span> to <span id="displayEndDate">[End Date]</span> 
+                                (Duration: <span id="displayDuration">[Duration]</span>)
+                            </div>
+                        </div>
+
+                        <div class="cert-bottom">
+                            <div class="signature">
+                                <div class="sig-line"></div>
+                                <h4>Daniyal Hamza</h4>
+                                <p>Course Instructor</p>
+                            </div>
+
+                            <div class="qr-container">
+                                <div id="qrcode"></div>
+                                <p class="qr-text">Scan to Verify</p>
+                            </div>
+
+                            <div class="signature">
+                                <div class="sig-line"></div>
+                                <h4>Arfa</h4>
+                                <p>Director, IOCH</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     </div>
 
+    <!-- LOGIN MODAL -->
     <div class="modal-overlay" id="loginModal">
         <div class="login-box">
             <button class="close-btn" onclick="closeLogin()">&times;</button>
@@ -206,6 +296,7 @@
         </div>
     </div>
 
+    <!-- DASHBOARD -->
     <div id="dashboard-page">
         <div class="dash-layout">
             <aside class="sidebar">
@@ -319,33 +410,76 @@
                         </div>
                     </div>
 
+                    <!-- GENERATE CERTIFICATE -->
                     <div id="generate-cert" class="page">
                         <div class="card" style="padding: 30px;">
                             <h2 style="margin-bottom: 20px;">Generate New Certificate</h2>
                             <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
-                                <div class="form-group"><label>Certificate ID</label><input type="text" id="genCertNo" placeholder="e.g. IOCH-2026-001" required></div>
+                                <div class="form-group"><label>Certificate ID (Auto/Manual)</label><input type="text" id="genCertNo" placeholder="Leave blank for Auto-Generate"></div>
                                 <div class="form-group"><label>Student Name</label><input type="text" id="genName" placeholder="e.g. Umer Riaz"></div>
-                                <div class="form-group"><label>CNIC</label><input type="text" id="genCnic" placeholder="12345-6789012-3"></div>
                                 <div class="form-group"><label>Course Name</label><input type="text" id="genCourse" placeholder="e.g. FIRST AIDER"></div>
-                                <div class="form-group"><label>Issue Date</label><input type="date" id="genIssueDate"></div>
+                                <div class="form-group"><label>Start Date</label><input type="date" id="genStartDate"></div>
+                                <div class="form-group"><label>End Date</label><input type="date" id="genEndDate"></div>
+                                <div class="form-group"><label>Duration</label><input type="text" id="genDuration" placeholder="e.g. 3 Months"></div>
                                 <div style="display:flex; align-items:flex-end;"><button class="btn btn-success" onclick="generateCertificate()" style="width:100%; padding:12px;">Generate & Save Record</button></div>
                             </div>
                         </div>
 
                         <button class="print-btn" id="printBtnGen" onclick="window.print()" style="display:none;">🖨️ Print / Download Certificate</button>
 
+                        <!-- CERTIFICATE DESIGN (FOR GENERATION) -->
                         <div class="cert-wrapper" id="certWrapperGen">
                             <div class="cert-container" id="certificateGen">
-                                <div id="displayCertNoGen" class="dyn-text cert-no-pos">Certificate No: IOCH-XXXX-XXXX</div>
-                                <div id="displayNameGen" class="dyn-text student-name-pos">[Student Name]</div>
-                                <div id="displayCourseGen" class="dyn-text course-name-pos">[Course Name]</div>
-                                <div id="displayDateGen" class="dyn-text date-pos">Issued on: [DD/MM/YYYY]</div>
-                                
-                                <div class="qr-pos" id="qrcodeGen"></div>
+                                <div class="cert-inner">
+                                    <div class="cert-number" id="displayCertNoGen">Certificate ID: IOCH-XXXX-XXXX</div>
+
+                                    <div class="cert-logo-head">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="IOCH Logo" style="filter: sepia(1) hue-rotate(90deg);">
+                                        <h3>INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
+                                    </div>
+
+                                    <div class="cert-title">
+                                        <h1>Certificate</h1>
+                                        <h2>of Achievement</h2>
+                                    </div>
+                                    
+                                    <div class="cert-details">
+                                        <div class="presented-text">This certificate is proudly presented to</div>
+                                        <div class="name-blank" id="displayNameGen">[Recipient Name]</div>
+                                        
+                                        <div class="course-text">for successfully completing the professional training program in</div>
+                                        <div class="course-blank" id="displayCourseGen">[Course Name]</div>
+                                        
+                                        <div class="dates-info">
+                                            from <span id="displayStartDateGen">[Start Date]</span> to <span id="displayEndDateGen">[End Date]</span> 
+                                            (Duration: <span id="displayDurationGen">[Duration]</span>)
+                                        </div>
+                                    </div>
+
+                                    <div class="cert-bottom">
+                                        <div class="signature">
+                                            <div class="sig-line"></div>
+                                            <h4>Daniyal Hamza</h4>
+                                            <p>Course Instructor</p>
+                                        </div>
+
+                                        <div class="qr-container">
+                                            <div id="qrcodeGen"></div>
+                                            <p class="qr-text">Scan to Verify</p>
+                                        </div>
+
+                                        <div class="signature">
+                                            <div class="sig-line"></div>
+                                            <h4>Arfa</h4>
+                                            <p>Director, IOCH</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- CERTIFICATE RECORDS -->
                     <div id="cert-records" class="page">
                         <div class="card">
                             <div class="card-header">
@@ -357,7 +491,7 @@
                             </div>
                             <div style="overflow-x:auto;">
                                 <table id="recordsTable">
-                                    <thead><tr><th>Cert No.</th><th>Student Name</th><th>Course</th><th>Issue Date</th><th>Action</th></tr></thead>
+                                    <thead><tr><th>Cert ID</th><th>Student Name</th><th>Course</th><th>Issue Date</th><th>Action</th></tr></thead>
                                     <tbody></tbody>
                                 </table>
                             </div>
@@ -369,6 +503,7 @@
         </div>
     </div>
 
+    <!-- ================= SCRIPTS ================= -->
     <script>
         let branches = JSON.parse(localStorage.getItem('ioch_branches')) || [];
         let users = JSON.parse(localStorage.getItem('ioch_users')) || [];
@@ -393,26 +528,33 @@
 
             if (urlCertNo === input && urlName && urlCourse) {
                 certData = { certNo: urlCertNo, name: urlName, course: urlCourse, issueDate: urlDate };
+                document.getElementById('displayStartDate').innerText = "N/A";
+                document.getElementById('displayEndDate').innerText = "N/A";
+                document.getElementById('displayDuration').innerText = "N/A";
             } else {
                 certData = savedCertificates.find(c => c.certNo === input);
+                if (certData) {
+                    document.getElementById('displayStartDate').innerText = certData.startDate || "N/A";
+                    document.getElementById('displayEndDate').innerText = certData.endDate || "N/A";
+                    document.getElementById('displayDuration').innerText = certData.duration || "N/A";
+                }
             }
 
             if(certData) {
                 errorMsg.style.display = 'none';
-                document.getElementById('displayCertNoPublic').innerText = `Certificate No: ${certData.certNo}`;
+                document.getElementById('displayCertNoPublic').innerText = `Certificate ID: ${certData.certNo}`;
                 document.getElementById('displayName').innerText = certData.name;
                 document.getElementById('displayCourse').innerText = certData.course;
-                document.getElementById('displayDate').innerText = `Issued on: ${certData.issueDate}`;
 
                 certWrapper.style.display = 'block';
                 printBtn.style.display = 'inline-block';
 
                 document.getElementById('qrcode').innerHTML = "";
-                const verifyUrl = `https://iffi.cc.cd/?verify=${input}&cert=${certData.certNo}&name=${encodeURIComponent(certData.name)}&course=${encodeURIComponent(certData.course)}&date=${encodeURIComponent(certData.issueDate)}`;
+                const verifyUrl = `https://iffi.cc.cd/?verify=${input}&cert=${certData.certNo}&name=${encodeURIComponent(certData.name)}&course=${encodeURIComponent(certData.course)}&date=${encodeURIComponent(certData.issueDate || '')}`;
                 
                 qrCodeObjPublic = new QRCode(document.getElementById("qrcode"), {
                     text: verifyUrl, width: 70, height: 70,
-                    colorDark : "#111827", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+                    colorDark : "#064e3b", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
                 });
 
                 certWrapper.scrollIntoView({ behavior: 'smooth' });
@@ -467,41 +609,57 @@
         let qrCodeObjGen = null;
 
         function generateCertificate() {
-            const certNo = document.getElementById('genCertNo').value.trim().toUpperCase();
+            let certNo = document.getElementById('genCertNo').value.trim().toUpperCase();
             const name = document.getElementById('genName').value.trim();
-            const cnic = document.getElementById('genCnic').value.trim();
             const course = document.getElementById('genCourse').value.trim();
-            const issueDate = document.getElementById('genIssueDate').value;
+            const startDate = document.getElementById('genStartDate').value;
+            const endDate = document.getElementById('genEndDate').value;
+            const duration = document.getElementById('genDuration').value.trim();
 
-            if(!certNo || !name || !course || !issueDate) { alert("Please fill required fields."); return; }
-            if(savedCertificates.some(c => c.certNo === certNo)) { alert("Yeh Certificate Number pehle se mojood hai!"); return; }
+            if(!name || !course) { alert("Please fill Student Name and Course."); return; }
+            
+            // Auto Generate Certificate Number if Blank
+            if(!certNo) {
+                certNo = `IOCH-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            }
+
+            if(savedCertificates.some(c => c.certNo === certNo)) { alert("Yeh Certificate ID pehle se mojood hai! Koi naya likhein."); return; }
 
             const formatDate = (dateStr) => {
-                if(!dateStr) return "[DD/MM/YYYY]";
+                if(!dateStr) return "N/A";
                 const [y, m, d] = dateStr.split('-');
                 return `${d}/${m}/${y}`;
             };
 
-            savedCertificates.push({ certNo, name, cnic, course, issueDate: formatDate(issueDate) });
+            savedCertificates.push({ 
+                certNo, name, course, 
+                startDate: formatDate(startDate), 
+                endDate: formatDate(endDate), 
+                duration,
+                issueDate: formatDate(new Date().toISOString().split('T')[0]) 
+            });
             localStorage.setItem('ioch_certificates', JSON.stringify(savedCertificates));
 
-            document.getElementById('displayCertNoGen').innerText = `Certificate No: ${certNo}`;
+            document.getElementById('displayCertNoGen').innerText = `Certificate ID: ${certNo}`;
             document.getElementById('displayNameGen').innerText = name.toUpperCase();
             document.getElementById('displayCourseGen').innerText = course.toUpperCase();
-            document.getElementById('displayDateGen').innerText = `Issued on: ${formatDate(issueDate)}`;
+            document.getElementById('displayStartDateGen').innerText = formatDate(startDate);
+            document.getElementById('displayEndDateGen').innerText = formatDate(endDate);
+            document.getElementById('displayDurationGen').innerText = duration || "N/A";
 
             document.getElementById('certWrapperGen').style.display = 'block';
             document.getElementById('printBtnGen').style.display = 'inline-block';
 
             document.getElementById('qrcodeGen').innerHTML = "";
-            const verifyUrl = `https://iffi.cc.cd/?verify=${certNo}&cert=${certNo}&name=${encodeURIComponent(name)}&course=${encodeURIComponent(course)}&date=${encodeURIComponent(formatDate(issueDate))}`;
+            const verifyUrl = `https://iffi.cc.cd/?verify=${certNo}&cert=${certNo}&name=${encodeURIComponent(name)}&course=${encodeURIComponent(course)}`;
             
             qrCodeObjGen = new QRCode(document.getElementById("qrcodeGen"), {
                 text: verifyUrl, width: 70, height: 70,
-                colorDark : "#111827", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
+                colorDark : "#064e3b", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
             });
 
             document.getElementById('certWrapperGen').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('genCertNo').value = certNo; // Show generated number
             renderRecords();
         }
 
@@ -527,8 +685,8 @@
 
         function exportRecordsCSV() {
             if (savedCertificates.length === 0) return alert("Koi record nahi hai!");
-            let csvContent = "data:text/csv;charset=utf-8,Certificate Number,Student Name,CNIC,Course,Issue Date\n";
-            savedCertificates.forEach(c => { csvContent += `"${c.certNo}","${c.name}","${c.cnic || ''}","${c.course}","${c.issueDate}"\n`; });
+            let csvContent = "data:text/csv;charset=utf-8,Certificate ID,Student Name,Course,Start Date,End Date,Duration,Issue Date\n";
+            savedCertificates.forEach(c => { csvContent += `"${c.certNo}","${c.name}","${c.course}","${c.startDate}","${c.endDate}","${c.duration || ''}","${c.issueDate}"\n`; });
             const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", "ioch_certificates.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
