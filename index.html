@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOCH - Super Admin Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
-    <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -106,13 +105,13 @@
 </head>
 <body>
 
-    <!-- LANDING PAGE (For Public) -->
+    <!-- LANDING PAGE (Public) -->
     <div id="landing-page">
         <nav>
             <div class="logo">🚀 IOCH</div>
             <div class="nav-links">
                 <a>Home</a>
-                <a class="btn-login-nav" onclick="openLogin()">Login to CRM</a>
+                <a class="btn-login-nav" onclick="openLogin()">Login</a>
             </div>
         </nav>
         
@@ -145,7 +144,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD (Same as before) -->
+    <!-- DASHBOARD -->
     <div id="dashboard-page">
         <div class="dash-layout">
             <aside class="sidebar">
@@ -156,7 +155,7 @@
                     <a class="menu-item" onclick="showPage('whatsapp')">💬 WhatsApp Inbox</a>
                     <a class="menu-item" onclick="showPage('users')">👨‍💼 Manage Users</a>
                     <a class="menu-item" onclick="showPage('branches')">🏢 Manage Branches</a>
-                    <!-- NAYA TAB: Certificate Verification -->
+                    <!-- Verify Certificate Option in Sidebar -->
                     <a class="menu-item" onclick="showPage('verify-cert')">📜 Verify Certificate</a>
                     
                     <a class="menu-item logout-btn" onclick="logout()">🚪 Logout</a>
@@ -259,7 +258,7 @@
                         </div>
                     </div>
 
-                    <!-- NAYA PAGE: Certificate Verification (CRM ke andar) -->
+                    <!-- CERTIFICATE VERIFICATION PAGE (Now Inside Dashboard) -->
                     <div id="verify-cert" class="page">
                         <div class="card" style="padding: 40px; text-align: center;">
                             <h2 style="margin-bottom: 20px;">Verify Student Certificate</h2>
@@ -276,7 +275,7 @@
                         <!-- CERTIFICATE DESIGN -->
                         <div class="cert-container" id="certificate" style="display:none; width:100%; max-width:1000px; margin:0 auto; background:#fdfbf7; padding:20px; border:15px solid var(--dark-green); box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
                             <div style="border: 2px solid var(--gold); padding: 40px;">
-                                <div class="cert-header" style="text-align:center; margin-bottom:20px;">
+                                <div style="text-align:center; margin-bottom:20px;">
                                     <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; letter-spacing: 2px; color: #1e293b;">INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
                                 </div>
                                 <div style="text-align:center; margin:20px 0;">
@@ -322,7 +321,7 @@
 
     <!-- ================= SCRIPTS ================= -->
     <script>
-        // --- DASHBOARD LOGIC ---
+        // --- DASHBOARD DATA ---
         let branches = JSON.parse(localStorage.getItem('ioch_branches')) || [];
         let users = JSON.parse(localStorage.getItem('ioch_users')) || [];
         let chats = JSON.parse(localStorage.getItem('ioch_chats')) || [];
@@ -546,7 +545,7 @@
             }
         }
 
-        // --- CERTIFICATE VERIFICATION LOGIC ---
+        // --- CERTIFICATE VERIFICATION (Inside Dashboard) ---
         const certificatesDB = {
             "IOCH-2024-1234": { name: "UMER RIAZ", course: "FIRST AIDER", startDate: "01/10/2024", endDate: "15/11/2024" },
             "IOCH-2024-5678": { name: "ALI KHAN", course: "NEBOSH IGC", startDate: "05/08/2024", endDate: "10/10/2024" }
@@ -573,6 +572,7 @@
                 printBtn.style.display = 'inline-block';
 
                 document.getElementById('qrcode').innerHTML = "";
+                // QR Code links to the main website with verify parameter
                 const verifyUrl = `https://iffi.cc.cd/?verify=${input}`;
                 
                 qrCodeObj = new QRCode(document.getElementById("qrcode"), {
@@ -589,23 +589,7 @@
             }
         }
 
-        // Auto-fill from URL
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const verifyId = urlParams.get('verify');
-            if(verifyId) {
-                openLogin(); // Open login if trying to access verify directly (optional)
-                setTimeout(() => {
-                    document.getElementById('username').value = 'superadmin';
-                    document.getElementById('password').value = 'admin123';
-                    handleLogin(new Event('submit'));
-                    showPage('verify-cert');
-                    document.getElementById('certNumber').value = verifyId;
-                    verifyCertificate();
-                }, 500);
-            }
-            renderAll();
-        }
+        renderAll();
     </script>
 </body>
 </html>
