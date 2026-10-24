@@ -54,12 +54,74 @@
         .cert-wrapper { display: none; margin-top: 40px; text-align: center; overflow-x: auto; padding-bottom: 20px;}
         .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; }
         
+        /* Certificate Layout (Matches your format exactly) */
         .cert-container { 
-            width: 1000px; background: #fdfbf7; padding: 20px; position: relative;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 15px solid var(--dark-green);
-            margin: 0 auto; text-align: left;
+            width: 1000px; 
+            background: #fdfbf7; 
+            padding: 15px; 
+            position: relative;
+            border: 12px solid var(--dark-green);
+            margin: 0 auto;
+            text-align: left;
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
         }
-        .cert-inner { border: 2px solid var(--gold); padding: 40px; background: #fdfbf7; }
+        .cert-inner { 
+            border: 2px solid var(--gold); 
+            padding: 30px 40px; 
+            position: relative;
+            background: rgba(253, 251, 247, 0.95);
+        }
+        
+        /* Watermark */
+        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.03; font-size: 200px; font-family: 'Playfair Display', serif; font-weight: bold; color: var(--dark-green); pointer-events: none; z-index: 0;}
+
+        /* Corner Decor */
+        .corner-decor { position: absolute; width: 80px; height: 80px; border: 2px solid var(--gold); z-index: 1;}
+        .top-left { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .top-right { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .bot-left { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .bot-right { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        /* Content */
+        .cert-content { position: relative; z-index: 2; text-align: center; }
+        
+        .cert-header h3 { font-family: 'Playfair Display', serif; font-size: 18px; letter-spacing: 2px; color: var(--dark-green); font-weight: 700; margin-bottom: 10px; }
+        .cert-title h1 { font-family: 'Playfair Display', serif; font-size: 60px; color: var(--dark-green); text-transform:uppercase; margin-bottom:5px; font-weight: 800; letter-spacing: 2px;}
+        .cert-title h2 { font-size: 14px; letter-spacing: 6px; color: var(--gold); text-transform:uppercase; font-weight: 600;}
+        
+        .presented-text { font-style:italic; font-size:16px; color:#475569; margin: 20px 0 10px 0; }
+        .student-name-box { border-bottom: 1px solid var(--gold); display: inline-block; padding: 0 40px 10px 40px; margin-bottom: 15px; }
+        .student-name-text { font-family: 'Playfair Display', serif; font-size: 42px; color: var(--dark-green); font-weight:700; }
+        
+        .course-text { font-size:16px; color:#475569; margin-bottom:10px; }
+        .course-name-text { font-family: 'Playfair Display', serif; font-size:26px; font-weight:700; color:var(--dark-green); margin-bottom: 15px; text-transform:uppercase; }
+        
+        .issue-date { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 30px; }
+
+        /* Icons */
+        .icons-row { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; }
+        .icon-box { text-align: center; }
+        .icon-circle { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--dark-green); display: flex; justify-content: center; align-items: center; font-size: 28px; margin: 0 auto 5px auto; background: white; }
+        .icon-box p { font-size: 11px; font-weight: 700; color: var(--dark-green); text-transform: uppercase; }
+
+        /* Signatures & Seal */
+        .bottom-area { display: flex; justify-content: space-between; align-items: flex-end; position: relative; margin-top: 20px;}
+        
+        .signature { text-align: center; width: 220px; }
+        .sig-name { font-family: 'Great Vibes', cursive; font-size: 34px; color: #1e3a8a; margin-bottom: 5px; transform: rotate(-5deg); }
+        .sig-line { border-top: 1px solid #1e293b; margin-bottom: 5px; width: 100%; }
+        .signature h4 { font-size: 16px; margin: 0; color: #1e293b; font-weight: 700;}
+        .signature p { font-size: 12px; color: var(--text-muted); margin: 0; font-style: italic;}
+
+        .center-seal { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); text-align: center; }
+        .seal-img { width: 110px; margin-bottom: -15px; }
+
+        /* QR Code & Cert Number */
+        .qr-section { text-align: center; width: 150px;}
+        #qrcode { background:white; padding:5px; display:inline-block; border: 1px solid #ccc;}
+        .qr-text { font-size:10px; color:var(--text-muted); margin-top:3px; font-weight: 600;}
+        
+        .cert-number { position: absolute; top: 10px; right: 20px; font-size: 12px; font-weight: 700; color: var(--dark-green); border-bottom: 1px solid #ccc; padding-bottom: 2px;}
 
         /* ================= LOGIN MODAL ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -130,8 +192,9 @@
         /* Print CSS */
         @media print {
             body * { visibility: hidden; }
-            #certificate, #certificate * { visibility: visible; }
-            #certificate { position: absolute; left: 0; top: 0; width: 100%; }
+            .cert-container, .cert-container * { visibility: visible; }
+            .cert-container { position: absolute; left: 0; top: 0; width: 100%; border-width: 10px; }
+            .print-btn, .close-btn { display: none !important; }
         }
     </style>
 </head>
@@ -172,42 +235,76 @@
             <div class="cert-wrapper" id="certWrapper">
                 <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Print / Download Certificate</button>
                 
-                <!-- CERTIFICATE DESIGN -->
+                <!-- CERTIFICATE DESIGN (PUBLIC VIEW) -->
                 <div class="cert-container" id="certificate">
                     <div class="cert-inner">
-                        <div style="text-align:center; margin-bottom:20px;">
-                            <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; letter-spacing: 2px; color: #1e293b;">INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
-                        </div>
-                        <div style="text-align:center; margin:20px 0;">
-                            <h1 style="font-family: 'Playfair Display', serif; font-size: 60px; color: var(--dark-green); text-transform:uppercase; margin-bottom:5px;">Certificate</h1>
-                            <h2 style="font-size: 16px; letter-spacing: 8px; color: var(--gold); text-transform:uppercase;">of Achievement</h2>
-                        </div>
-                        <div style="text-align:center; font-style:italic; font-size:18px; color:#475569; margin-bottom:10px;">This certificate is proudly presented to</div>
-                        <div style="text-align:center;">
-                            <div id="displayName" style="font-family: 'Playfair Display', serif; font-size: 45px; color: var(--dark-green); border-bottom: 2px solid #cbd5e1; display: inline-block; padding: 0 40px 10px 40px; margin-bottom: 20px; font-weight:700;">[Student Name]</div>
-                        </div>
-                        <div style="text-align:center; font-size:18px; color:#475569; margin-bottom:15px;">for successfully completing the professional training program in</div>
-                        <div id="displayCourse" style="text-align:center; font-family: 'Playfair Display', serif; font-size:28px; font-weight:700; color:#1e293b; margin-bottom:30px; text-transform:uppercase;">[Course Name]</div>
-                        <div style="display:flex; justify-content:center; gap:50px; font-size:16px; margin-bottom:40px; font-weight:600; color:#475569;">
-                            <div>Start: <span id="displayStartDate">[DD/MM/YYYY]</span></div>
-                            <div>Completion: <span id="displayEndDate">[DD/MM/YYYY]</span></div>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:40px;">
-                            <div style="text-align:center; width:200px;">
-                                <div style="font-family: 'Great Vibes', cursive; font-size: 36px; color:#1e3a8a; margin-bottom:5px; transform:rotate(-5deg);">Bilal Ahmed</div>
-                                <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
-                                <h4 style="font-size:18px; margin:0;">Bilal Ahmed</h4>
-                                <p style="font-size:13px; color:#64748b; margin:0;">Course Instructor</p>
+                        <!-- Watermark -->
+                        <div class="watermark">IOCH</div>
+                        
+                        <!-- Certificate Number -->
+                        <div class="cert-number" id="displayCertNoPublic">Certificate No: IOCH-XXXX-XXXX</div>
+
+                        <div class="cert-content">
+                            <div class="cert-header">
+                                <h3>INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
                             </div>
-                            <div style="text-align:center; margin-bottom:20px;">
-                                <div id="qrcode" style="background:white; padding:10px; display:inline-block;"></div>
-                                <p style="font-size:12px; color:#64748b; margin-top:5px; font-weight:600;">Scan to Verify</p>
+                            <div class="cert-title">
+                                <h1>Certificate</h1>
+                                <h2>of Achievement</h2>
                             </div>
-                            <div style="text-align:center; width:200px;">
-                                <div style="font-family: 'Great Vibes', cursive; font-size: 28px; color:#1e3a8a; margin-bottom:5px;">Director IOCH</div>
-                                <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
-                                <h4 style="font-size:18px; margin:0;">Director</h4>
-                                <p style="font-size:13px; color:#64748b; margin:0;">Director, IOCH</p>
+                            <div class="presented-text">This certificate is proudly presented to</div>
+                            
+                            <div class="student-name-box">
+                                <div class="student-name-text" id="displayName">[Student Name]</div>
+                            </div>
+                            
+                            <div class="course-text">for successfully completing the professional training program in</div>
+                            <div class="course-name-text" id="displayCourse">[Course Name]</div>
+                            
+                            <div class="issue-date">Issued on: <span id="displayDate">[DD/MM/YYYY]</span></div>
+
+                            <!-- Icons Row -->
+                            <div class="icons-row">
+                                <div class="icon-box">
+                                    <div class="icon-circle">🔥</div>
+                                    <p>Fire Safety</p>
+                                </div>
+                                <div class="icon-box">
+                                    <div class="icon-circle">➕</div>
+                                    <p>First Aid</p>
+                                </div>
+                                <div class="icon-box">
+                                    <div class="icon-circle">📟</div>
+                                    <p>Gas Monitor</p>
+                                </div>
+                            </div>
+
+                            <!-- Signatures & Seal -->
+                            <div class="bottom-area">
+                                <div class="signature">
+                                    <div class="sig-name">Bilal Ahmed</div>
+                                    <div class="sig-line"></div>
+                                    <h4>Bilal Ahmed</h4>
+                                    <p>Course Instructor</p>
+                                </div>
+
+                                <!-- Center Seal (Gold) -->
+                                <div class="center-seal">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="Seal" class="seal-img" style="filter: sepia(1) hue-rotate(90deg);">
+                                </div>
+
+                                <!-- QR Code -->
+                                <div class="qr-section">
+                                    <div id="qrcode"></div>
+                                    <p class="qr-text">Scan to Verify</p>
+                                </div>
+
+                                <div class="signature">
+                                    <div class="sig-name" style="font-size:28px;">Director IOCH</div>
+                                    <div class="sig-line"></div>
+                                    <h4>Director</h4>
+                                    <p>Director, IOCH</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -355,6 +452,10 @@
                             <h2 style="margin-bottom: 20px;">Generate New Certificate</h2>
                             <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
                                 <div class="form-group">
+                                    <label>Certificate Number</label>
+                                    <input type="text" id="genCertNo" placeholder="e.g. IOCH-2024-9999" required>
+                                </div>
+                                <div class="form-group">
                                     <label>Student Name</label>
                                     <input type="text" id="genName" placeholder="e.g. Umer Riaz">
                                 </div>
@@ -371,12 +472,8 @@
                                     <input type="text" id="genCourse" placeholder="e.g. FIRST AIDER">
                                 </div>
                                 <div class="form-group">
-                                    <label>Start Date</label>
-                                    <input type="date" id="genStartDate">
-                                </div>
-                                <div class="form-group">
-                                    <label>Completion Date</label>
-                                    <input type="date" id="genEndDate">
+                                    <label>Issue Date</label>
+                                    <input type="date" id="genIssueDate">
                                 </div>
                                 <div class="form-group">
                                     <label>Payment Receipt No.</label>
@@ -395,41 +492,73 @@
                         <div class="cert-wrapper" id="certWrapperGen">
                             <div class="cert-container" id="certificateGen">
                                 <div class="cert-inner">
-                                    <div style="text-align:center; margin-bottom:20px;">
-                                        <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; letter-spacing: 2px; color: #1e293b;">INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
-                                    </div>
-                                    <div style="text-align:center; margin:20px 0;">
-                                        <h1 style="font-family: 'Playfair Display', serif; font-size: 60px; color: var(--dark-green); text-transform:uppercase; margin-bottom:5px;">Certificate</h1>
-                                        <h2 style="font-size: 16px; letter-spacing: 8px; color: var(--gold); text-transform:uppercase;">of Achievement</h2>
-                                    </div>
-                                    <div style="text-align:center; font-style:italic; font-size:18px; color:#475569; margin-bottom:10px;">This certificate is proudly presented to</div>
-                                    <div style="text-align:center;">
-                                        <div id="displayNameGen" style="font-family: 'Playfair Display', serif; font-size: 45px; color: var(--dark-green); border-bottom: 2px solid #cbd5e1; display: inline-block; padding: 0 40px 10px 40px; margin-bottom: 20px; font-weight:700;">[Student Name]</div>
-                                    </div>
-                                    <div style="text-align:center; font-size:18px; color:#475569; margin-bottom:15px;">for successfully completing the professional training program in</div>
-                                    <div id="displayCourseGen" style="text-align:center; font-family: 'Playfair Display', serif; font-size:28px; font-weight:700; color:#1e293b; margin-bottom:30px; text-transform:uppercase;">[Course Name]</div>
+                                    <!-- Watermark -->
+                                    <div class="watermark">IOCH</div>
                                     
-                                    <div style="display:flex; justify-content:center; gap:50px; font-size:16px; margin-bottom:40px; font-weight:600; color:#475569;">
-                                        <div>Start: <span id="displayStartDateGen">[DD/MM/YYYY]</span></div>
-                                        <div>Completion: <span id="displayEndDateGen">[DD/MM/YYYY]</span></div>
-                                    </div>
+                                    <!-- Certificate Number -->
+                                    <div class="cert-number" id="displayCertNoGen">Certificate No: IOCH-XXXX-XXXX</div>
 
-                                    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:40px;">
-                                        <div style="text-align:center; width:200px;">
-                                            <div style="font-family: 'Great Vibes', cursive; font-size: 36px; color:#1e3a8a; margin-bottom:5px; transform:rotate(-5deg);">Bilal Ahmed</div>
-                                            <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
-                                            <h4 style="font-size:18px; margin:0;">Bilal Ahmed</h4>
-                                            <p style="font-size:13px; color:#64748b; margin:0;">Course Instructor</p>
+                                    <div class="cert-content">
+                                        <div class="cert-header">
+                                            <h3>INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
                                         </div>
-                                        <div style="text-align:center; margin-bottom:20px;">
-                                            <div id="qrcodeGen" style="background:white; padding:10px; display:inline-block;"></div>
-                                            <p style="font-size:12px; color:#64748b; margin-top:5px; font-weight:600;">Scan to Verify</p>
+                                        <div class="cert-title">
+                                            <h1>Certificate</h1>
+                                            <h2>of Achievement</h2>
                                         </div>
-                                        <div style="text-align:center; width:200px;">
-                                            <div style="font-family: 'Great Vibes', cursive; font-size: 28px; color:#1e3a8a; margin-bottom:5px;">Director IOCH</div>
-                                            <div style="border-top:2px solid #1e293b; margin-bottom:10px;"></div>
-                                            <h4 style="font-size:18px; margin:0;">Director</h4>
-                                            <p style="font-size:13px; color:#64748b; margin:0;">Director, IOCH</p>
+                                        <div class="presented-text">This certificate is proudly presented to</div>
+                                        
+                                        <div class="student-name-box">
+                                            <div class="student-name-text" id="displayNameGen">[Student Name]</div>
+                                        </div>
+                                        
+                                        <div class="course-text">for successfully completing the professional training program in</div>
+                                        <div class="course-name-text" id="displayCourseGen">[Course Name]</div>
+                                        
+                                        <div class="issue-date">Issued on: <span id="displayDateGen">[DD/MM/YYYY]</span></div>
+
+                                        <!-- Icons Row -->
+                                        <div class="icons-row">
+                                            <div class="icon-box">
+                                                <div class="icon-circle">🔥</div>
+                                                <p>Fire Safety</p>
+                                            </div>
+                                            <div class="icon-box">
+                                                <div class="icon-circle">➕</div>
+                                                <p>First Aid</p>
+                                            </div>
+                                            <div class="icon-box">
+                                                <div class="icon-circle">📟</div>
+                                                <p>Gas Monitor</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Signatures & Seal -->
+                                        <div class="bottom-area">
+                                            <div class="signature">
+                                                <div class="sig-name">Bilal Ahmed</div>
+                                                <div class="sig-line"></div>
+                                                <h4>Bilal Ahmed</h4>
+                                                <p>Course Instructor</p>
+                                            </div>
+
+                                            <!-- Center Seal (Gold) -->
+                                            <div class="center-seal">
+                                                <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="Seal" class="seal-img" style="filter: sepia(1) hue-rotate(90deg);">
+                                            </div>
+
+                                            <!-- QR Code -->
+                                            <div class="qr-section">
+                                                <div id="qrcodeGen"></div>
+                                                <p class="qr-text">Scan to Verify</p>
+                                            </div>
+
+                                            <div class="signature">
+                                                <div class="sig-name" style="font-size:28px;">Director IOCH</div>
+                                                <div class="sig-line"></div>
+                                                <h4>Director</h4>
+                                                <p>Director, IOCH</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -446,8 +575,8 @@
     <script>
         // --- PUBLIC CERTIFICATE VERIFICATION LOGIC ---
         const certificatesDB = {
-            "IOCH-2024-1234": { name: "UMER RIAZ", course: "FIRST AIDER", startDate: "01/10/2024", endDate: "15/11/2024" },
-            "IOCH-2024-5678": { name: "ALI KHAN", course: "NEBOSH IGC", startDate: "05/08/2024", endDate: "10/10/2024" }
+            "IOCH-2024-1234": { name: "UMER RIAZ", course: "FIRST AIDER", date: "15/11/2024" },
+            "IOCH-2024-5678": { name: "ALI KHAN", course: "NEBOSH IGC", date: "10/10/2024" }
         };
 
         let qrCodeObjPublic = null;
@@ -462,10 +591,10 @@
                 const data = certificatesDB[input];
                 errorMsg.style.display = 'none';
                 
+                document.getElementById('displayCertNoPublic').innerText = `Certificate No: ${input}`;
                 document.getElementById('displayName').innerText = data.name;
                 document.getElementById('displayCourse').innerText = data.course;
-                document.getElementById('displayStartDate').innerText = data.startDate;
-                document.getElementById('displayEndDate').innerText = data.endDate;
+                document.getElementById('displayDate').innerText = data.date;
 
                 certWrapper.style.display = 'block';
                 printBtn.style.display = 'inline-block';
@@ -474,7 +603,7 @@
                 const verifyUrl = `https://iffi.cc.cd/?verify=${input}`;
                 
                 qrCodeObjPublic = new QRCode(document.getElementById("qrcode"), {
-                    text: verifyUrl, width: 80, height: 80,
+                    text: verifyUrl, width: 70, height: 70,
                     colorDark : "#064e3b", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
                 });
 
@@ -541,16 +670,14 @@
         let qrCodeObjGen = null;
 
         function generateCertificate() {
+            const certNo = document.getElementById('genCertNo').value.trim();
             const name = document.getElementById('genName').value.trim();
-            const dob = document.getElementById('genDob').value;
-            const cnic = document.getElementById('genCnic').value.trim();
             const course = document.getElementById('genCourse').value.trim();
-            const startDate = document.getElementById('genStartDate').value;
-            const endDate = document.getElementById('genEndDate').value;
+            const issueDate = document.getElementById('genIssueDate').value;
             const receipt = document.getElementById('genReceipt').value.trim();
 
-            if(!name || !course || !startDate || !endDate) {
-                alert("Please fill Student Name, Course, and Dates.");
+            if(!certNo || !name || !course || !issueDate) {
+                alert("Please fill Certificate Number, Student Name, Course, and Issue Date.");
                 return;
             }
 
@@ -562,22 +689,21 @@
             };
 
             // Populate Certificate
+            document.getElementById('displayCertNoGen').innerText = `Certificate No: ${certNo.toUpperCase()}`;
             document.getElementById('displayNameGen').innerText = name.toUpperCase();
             document.getElementById('displayCourseGen').innerText = course.toUpperCase();
-            document.getElementById('displayStartDateGen').innerText = formatDate(startDate);
-            document.getElementById('displayEndDateGen').innerText = formatDate(endDate);
+            document.getElementById('displayDateGen').innerText = formatDate(issueDate);
 
             // Show Preview
             document.getElementById('certWrapperGen').style.display = 'block';
             document.getElementById('printBtnGen').style.display = 'inline-block';
 
-            // Generate QR Code (Unique Certificate ID based on Name + Receipt)
-            const certId = `IOCH-${new Date().getFullYear()}-${receipt || Math.floor(Math.random()*10000)}`;
+            // Generate QR Code
             document.getElementById('qrcodeGen').innerHTML = "";
-            const verifyUrl = `https://iffi.cc.cd/?verify=${certId}`;
+            const verifyUrl = `https://iffi.cc.cd/?verify=${certNo.toUpperCase()}`;
             
             qrCodeObjGen = new QRCode(document.getElementById("qrcodeGen"), {
-                text: verifyUrl, width: 80, height: 80,
+                text: verifyUrl, width: 70, height: 70,
                 colorDark : "#064e3b", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H
             });
 
