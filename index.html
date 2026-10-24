@@ -3,200 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IOCH CRM - Premium Enterprise</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>IOCH CRM - Super Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #09090b;
-            --bg-card: #18181b;
-            --primary: #f59e0b; /* Golden/Amber */
-            --primary-hover: #d97706;
-            --text-main: #f8fafc;
-            --text-muted: #a1a1aa;
-            --border: #27272a;
-            --success: #10b981;
-            --danger: #ef4444;
+            --primary: #3b82f6; --primary-dark: #2563eb; --bg-body: #f8fafc; --text-main: #0f172a;
+            --text-muted: #64748b; --white: #ffffff; --border: #e2e8f0; --success: #10b981;
+            --warning: #f59e0b; --danger: #ef4444; --sidebar-bg: #0f172a;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; overflow: hidden; }
+        /* --- LANDING PAGE --- */
+        #landing-page { background: var(--bg-body); min-height: 100vh; display: flex; flex-direction: column; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 8%; background: var(--white); position: fixed; width: 100%; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-size: 24px; font-weight: 700; color: var(--text-main); }
+        .logo span { color: var(--primary); }
+        .nav-links a { text-decoration: none; color: var(--text-muted); margin-left: 20px; cursor: pointer; }
+        .btn-login-nav { background: var(--primary); color: white !important; padding: 10px 25px; border-radius: 50px; }
+        
+        .hero { min-height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 0 8%; background: #eff6ff; padding-top: 80px; }
+        .hero-text h1 { font-size: 48px; font-weight: 700; line-height: 1.2; margin-bottom: 20px; }
+        .hero-text h1 span { color: var(--primary); }
+        .hero-text p { font-size: 16px; color: var(--text-muted); margin-bottom: 30px; }
+        .btn-main { background: var(--text-main); color: white; padding: 15px 35px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; }
+        .illustration { width: 350px; height: 350px; background: linear-gradient(135deg, var(--primary), #8b5cf6); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 80px; color: white; }
 
-        /* --- PREMIUM LOGIN MODAL --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .login-box { 
-            background: linear-gradient(145deg, #18181b, #09090b); 
-            padding: 50px 40px; 
-            border-radius: 24px; 
-            width: 100%; 
-            max-width: 420px; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.05); 
-            text-align: center; 
-            position: relative;
-            overflow: hidden;
-        }
-        .login-box::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 60%);
-            z-index: 0; pointer-events: none;
-        }
-        .login-content { position: relative; z-index: 1; }
-        
-        .login-box h2 { font-size: 32px; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
-        .login-box h2 span { color: var(--primary); }
-        .login-box p { color: var(--text-muted); font-size: 15px; margin-bottom: 35px; }
-        
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; font-size: 13px; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
-        .form-group input { 
-            width: 100%; padding: 16px; 
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid var(--border); 
-            border-radius: 12px; 
-            color: white; 
-            font-size: 15px; 
-            transition: 0.3s; 
-            outline: none;
-        }
-        .form-group input:focus { border-color: var(--primary); background: rgba(255,255,255,0.05); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15); }
-        
-        .btn-submit { 
-            width: 100%; 
-            background: linear-gradient(to right, var(--primary), #fbbf24); 
-            color: #000; 
-            padding: 16px; 
-            border-radius: 12px; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: 800; 
-            margin-top: 10px; 
-            transition: 0.3s;
-            box-shadow: 0 10px 20px -10px rgba(245, 158, 11, 0.5);
-        }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -10px rgba(245, 158, 11, 0.6); }
+        /* --- LOGIN MODAL --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: var(--white); padding: 40px; border-radius: 15px; width: 100%; max-width: 400px; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; background: none; border: none; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; }
+        .btn-submit { width: 100%; background: var(--primary); color: white; padding: 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; }
 
-        /* --- DASHBOARD LAYOUT --- */
-        #dashboard-page { display: none; height: 100vh; }
+        /* --- DASHBOARD --- */
+        #dashboard-page { display: none; height: 100vh; background: var(--bg-body); }
         .dash-layout { display: flex; height: 100%; }
+        .sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink:0; }
+        .sidebar-header { padding: 20px; font-size: 20px; color: white; font-weight: bold; border-bottom: 1px solid #334155; }
+        .menu-item { padding: 15px 20px; color: #94a3b8; cursor: pointer; display: block; text-decoration: none; border-left: 3px solid transparent; }
+        .menu-item:hover, .menu-item.active { background: #1e293b; color: white; border-left-color: var(--primary); }
         
-        /* Sidebar */
-        .sidebar { width: 280px; background: var(--bg-card); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink:0; }
-        .sidebar-header { padding: 30px; font-size: 22px; color: white; font-weight: 800; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;}
-        .sidebar-header span { color: var(--primary); }
-        .menu-item { padding: 16px 30px; cursor: pointer; display: flex; align-items: center; gap: 15px; font-size: 15px; font-weight: 600; color: var(--text-muted); transition: 0.2s; border-left: 3px solid transparent; }
-        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.03); color: white; border-left-color: var(--primary); }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .topbar { background: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); align-items: center;}
+        .content-area { padding: 30px; }
         
-        /* Main Content */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg-dark); }
-        .topbar { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(10px); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
-        .topbar h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px;}
-        .user-profile { display: flex; align-items: center; gap: 15px; font-size: 14px; font-weight: 600; }
-        .avatar { width: 45px; height: 45px; background: linear-gradient(135deg, var(--primary), #d97706); color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 18px; box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);}
-        
-        .content-area { padding: 40px; height: calc(100vh - 85px); overflow-y: auto; }
-        .page { display: none; animation: fadeIn 0.4s ease; }
+        .page { display: none; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Cards */
-        .card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.2); margin-bottom: 25px; overflow: hidden; }
-        .card-header { padding: 25px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
-        .card-header h2 { font-size: 18px; font-weight: 700; color: white; }
+        .card { background: white; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .card-header { padding: 20px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .btn { background: var(--primary); color: white; padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; font-size:14px;}
+        .btn-danger { background: var(--danger); }
         
-        .btn { background: var(--primary); color: #000; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
-        .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2);}
-        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); transform: none; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 20px; }
         
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; padding: 30px; }
-        
-        /* Tables */
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 20px 30px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
-        th { background: rgba(255,255,255,0.02); font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; }
-        tr:hover td { background: rgba(255,255,255,0.01); }
-        .badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2);}
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+        th { background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
         
-        /* --- WHATSAPP INBOX UI (Premium) --- */
-        .chat-container { display: flex; height: 75vh; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--bg-card); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .chat-sidebar { width: 350px; background: var(--bg-card); border-right: 1px solid var(--border); overflow-y: auto; flex-shrink:0; }
+        /* --- WHATSAPP CHAT UI --- */
+        .chat-container { display: flex; height: 600px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: white;}
+        .chat-sidebar { width: 320px; background: #f8fafc; border-right: 1px solid var(--border); overflow-y: auto; flex-shrink:0;}
+        .chat-user { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; }
+        .chat-user:hover, .chat-user.active { background: #e2e8f0; }
+        .chat-user h4 { font-size: 15px; margin-bottom: 3px; }
+        .chat-user p { font-size: 12px; color: var(--text-muted); }
         
-        .number-title { background: rgba(255,255,255,0.03); padding: 15px 25px; font-weight: 700; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; margin-right: 10px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);}
-        
-        .chat-user { padding: 20px 25px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
-        .chat-user:hover, .chat-user.active { background: rgba(255,255,255,0.05); border-left: 4px solid var(--primary); }
-        .chat-user h4 { font-size: 15px; margin-bottom: 5px; color: white; font-weight: 600; }
-        .chat-user p { font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: #0f0f11; }
-        .chat-header { padding: 20px 30px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .chat-box { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        
-        .msg { padding: 14px 20px; border-radius: 16px; max-width: 65%; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); line-height: 1.6;}
-        .msg.received { background: var(--bg-card); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--border); }
-        .msg.sent { background: linear-gradient(135deg, var(--primary), #d97706); color: #000; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500;}
-        
-        .chat-input-area { padding: 20px 30px; background: var(--bg-card); display: flex; gap: 15px; border-top: 1px solid var(--border); align-items: center;}
-        .chat-input-area input { flex: 1; padding: 16px 25px; border: 1px solid var(--border); border-radius: 30px; outline: none; background: rgba(255,255,255,0.03); font-size: 15px; color: white; transition: 0.3s;}
-        .chat-input-area input:focus { border-color: var(--primary); background: rgba(255,255,255,0.05); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1); }
-        .chat-input-area .btn { border-radius: 30px; padding: 16px 30px; }
-        
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); text-align: center; padding: 20px;}
-        .empty-state h3 { font-size: 20px; color: white; margin-bottom: 10px; font-weight: 700; }
-        .empty-state p { font-size: 14px; }
-        
-        /* Dashboard Stats */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-        .stat-card { background: var(--bg-card); padding: 30px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden;}
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary); }
-        .stat-card h3 { font-size: 14px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
-        .stat-card .value { font-size: 42px; font-weight: 800; color: white; }
-        .stat-card p { font-size: 13px; color: var(--text-muted); }
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: #efeae2; }
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 8px; max-width: 70%; font-size: 14px; }
+        .msg.received { background: white; align-self: flex-start; }
+        .msg.sent { background: #d9fdd3; align-self: flex-end; }
+        .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid var(--border);}
+        .chat-input-area input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 20px; outline: none; }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN MODAL -->
-    <div class="modal-overlay" id="loginModal" style="display: flex;">
-        <div class="login-box">
-            <div class="login-content">
-                <h2>IOCH <span>CRM</span></h2>
-                <p>Enter your credentials to access the premium portal.</p>
-                <form onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" id="username" placeholder="superadmin" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="password" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn-submit">Sign In to Dashboard</button>
-                </form>
+    <!-- LANDING PAGE -->
+    <div id="landing-page">
+        <nav>
+            <div class="logo">🚀 IOCH<span>CRM</span></div>
+            <div class="nav-links">
+                <a class="btn-login-nav" onclick="openLogin()">Login</a>
             </div>
+        </nav>
+        <section class="hero">
+            <div class="hero-text">
+                <h1>Manage <span>Leads</span> & WhatsApps Easily.</h1>
+                <p>Super Admin Control Panel with Advanced WhatsApp API Integration.</p>
+                <button class="btn-main" onclick="openLogin()">Super Admin Login</button>
+            </div>
+            <div class="illustration">💬</div>
+        </section>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-box">
+            <button class="close-btn" onclick="closeLogin()">&times;</button>
+            <h2 style="margin-bottom:20px;">Super Admin Login</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="superadmin" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="admin123" required>
+                </div>
+                <button type="submit" class="btn-submit">Login</button>
+            </form>
         </div>
     </div>
 
     <!-- DASHBOARD -->
     <div id="dashboard-page">
         <div class="dash-layout">
-            <!-- Sidebar -->
             <aside class="sidebar">
-                <div class="sidebar-header">🚀 IOCH <span>CRM</span></div>
+                <div class="sidebar-header">🚀 IOCH CRM</div>
                 <a class="menu-item active" onclick="showPage('dashboard', this)">📊 Dashboard</a>
                 <a class="menu-item" onclick="showPage('inbox', this)">💬 WhatsApp Inbox</a>
-                <a class="menu-item" onclick="showPage('numbers', this)">📱 My Numbers & API</a>
+                <a class="menu-item" onclick="showPage('setup', this)">⚙️ WhatsApp Setup</a>
+                <a class="menu-item" onclick="showPage('users', this)">👨‍💼 Manage Users</a>
                 <a class="menu-item" style="margin-top:auto; color:#ef4444;" onclick="logout()">🚪 Logout</a>
             </aside>
 
-            <!-- Main Content -->
             <main class="main-content">
                 <header class="topbar">
                     <h1 id="page-title">Dashboard Overview</h1>
-                    <div class="user-profile">
+                    <div style="display:flex; align-items:center; gap:10px;">
                         <span>Super Admin</span>
-                        <div class="avatar">SA</div>
+                        <div style="width:35px;height:35px;background:#3b82f6;color:white;border-radius:50%;display:flex;justify-content:center;align-items:center;">SA</div>
                     </div>
                 </header>
 
@@ -204,91 +144,115 @@
                     
                     <!-- 1. DASHBOARD -->
                     <div id="dashboard" class="page active">
-                        <h2 style="margin-bottom: 30px; font-weight: 700; color: white; font-size: 24px;">Welcome Back, Super Admin! 👋</h2>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <h3>Connected Numbers</h3>
-                                <div class="value" id="dash-num-count" style="color: var(--primary);">0</div>
-                                <p>Active WhatsApp APIs</p>
-                            </div>
-                            <div class="stat-card" style="--primary: #10b981;">
-                                <h3>Total Incoming Chats</h3>
-                                <div class="value" style="color: var(--success);">0</div>
-                                <p>Messages received today</p>
-                            </div>
-                            <div class="stat-card" style="--primary: #3b82f6;">
-                                <h3>Total Leads</h3>
-                                <div class="value" style="color: #3b82f6;">1,248</div>
-                                <p>Active prospects in system</p>
-                            </div>
-                        </div>
+                        <h2 style="font-size: 24px; color: var(--text-main);">Welcome Super Admin</h2>
+                        <p style="color: var(--text-muted);">Use the sidebar to manage Leads, Users, and WhatsApp Settings.</p>
                     </div>
 
-                    <!-- 2. WHATSAPP INBOX -->
+                    <!-- 2. WHATSAPP INBOX (All Branches) -->
                     <div id="inbox" class="page">
-                        <div class="chat-container">
-                            <div class="chat-sidebar" id="inbox-sidebar">
-                                <div class="empty-state">
-                                    <h3>No Chats Yet</h3>
-                                    <p style="font-size:13px; margin-top:5px;">Connect a number in "My Numbers" to start receiving messages.</p>
-                                </div>
-                            </div>
-
-                            <div class="chat-area">
-                                <div id="no-chat-selected" class="empty-state">
-                                    <h3>Select a Conversation</h3>
-                                    <p>Choose a chat from the left sidebar to view and reply.</p>
-                                </div>
-
-                                <div id="active-chat-ui" style="display:none; flex-direction:column; height:100%;">
-                                    <div class="chat-header">
-                                        <div>
-                                            <h3 id="chat-title" style="font-size:18px; font-weight:700; color:white;">Customer Name</h3>
-                                            <p id="chat-number" style="font-size:13px; color:var(--success); font-weight:600; margin-top:2px;">🟢 Online</p>
-                                        </div>
-                                        <button class="btn btn-danger" onclick="deleteChat()">🗑️ Delete</button>
+                        <div class="card" style="padding:0; border:none;">
+                            <div class="chat-container">
+                                <!-- Users List -->
+                                <div class="chat-sidebar">
+                                    <div style="padding:15px; background:white; font-weight:bold; border-bottom:1px solid var(--border);">All Branch Chats</div>
+                                    
+                                    <div class="chat-user active" onclick="loadChat('Ali Khan', 'Rawalpindi')">
+                                        <h4>Ali Khan <span style="font-size:10px; background:#dbeafe; color:#1d4ed8; padding:2px 6px; border-radius:4px;">Rawalpindi</span></h4>
+                                        <p>Assigned to: Sales Staff</p>
                                     </div>
-                                    <div class="chat-box" id="chat-box"></div>
+                                    <div class="chat-user" onclick="loadChat('Sara Ahmed', 'Lahore')">
+                                        <h4>Sara Ahmed <span style="font-size:10px; background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:4px;">Lahore</span></h4>
+                                        <p>Assigned to: Admin</p>
+                                    </div>
+                                </div>
+
+                                <!-- Chat Area -->
+                                <div class="chat-area">
+                                    <div style="padding:15px; background:white; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                                        <div>
+                                            <h3 id="chat-title" style="font-size:16px;">Ali Khan</h3>
+                                            <p id="chat-branch" style="font-size:12px; color:var(--text-muted);">Branch: Rawalpindi</p>
+                                        </div>
+                                        <button class="btn btn-danger" onclick="stopAccess(this)">🛑 Stop Sales/Admin Access</button>
+                                    </div>
+
+                                    <div class="chat-box" id="chat-box">
+                                        <div class="msg received">Assalam o Alaikum, mujhe NEBOSH course ki details chahiye.</div>
+                                        <div class="msg sent">Walaikum Assalam! Fee 25,000 hai. Kab start karna chahte hain?</div>
+                                        <div class="msg received">Next week se start karni hai.</div>
+                                    </div>
+
                                     <div class="chat-input-area">
-                                        <input type="text" id="chat-input" placeholder="Type your message here...">
-                                        <button class="btn" onclick="sendMsg()">Send ➤</button>
+                                        <input type="text" id="chat-input" placeholder="Type a message as Super Admin...">
+                                        <button class="btn" onclick="sendMsg()">Send</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 3. MY NUMBERS & API SETUP -->
-                    <div id="numbers" class="page">
+                    <!-- 3. WHATSAPP SETUP -->
+                    <div id="setup" class="page">
                         <div class="card">
-                            <div class="card-header"><h2>Connect New WhatsApp Number (Meta API)</h2></div>
+                            <div class="card-header"><h2>Connect WhatsApp API</h2></div>
                             <div class="form-grid">
                                 <div class="form-group">
+                                    <label>API Provider</label>
+                                    <select id="wa_provider">
+                                        <option>Meta Official API</option>
+                                        <option>Twilio</option>
+                                        <option>UltraMsg</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label>WhatsApp Number</label>
-                                    <input type="text" id="wa_number" placeholder="+92 300 1234567">
+                                    <input type="text" id="wa_phone" placeholder="+92 300 1234567">
                                 </div>
                                 <div class="form-group">
-                                    <label>Meta API Token</label>
-                                    <input type="password" id="wa_token" placeholder="Enter Long-Lived Token">
+                                    <label>API Token / Key</label>
+                                    <input type="password" id="wa_token" placeholder="Enter Token">
                                 </div>
                                 <div class="form-group">
-                                    <label>Phone Number ID</label>
-                                    <input type="text" id="wa_phone_id" placeholder="e.g. 10987654321">
+                                    <label>Phone Number ID (Meta)</label>
+                                    <input type="text" id="wa_id" placeholder="e.g. 10987654321">
                                 </div>
                                 <div style="display:flex; align-items:flex-end;">
-                                    <button class="btn" onclick="connectNumber()" style="width:100%; justify-content:center;">Connect Number</button>
+                                    <button class="btn" onclick="saveAPI()" style="width:100%;">Connect Now</button>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
+                    <!-- 4. MANAGE USERS -->
+                    <div id="users" class="page">
                         <div class="card">
-                            <div class="card-header"><h2>My Connected Numbers</h2></div>
-                            <table id="numbersTable">
-                                <thead><tr><th>WhatsApp Number</th><th>Phone Number ID</th><th>Status</th><th>Action</th></tr></thead>
-                                <tbody>
-                                    <!-- Connected numbers will appear here -->
-                                </tbody>
-                            </table>
+                            <div class="card-header"><h2>Create User / Staff</h2></div>
+                            <div class="form-grid">
+                                <div class="form-group"><label>Full Name</label><input type="text" id="u_name" placeholder="John Doe"></div>
+                                <div class="form-group"><label>Role</label>
+                                    <select id="u_role">
+                                        <option>Admin</option>
+                                        <option>Sales Staff</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Phone Number</label><input type="text" id="u_phone" placeholder="0300 1234567"></div>
+                                <div class="form-group"><label>Email Address</label><input type="email" id="u_email" placeholder="user@example.com"></div>
+                                <div class="form-group"><label>Assigned Email</label><input type="email" id="u_assigned_email" placeholder="assigned@example.com"></div>
+                                <div class="form-group"><label>CNIC Number</label><input type="text" id="u_cnic" placeholder="12345-1234567-1"></div>
+                                <div style="display:flex; align-items:flex-end;">
+                                    <button class="btn" onclick="addUser()" style="width:100%;">+ Add User</button>
+                                </div>
+                            </div>
+                            <div style="overflow-x: auto;">
+                                <table id="usersTable">
+                                    <thead>
+                                        <tr><th>Name</th><th>Role</th><th>Phone</th><th>Email</th><th>Assigned Email</th><th>CNIC</th><th>Action</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Users appended here -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -299,20 +263,20 @@
 
     <!-- SCRIPTS -->
     <script>
-        let connectedNumbers = []; 
-
         // Auth
+        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+        function closeLogin() { document.getElementById('loginModal').style.display = 'none'; }
         function handleLogin(e) {
             e.preventDefault();
             if (document.getElementById('username').value === 'superadmin' && document.getElementById('password').value === 'admin123') {
-                document.getElementById('loginModal').style.display = 'none';
+                closeLogin();
+                document.getElementById('landing-page').style.display = 'none';
                 document.getElementById('dashboard-page').style.display = 'block';
             } else { alert('❌ Ghalat Username ya Password!'); }
         }
-        
         function logout() {
             document.getElementById('dashboard-page').style.display = 'none';
-            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('landing-page').style.display = 'flex';
         }
 
         // Navigation
@@ -321,95 +285,64 @@
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
             if(element) element.classList.add('active');
-            
-            const titles = { 'dashboard': 'Dashboard Overview', 'inbox': 'WhatsApp Inbox', 'numbers': 'My Numbers & API' };
+            const titles = { 'dashboard': 'Dashboard', 'inbox': 'WhatsApp Inbox', 'setup': 'WhatsApp API Setup', 'users': 'Manage Users' };
             document.getElementById('page-title').innerText = titles[pageId];
-            
-            if(pageId === 'inbox') updateInboxView();
         }
 
-        // --- CONNECT NUMBER (API) ---
-        function connectNumber() {
-            const number = document.getElementById('wa_number').value;
-            const token = document.getElementById('wa_token').value;
-            const phoneId = document.getElementById('wa_phone_id').value;
+        // 1. ADD USER
+        function addUser() {
+            const name = document.getElementById('u_name').value;
+            const role = document.getElementById('u_role').value;
+            const phone = document.getElementById('u_phone').value;
+            const email = document.getElementById('u_email').value;
+            const assigned = document.getElementById('u_assigned_email').value;
+            const cnic = document.getElementById('u_cnic').value;
 
-            if(!number || !token || !phoneId) {
-                alert('Meherbani kar ke saari details bharein!');
-                return;
+            if(name.trim() === '' || phone.trim() === '' || email.trim() === '') {
+                alert('Name, Phone aur Email zaroori hain!'); return;
             }
 
-            connectedNumbers.push({ number, token, phoneId, chats: [] });
-            
-            const tbody = document.querySelector('#numbersTable tbody');
+            const tbody = document.querySelector('#usersTable tbody');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><b style="color:white;">${number}</b></td>
-                <td style="color:var(--text-muted);">${phoneId}</td>
-                <td><span class="badge">🟢 Connected</span></td>
-                <td><button class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="removeNumber(this)">Remove</button></td>
+                <td><b>${name}</b></td>
+                <td>${role}</td>
+                <td>${phone}</td>
+                <td>${email}</td>
+                <td>${assigned}</td>
+                <td>${cnic}</td>
+                <td><button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="this.closest('tr').remove()">Delete</button></td>
             `;
             tbody.appendChild(tr);
-
-            document.getElementById('dash-num-count').innerText = connectedNumbers.length;
-
-            document.getElementById('wa_number').value = '';
-            document.getElementById('wa_token').value = '';
-            document.getElementById('wa_phone_id').value = '';
-
-            alert('✅ Number Connected Successfully!');
-        }
-
-        function removeNumber(btn) {
-            if(confirm('Kya aap yeh number remove karna chahte hain?')) {
-                btn.closest('tr').remove();
-                document.getElementById('dash-num-count').innerText = document.querySelectorAll('#numbersTable tbody tr').length;
-            }
-        }
-
-        // --- INBOX VIEW ---
-        function updateInboxView() {
-            const sidebar = document.getElementById('inbox-sidebar');
             
-            if (connectedNumbers.length === 0) {
-                sidebar.innerHTML = `<div class="empty-state"><h3>No Chats Yet</h3><p style="font-size:13px; margin-top:5px;">Connect a number to start.</p></div>`;
-                return;
-            }
-
-            let html = '';
-            connectedNumbers.forEach(num => {
-                html += `<div class="number-title"><span><span class="status-dot"></span>${num.number}</span></div>`;
-                
-                // Dummy Chats
-                html += `
-                    <div class="chat-user" onclick="loadChat(this, 'Customer 1', '${num.number}')">
-                        <h4>Customer 1</h4>
-                        <p>Mujhe details chahiye...</p>
-                    </div>
-                    <div class="chat-user" onclick="loadChat(this, 'Customer 2', '${num.number}')">
-                        <h4>Customer 2</h4>
-                        <p>Fee kitni hai?</p>
-                    </div>
-                `;
-            });
-
-            sidebar.innerHTML = html;
+            // Clear fields
+            document.getElementById('u_name').value = '';
+            document.getElementById('u_phone').value = '';
+            document.getElementById('u_email').value = '';
+            document.getElementById('u_assigned_email').value = '';
+            document.getElementById('u_cnic').value = '';
         }
 
-        // --- CHAT UI ---
-        function loadChat(element, name, number) {
-            document.querySelectorAll('.chat-user').forEach(u => u.classList.remove('active'));
-            element.classList.add('active');
+        // 2. WHATSAPP API SAVE
+        function saveAPI() {
+            const phone = document.getElementById('wa_phone').value;
+            const token = document.getElementById('wa_token').value;
+            if(!phone || !token) { alert('Phone number aur API Token zaroori hain!'); return; }
+            alert(`✅ API Configured Successfully!\nNumber: ${phone}`);
+        }
 
-            document.getElementById('no-chat-selected').style.display = 'none';
-            document.getElementById('active-chat-ui').style.display = 'flex';
-
+        // 3. WHATSAPP INBOX (Switch chat)
+        function loadChat(name, branch) {
             document.getElementById('chat-title').innerText = name;
-            document.getElementById('chat-number').innerText = `To: ${number}`;
+            document.getElementById('chat-branch').innerText = `Branch: ${branch}`;
+            
+            // Highlight active user
+            document.querySelectorAll('.chat-user').forEach(u => u.classList.remove('active'));
+            event.currentTarget.classList.add('active');
 
+            // Reset Chat Box (Demo)
             document.getElementById('chat-box').innerHTML = `
-                <div class="msg received">Assalam o Alaikum, mujhe course ki details chahiye.</div>
-                <div class="msg sent">Walaikum Assalam! Details bhej rahe hain.</div>
+                <div class="msg received">Hi, I am ${name}. I need details for NEBOSH.</div>
             `;
         }
 
@@ -426,10 +359,12 @@
             }
         }
 
-        function deleteChat() {
-            if(confirm('⚠️ Chat delete karni hai?')) {
-                document.getElementById('active-chat-ui').style.display = 'none';
-                document.getElementById('no-chat-selected').style.display = 'flex';
+        // 4. STOP ACCESS BUTTON
+        function stopAccess(btn) {
+            if(confirm('Kya aap waqai iss branch ki sales/admin team ka access rokna chahte hain?')) {
+                btn.innerText = '🔒 Access Stopped';
+                btn.style.background = '#64748b';
+                btn.disabled = true;
             }
         }
     </script>
