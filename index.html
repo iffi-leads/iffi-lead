@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOCH - Super Admin Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         :root {
-            --primary: #6366f1; --primary-dark: #4f46e5; --bg-body: #f8fafc; --text-main: #0f172a;
+            --primary: #3b82f6; --primary-dark: #2563eb; --bg-body: #f8fafc; --text-main: #0f172a;
             --text-muted: #64748b; --white: #ffffff; --border: #e2e8f0; --success: #10b981;
             --warning: #f59e0b; --danger: #ef4444; --sidebar-bg: #0f172a;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
         /* ================= LANDING PAGE ================= */
         #landing-page { background-color: var(--bg-body); min-height: 100vh; display: flex; flex-direction: column; }
@@ -27,7 +27,7 @@
         
         .hero { min-height: 80vh; display: flex; align-items: center; justify-content: space-between; padding: 120px 8% 40px 8%; background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%); }
         .hero-text { max-width: 500px; }
-        .hero-text h1 { font-size: 48px; font-weight: 800; color: var(--text-main); line-height: 1.2; margin-bottom: 20px; letter-spacing: -1px;}
+        .hero-text h1 { font-size: 48px; font-weight: 700; color: var(--text-main); line-height: 1.2; margin-bottom: 20px; }
         .hero-text h1 span { color: var(--primary); }
         .hero-text p { font-size: 16px; color: var(--text-muted); margin-bottom: 30px; }
         .btn-main { background: var(--text-main); color: white; padding: 15px 35px; border-radius: 50px; font-weight: 600; border: none; cursor: pointer; transition: 0.3s;}
@@ -35,109 +35,69 @@
         .illustration { width: 400px; height: 400px; background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; animation: morph 8s ease-in-out infinite; display: flex; justify-content: center; align-items: center; color: white; font-size: 80px; }
         @keyframes morph { 0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; } 50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; } 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; } }
 
-        /* ================= VERIFY SECTION ================= */
+        /* ================= VERIFY CERTIFICATE SECTION ================= */
         .verify-section { padding: 60px 8%; background: white; text-align: center; }
-        .verify-section h2 { font-size: 32px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; letter-spacing: -1px;}
+        .verify-section h2 { font-size: 32px; font-weight: 700; color: var(--text-main); margin-bottom: 10px; }
         .verify-section p { color: var(--text-muted); margin-bottom: 30px; }
         
         .verify-form { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .verify-form input { flex: 1; padding: 15px 20px; border: 1px solid var(--border); border-radius: 10px; font-size: 16px; outline: none; transition: 0.3s; }
-        .verify-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        .verify-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         .verify-form button { background: var(--primary); color: white; border: none; padding: 0 30px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; }
         .verify-form button:hover { background: var(--primary-dark); }
 
         .error-msg { color: var(--danger); margin-top: 15px; display: none; font-size: 14px; font-weight: 600; }
 
-        /* ================= MODERN CERTIFICATE DESIGN ================= */
+        /* ================= CUSTOM IMAGE CERTIFICATE ================= */
         .cert-wrapper { display: none; margin-top: 40px; text-align: center; overflow-x: auto; padding-bottom: 20px;}
-        .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; transition: 0.3s;}
-        .print-btn:hover { background: #059669; }
+        .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; }
         
         .cert-container { 
             width: 1000px; 
-            height: 707px; /* A4 Landscape Ratio */
-            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+            height: 707px; /* A4 Landscape Ratio (Aap apni image ka size daal sakte hain) */
             position: relative;
             margin: 0 auto;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-            overflow: hidden;
-            text-align: left;
-            border: 1px solid #e5e7eb;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            /* 👇 YAHAN APNI IMAGE KA LINK PASTE KAREIN 👇 */
+            background-image: url('https://raw.githubusercontent.com/aapka-naam/aapka-repo/main/certificate.jpg'); 
         }
-        
-        /* Modern Background Decor */
-        .cert-bg-top { position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; filter: blur(50px); }
-        .cert-bg-bottom { position: absolute; bottom: -100px; left: -100px; width: 400px; height: 400px; background: rgba(139, 92, 246, 0.1); border-radius: 50%; filter: blur(50px); }
-        
-        /* Content */
-        .cert-content { position: relative; z-index: 2; padding: 60px; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
-        
-        .cert-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .cert-logo-text h3 { font-family: 'Playfair Display', serif; font-size: 22px; color: #111827; font-weight: 700; letter-spacing: 1px; }
-        .cert-logo-text p { font-size: 13px; color: #6b7280; letter-spacing: 2px; text-transform: uppercase; }
-        
-        .cert-number { font-size: 13px; font-weight: 600; color: #4f46e5; background: #e0e7ff; padding: 6px 15px; border-radius: 20px; }
 
-        .cert-title-area { margin-top: 20px; }
-        .cert-title-area h1 { font-family: 'Playfair Display', serif; font-size: 64px; color: #111827; margin-bottom: 5px; font-weight: 800;}
-        .cert-title-area h2 { font-size: 16px; letter-spacing: 4px; color: #6b7280; text-transform: uppercase; font-weight: 600;}
-        
-        .presented-text { font-size: 16px; color: #6b7280; margin: 20px 0 10px 0; font-style: italic;}
-        
-        .student-name { 
-            font-family: 'Playfair Display', serif; font-size: 52px; color: #111827; font-weight: 700; 
-            border-bottom: 2px solid #e5e7eb; display: inline-block; padding: 0 40px 10px 40px; margin-bottom: 20px;
-            background: linear-gradient(90deg, #111827, #4f46e5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* Dynamic Text (Aap in positions ko apni image ke hisaab se adjust kar sakte hain) */
+        .dyn-text {
+            position: absolute;
+            text-align: center;
+            left: 0;
+            width: 100%;
+            color: #111827;
         }
+
+        .cert-no-pos { top: 40px; right: 50px; width: auto; left: auto; font-size: 14px; color: #333; font-weight: 600; background: rgba(255,255,255,0.8); padding: 5px 10px; border-radius: 5px;}
+        .student-name-pos { top: 300px; font-family: 'Playfair Display', serif; font-size: 45px; color: #064e3b; font-weight: 700; text-transform: uppercase; }
+        .course-name-pos { top: 420px; font-family: 'Playfair Display', serif; font-size: 28px; color: #1e293b; font-weight: 700; text-transform: uppercase; }
+        .date-pos { top: 500px; font-size: 16px; color: #333; font-weight: 600; }
         
-        .course-text { font-size: 16px; color: #6b7280; margin-bottom: 10px; }
-        .course-name { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: #4f46e5; margin-bottom: 20px; text-transform: uppercase;}
-        
-        .issue-date { font-size: 14px; font-weight: 500; color: #374151; }
+        .qr-pos { position: absolute; bottom: 50px; right: 80px; display: inline-block; background: white; padding: 5px; border: 1px solid #ccc;}
 
-        /* Bottom Section */
-        .cert-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px; }
-        
-        .signature { text-align: center; width: 200px; }
-        .sig-line { border-top: 2px solid #d1d5db; margin-bottom: 10px; }
-        .signature h4 { font-size: 15px; margin: 0; color: #111827; font-weight: 600;}
-        .signature p { font-size: 12px; color: #6b7280; margin: 0; }
-
-        /* Center Modern Seal */
-        .center-seal { position: relative; text-align: center; }
-        .modern-seal { 
-            width: 80px; height: 80px; border-radius: 50%; 
-            background: linear-gradient(135deg, #fbbf24, #d97706); 
-            display: flex; justify-content: center; align-items: center; 
-            box-shadow: 0 10px 20px rgba(217, 119, 6, 0.3);
-            border: 4px solid white;
-        }
-        .modern-seal img { width: 45px; filter: brightness(0) invert(1); }
-
-        /* QR Code */
-        .qr-section { text-align: center; }
-        #qrcode { background:white; padding:8px; display:inline-block; border-radius: 8px; border: 1px solid #e5e7eb;}
-        .qr-text { font-size:11px; color:#6b7280; margin-top:5px; font-weight: 600;}
-
-        /* ================= LOGIN MODAL & DASHBOARD (Same as before) ================= */
+        /* ================= LOGIN MODAL ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .login-box { background: var(--white); padding: 40px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; position: relative; }
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; border: none; background: none; }
-        .login-box h2 { font-size: 24px; margin-bottom: 10px; font-weight: 700; letter-spacing: -0.5px;}
+        .login-box h2 { font-size: 24px; margin-bottom: 10px; }
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; font-size: 13px; margin-bottom: 8px; font-weight: 500; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; outline: none; }
-        .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; cursor: pointer; font-weight: 600;}
+        .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; font-size: 16px; cursor: pointer; }
 
+        /* ================= DASHBOARD ================= */
         #dashboard-page { display: none; height: 100vh; background: var(--bg-body); }
         .dash-layout { display: flex; height: 100%; }
         .sidebar { width: 260px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; }
-        .sidebar-header { padding: 24px; font-size: 20px; font-weight: 800; color: var(--white); border-bottom: 1px solid #374151; letter-spacing: -0.5px;}
+        .sidebar-header { padding: 24px; font-size: 20px; font-weight: 700; color: var(--white); border-bottom: 1px solid #374151; }
         .sidebar-menu { padding: 20px 0; display: flex; flex-direction: column; gap: 5px; }
-        .menu-item { padding: 12px 24px; color: #9ca3af; font-size: 15px; display: flex; cursor: pointer; border-left: 3px solid transparent; transition: 0.2s; font-weight: 500;}
+        .menu-item { padding: 12px 24px; color: #9ca3af; font-size: 15px; display: flex; cursor: pointer; border-left: 3px solid transparent; transition: 0.2s;}
         .menu-item:hover, .menu-item.active { background: #1f2937; color: var(--white); border-left-color: var(--primary); }
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         .topbar { background: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
@@ -148,12 +108,12 @@
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 20px; }
         .stat-card { background: var(--white); padding: 24px; border-radius: 12px; border: 1px solid var(--border); }
-        .stat-card h3 { font-size: 14px; color: var(--text-muted); font-weight: 500;}
-        .stat-card .value { font-size: 28px; font-weight: 800; color: var(--text-main); letter-spacing: -1px;}
+        .stat-card h3 { font-size: 14px; color: var(--text-muted); }
+        .stat-card .value { font-size: 28px; font-weight: 700; }
 
         .card { background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
         .card-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-        .btn { background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; transition: 0.2s; font-weight: 600;}
+        .btn { background: var(--primary); color: white; padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; transition: 0.2s;}
         .btn-danger { background: var(--danger); }
         .btn-edit { background: var(--warning); }
         .btn-success { background: var(--success); }
@@ -162,13 +122,14 @@
         
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 16px 24px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
-        th { background: #f9fafb; color: var(--text-muted); font-size: 12px; text-transform: uppercase; font-weight: 600;}
+        th { background: #f9fafb; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
         .badge { padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-        .badge-admin { background: #e0e7ff; color: #3730a3; }
+        .badge-admin { background: #dbeafe; color: #1d4ed8; }
         .badge-sales { background: #fef3c7; color: #b45309; }
         .badge-connected { background: #d1fae5; color: #065f46; }
         .logout-btn { margin-top: auto; color: var(--danger) !important; border-top: 1px solid #374151; }
 
+        /* WhatsApp Chat UI */
         .chat-container { display: flex; height: 75vh; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: white;}
         .chat-sidebar { width: 320px; background: #f8fafc; border-right: 1px solid var(--border); overflow-y: auto; flex-shrink:0;}
         .branch-title { background: #e2e8f0; padding: 10px 20px; font-weight: 700; font-size: 13px; color: #334155; text-transform: uppercase; }
@@ -186,6 +147,7 @@
         .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid var(--border);}
         .chat-input-area input { flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 20px; outline: none; }
 
+        /* Print CSS */
         @media print {
             body * { visibility: hidden; }
             .cert-container, .cert-container * { visibility: visible; }
@@ -196,7 +158,7 @@
 </head>
 <body>
 
-    <!-- LANDING PAGE -->
+    <!-- LANDING PAGE (Public) -->
     <div id="landing-page">
         <nav>
             <div class="logo">🚀 IOCH</div>
@@ -216,7 +178,7 @@
             <div class="illustration">💬</div>
         </section>
 
-        <!-- PUBLIC VERIFY -->
+        <!-- PUBLIC CERTIFICATE VERIFICATION SECTION -->
         <section class="verify-section" id="verify-section">
             <h2>Verify Student Certificate</h2>
             <p>Enter your Certificate ID to verify its authenticity.</p>
@@ -227,76 +189,18 @@
             </div>
             <p class="error-msg" id="errorMsgPublic">❌ Invalid Certificate Number. Please try again.</p>
 
+            <!-- Print Button -->
             <div class="cert-wrapper" id="certWrapper">
                 <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Print / Download Certificate</button>
                 
-                <!-- MODERN CERTIFICATE (PUBLIC VIEW) -->
-               <div class="cert-container" id="certificate" style="background-image: url('YAHAN_APNA_LINK_PASTE_KAREIN'); background-size: 100% 100%; background-repeat: no-repeat; position: relative; width: 1000px; height: 707px; margin: 0 auto;">
-    
-    <!-- Certificate Number (Position adjust karne ke liye top aur right change karein) -->
-    <div id="displayCertNoPublic" style="position: absolute; top: 40px; right: 50px; font-family: 'Poppins', sans-serif; font-size: 14px; color: #333; font-weight: 600; background: rgba(255,255,255,0.7); padding: 5px 10px; border-radius: 5px;">
-        Certificate No: IOCH-XXXX-XXXX
-    </div>
-
-    <!-- Student Name -->
-    <div id="displayName" style="position: absolute; top: 300px; left: 0; width: 100%; text-align: center; font-family: 'Playfair Display', serif; font-size: 45px; color: #064e3b; font-weight: 700; text-transform: uppercase;">
-        [Student Name]
-    </div>
-
-    <!-- Course Name -->
-    <div id="displayCourse" style="position: absolute; top: 420px; left: 0; width: 100%; text-align: center; font-family: 'Playfair Display', serif; font-size: 28px; color: #1e293b; font-weight: 700; text-transform: uppercase;">
-        [Course Name]
-    </div>
-
-    <!-- Date -->
-    <div id="displayDate" style="position: absolute; top: 500px; left: 0; width: 100%; text-align: center; font-family: 'Poppins', sans-serif; font-size: 16px; color: #333; font-weight: 600;">
-        Issued on: [DD/MM/YYYY]
-    </div>
-
-    <!-- QR Code -->
-    <div id="qrcode" style="position: absolute; bottom: 50px; right: 80px; background: white; padding: 5px; border: 1px solid #ccc;"></div>
-</div>
-                            <div class="cert-number" id="displayCertNoPublic">Certificate No: IOCH-XXXX-XXXX</div>
-                        </div>
-
-                        <div class="cert-title-area">
-                            <h1>Certificate</h1>
-                            <h2>of Achievement</h2>
-                        </div>
-                        
-                        <div>
-                            <div class="presented-text">This certificate is proudly presented to</div>
-                            <div class="student-name" id="displayName">[Student Name]</div>
-                            <div class="course-text">for successfully completing the professional training program in</div>
-                            <div class="course-name" id="displayCourse">[Course Name]</div>
-                            <div class="issue-date">Issued on: <span id="displayDate">[DD/MM/YYYY]</span></div>
-                        </div>
-
-                        <div class="cert-bottom">
-                            <div class="signature">
-                                <div class="sig-line"></div>
-                                <h4>Bilal Ahmed</h4>
-                                <p>Course Instructor</p>
-                            </div>
-
-                            <div class="center-seal">
-                                <div class="modern-seal">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="Seal">
-                                </div>
-                            </div>
-
-                            <div class="qr-section">
-                                <div id="qrcode"></div>
-                                <p class="qr-text">Scan to Verify</p>
-                            </div>
-
-                            <div class="signature">
-                                <div class="sig-line"></div>
-                                <h4>Director</h4>
-                                <p>Director, IOCH</p>
-                            </div>
-                        </div>
-                    </div>
+                <!-- CUSTOM CERTIFICATE (PUBLIC VIEW) -->
+                <div class="cert-container" id="certificate">
+                    <div id="displayCertNoPublic" class="dyn-text cert-no-pos">Certificate No: IOCH-XXXX-XXXX</div>
+                    <div id="displayName" class="dyn-text student-name-pos">[Student Name]</div>
+                    <div id="displayCourse" class="dyn-text course-name-pos">[Course Name]</div>
+                    <div id="displayDate" class="dyn-text date-pos">Issued on: [DD/MM/YYYY]</div>
+                    
+                    <div class="qr-pos" id="qrcode"></div>
                 </div>
             </div>
         </section>
@@ -321,7 +225,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- DASHBOARD (Super Admin Only) -->
     <div id="dashboard-page">
         <div class="dash-layout">
             <aside class="sidebar">
@@ -334,6 +238,7 @@
                     <a class="menu-item" onclick="showPage('branches')">🏢 Manage Branches</a>
                     <a class="menu-item" onclick="showPage('generate-cert')">📜 Generate Certificate</a>
                     <a class="menu-item" onclick="showPage('cert-records')">📂 Certificate Records</a>
+                    
                     <a class="menu-item logout-btn" onclick="logout()">🚪 Logout</a>
                 </div>
             </aside>
@@ -343,7 +248,7 @@
                     <h1 id="page-title">Dashboard Overview</h1>
                     <div class="user-profile">
                         <span style="font-size: 14px; font-weight: 500;">Super Admin</span>
-                        <div class="avatar" style="width:40px;height:40px;background:var(--primary);color:white;border-radius:50%;display:flex;justify-content:center;align-items:center; font-weight:700;">SA</div>
+                        <div class="avatar" style="width:40px;height:40px;background:#3b82f6;color:white;border-radius:50%;display:flex;justify-content:center;align-items:center;">SA</div>
                     </div>
                 </header>
 
@@ -351,9 +256,9 @@
                     
                     <div id="dashboard" class="page active">
                         <div class="stats-grid">
-                            <div class="stat-card" style="border-top:4px solid var(--primary);"><h3>Total Leads</h3><div class="value" id="total-leads">0</div></div>
-                            <div class="stat-card" style="border-top:4px solid var(--success);"><h3>Total Users</h3><div class="value" id="total-users">0</div></div>
-                            <div class="stat-card" style="border-top:4px solid var(--warning);"><h3>Active WhatsApps</h3><div class="value" id="total-branches">0</div></div>
+                            <div class="stat-card" style="border-top:4px solid #3b82f6;"><h3>Total Leads</h3><div class="value" id="total-leads">0</div></div>
+                            <div class="stat-card" style="border-top:4px solid #10b981;"><h3>Total Users</h3><div class="value" id="total-users">0</div></div>
+                            <div class="stat-card" style="border-top:4px solid #f59e0b;"><h3>Active WhatsApps</h3><div class="value" id="total-branches">0</div></div>
                         </div>
                     </div>
 
@@ -434,9 +339,10 @@
                         </div>
                     </div>
 
+                    <!-- GENERATE CERTIFICATE -->
                     <div id="generate-cert" class="page">
                         <div class="card" style="padding: 30px;">
-                            <h2 style="margin-bottom: 20px; font-weight: 800; letter-spacing: -0.5px;">Generate New Certificate</h2>
+                            <h2 style="margin-bottom: 20px;">Generate New Certificate</h2>
                             <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
                                 <div class="form-group"><label>Certificate Number</label><input type="text" id="genCertNo" placeholder="e.g. IOCH-2024-9999" required></div>
                                 <div class="form-group"><label>Student Name</label><input type="text" id="genName" placeholder="e.g. Umer Riaz"></div>
@@ -451,63 +357,20 @@
 
                         <button class="print-btn" id="printBtnGen" onclick="window.print()" style="display:none;">🖨️ Print / Download Certificate</button>
 
-                        <!-- MODERN CERTIFICATE (FOR GENERATION) -->
+                        <!-- CUSTOM CERTIFICATE (FOR GENERATION) -->
                         <div class="cert-wrapper" id="certWrapperGen">
                             <div class="cert-container" id="certificateGen">
-                                <div class="cert-bg-top"></div>
-                                <div class="cert-bg-bottom"></div>
+                                <div id="displayCertNoGen" class="dyn-text cert-no-pos">Certificate No: IOCH-XXXX-XXXX</div>
+                                <div id="displayNameGen" class="dyn-text student-name-pos">[Student Name]</div>
+                                <div id="displayCourseGen" class="dyn-text course-name-pos">[Course Name]</div>
+                                <div id="displayDateGen" class="dyn-text date-pos">Issued on: [DD/MM/YYYY]</div>
                                 
-                                <div class="cert-content">
-                                    <div class="cert-header">
-                                        <div class="cert-logo-text">
-                                            <h3>IOCH</h3>
-                                            <p>Institution of Occupational Career Hub</p>
-                                        </div>
-                                        <div class="cert-number" id="displayCertNoGen">Certificate No: IOCH-XXXX-XXXX</div>
-                                    </div>
-
-                                    <div class="cert-title-area">
-                                        <h1>Certificate</h1>
-                                        <h2>of Achievement</h2>
-                                    </div>
-                                    
-                                    <div>
-                                        <div class="presented-text">This certificate is proudly presented to</div>
-                                        <div class="student-name" id="displayNameGen">[Student Name]</div>
-                                        <div class="course-text">for successfully completing the professional training program in</div>
-                                        <div class="course-name" id="displayCourseGen">[Course Name]</div>
-                                        <div class="issue-date">Issued on: <span id="displayDateGen">[DD/MM/YYYY]</span></div>
-                                    </div>
-
-                                    <div class="cert-bottom">
-                                        <div class="signature">
-                                            <div class="sig-line"></div>
-                                            <h4>Bilal Ahmed</h4>
-                                            <p>Course Instructor</p>
-                                        </div>
-
-                                        <div class="center-seal">
-                                            <div class="modern-seal">
-                                                <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="Seal">
-                                            </div>
-                                        </div>
-
-                                        <div class="qr-section">
-                                            <div id="qrcodeGen"></div>
-                                            <p class="qr-text">Scan to Verify</p>
-                                        </div>
-
-                                        <div class="signature">
-                                            <div class="sig-line"></div>
-                                            <h4>Director</h4>
-                                            <p>Director, IOCH</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div class="qr-pos" id="qrcodeGen"></div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- CERTIFICATE RECORDS -->
                     <div id="cert-records" class="page">
                         <div class="card">
                             <div class="card-header">
@@ -553,7 +416,7 @@
                 document.getElementById('displayCertNoPublic').innerText = `Certificate No: ${certData.certNo}`;
                 document.getElementById('displayName').innerText = certData.name;
                 document.getElementById('displayCourse').innerText = certData.course;
-                document.getElementById('displayDate').innerText = certData.issueDate;
+                document.getElementById('displayDate').innerText = `Issued on: ${certData.issueDate}`;
 
                 certWrapper.style.display = 'block';
                 printBtn.style.display = 'inline-block';
@@ -641,7 +504,7 @@
             document.getElementById('displayCertNoGen').innerText = `Certificate No: ${certNo}`;
             document.getElementById('displayNameGen').innerText = name.toUpperCase();
             document.getElementById('displayCourseGen').innerText = course.toUpperCase();
-            document.getElementById('displayDateGen').innerText = formatDate(issueDate);
+            document.getElementById('displayDateGen').innerText = `Issued on: ${formatDate(issueDate)}`;
 
             document.getElementById('certWrapperGen').style.display = 'block';
             document.getElementById('printBtnGen').style.display = 'inline-block';
