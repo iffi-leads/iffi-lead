@@ -256,20 +256,26 @@
                         </div>
                     </div>
 
-                    <!-- 5. MANAGE BRANCHES PAGE -->
+                    <!-- 5. MANAGE BRANCHES PAGE (UPDATED) -->
                     <div id="branches" class="page">
                         <div class="card">
-                            <div class="card-header"><h2>Manage Branches</h2></div>
+                            <div class="card-header"><h2>Manage Branches & Users</h2></div>
                             <div class="form-grid">
-                                <div class="form-group" style="margin:0;"><label>Branch Name</label><input type="text" id="b_name" placeholder="e.g. Islamabad"></div>
-                                <div class="form-group" style="margin:0;"><label>City</label><input type="text" id="b_city" placeholder="e.g. Islamabad"></div>
-                                <div style="display:flex; align-items:flex-end;">
-                                    <button class="btn" onclick="addBranch()" style="width:100%;">+ Add Branch</button>
+                                <div class="form-group" style="margin:0;"><label>User Name</label><input type="text" id="b_name" placeholder="Enter User Name"></div>
+                                <div class="form-group" style="margin:0;"><label>User Number</label><input type="text" id="b_number" placeholder="Enter User Number"></div>
+                                <div class="form-group" style="margin:0;"><label>User City</label><input type="text" id="b_city" placeholder="Enter User City"></div>
+                                <div class="form-group" style="margin:0;"><label>User Email</label><input type="email" id="b_email" placeholder="Enter User Email"></div>
+                                <div style="display:flex; align-items:flex-end; grid-column: span 2;">
+                                    <button class="btn" onclick="addBranch()" style="width:100%;">+ Add Branch User</button>
                                 </div>
                             </div>
                             <table id="branchesTable">
-                                <tr><th>Branch Name</th><th>City</th><th>Action</th></tr>
-                                <!-- Branches will be added here -->
+                                <thead>
+                                    <tr><th>User Name</th><th>User Number</th><th>User City</th><th>User Email</th><th>Action</th></tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Branches will be added here -->
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -370,35 +376,45 @@
             document.getElementById('u_name').value = '';
         }
 
-        // --- BRANCHES FUNCTIONALITY ---
+        // --- BRANCHES FUNCTIONALITY (UPDATED) ---
         function addBranch() {
             const name = document.getElementById('b_name').value;
+            const number = document.getElementById('b_number').value;
             const city = document.getElementById('b_city').value;
+            const email = document.getElementById('b_email').value;
 
-            if(!name || !city) return alert('Branch name aur city likhein!');
+            if(!name || !number || !city || !email) return alert('Saari details bharein!');
 
-            const table = document.getElementById('branchesTable');
-            const row = table.insertRow(-1);
+            const tbody = document.querySelector('#branchesTable tbody');
+            const row = tbody.insertRow(-1);
             
             row.innerHTML = `
                 <td style="font-weight:500;">${name}</td>
+                <td>${number}</td>
                 <td>${city}</td>
+                <td>${email}</td>
                 <td>
                     <button class="btn btn-edit" style="padding:5px 10px;font-size:12px;" onclick="editBranch(this)">Edit</button>
                     <button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="this.closest('tr').remove()">Delete</button>
                 </td>
             `;
             document.getElementById('b_name').value = '';
+            document.getElementById('b_number').value = '';
             document.getElementById('b_city').value = '';
+            document.getElementById('b_email').value = '';
         }
 
         function editBranch(btn) {
             const row = btn.closest('tr');
-            const name = prompt("Naya Branch Name likhein:", row.cells[0].innerText);
-            const city = prompt("Naya City likhein:", row.cells[1].innerText);
-            if(name && city) {
+            const name = prompt("Naya User Name likhein:", row.cells[0].innerText);
+            const number = prompt("Naya Number likhein:", row.cells[1].innerText);
+            const city = prompt("Naya City likhein:", row.cells[2].innerText);
+            const email = prompt("Naya Email likhein:", row.cells[3].innerText);
+            if(name && number && city && email) {
                 row.cells[0].innerText = name;
-                row.cells[1].innerText = city;
+                row.cells[1].innerText = number;
+                row.cells[2].innerText = city;
+                row.cells[3].innerText = email;
             }
         }
     </script>
