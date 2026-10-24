@@ -12,6 +12,7 @@
             --primary: #3b82f6; --primary-dark: #2563eb; --bg-body: #f8fafc; --text-main: #0f172a;
             --text-muted: #64748b; --white: #ffffff; --border: #e2e8f0; --success: #10b981;
             --warning: #f59e0b; --danger: #ef4444; --sidebar-bg: #0f172a;
+            --gold: #d4af37; --dark-green: #064e3b;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
@@ -48,39 +49,65 @@
 
         .error-msg { color: var(--danger); margin-top: 15px; display: none; font-size: 14px; font-weight: 600; }
 
-        /* ================= CUSTOM BACKGROUND CERTIFICATE DESIGN ================= */
+        /* Certificate Design Container */
         .cert-wrapper { display: none; margin-top: 40px; text-align: center; overflow-x: auto; padding-bottom: 20px;}
         .print-btn { background: var(--success); color: white; padding: 12px 25px; border-radius: 8px; border: none; cursor: pointer; font-size: 16px; font-weight: 600; margin-bottom: 20px; display: none; }
         
         .cert-container { 
             width: 1000px; 
-            height: 707px; /* A4 Landscape Ratio */
+            background: #fdfbf7; 
+            padding: 15px; 
             position: relative;
+            border: 12px solid var(--dark-green);
             margin: 0 auto;
-            background-size: 100% 100%;
-            background-position: center;
-            background-repeat: no-repeat;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            /* Yahan apni image ka link dalein */
-            background-image: url('https://raw.githubusercontent.com/https://github.com/iffi-leads/iffi-lead/blob/main/Screenshot%202026-10-20%20005945.png/certificate-bg.jpg'); 
+            text-align: left;
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
         }
-
-        /* Dynamic Text Positioning (Aap inko adjust kar sakte hain) */
-        .dyn-text {
-            position: absolute;
-            font-family: 'Playfair Display', serif;
-            color: #000;
-            text-align: center;
-            width: 100%;
-            left: 0;
-        }
-
-        .cert-no-pos { top: 30px; right: 50px; width: auto; left: auto; font-family: 'Poppins', sans-serif; font-size: 14px; color: #333; font-weight: 600;}
-        .student-name-pos { top: 310px; font-size: 42px; color: #064e3b; font-weight: 700; text-transform: uppercase; }
-        .course-name-pos { top: 430px; font-size: 28px; color: #1e293b; font-weight: 700; text-transform: uppercase; }
-        .date-pos { top: 510px; font-family: 'Poppins', sans-serif; font-size: 16px; color: #333; font-weight: 600; }
+        .cert-inner { border: 2px solid var(--gold); padding: 30px 40px; position: relative; background: rgba(253, 251, 247, 0.95); }
         
-        .qr-pos { position: absolute; bottom: 50px; right: 80px; display: inline-block; background: white; padding: 5px; border: 1px solid #ccc;}
+        /* Watermark */
+        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.03; font-size: 200px; font-family: 'Playfair Display', serif; font-weight: bold; color: var(--dark-green); pointer-events: none; z-index: 0;}
+
+        /* Content */
+        .cert-content { position: relative; z-index: 2; text-align: center; }
+        
+        .cert-header h3 { font-family: 'Playfair Display', serif; font-size: 18px; letter-spacing: 2px; color: var(--dark-green); font-weight: 700; margin-bottom: 10px; }
+        .cert-title h1 { font-family: 'Playfair Display', serif; font-size: 60px; color: var(--dark-green); text-transform:uppercase; margin-bottom:5px; font-weight: 800; letter-spacing: 2px;}
+        .cert-title h2 { font-size: 14px; letter-spacing: 6px; color: var(--gold); text-transform:uppercase; font-weight: 600;}
+        
+        .presented-text { font-style:italic; font-size:16px; color:#475569; margin: 20px 0 10px 0; }
+        .student-name-box { border-bottom: 1px solid var(--gold); display: inline-block; padding: 0 40px 10px 40px; margin-bottom: 15px; }
+        .student-name-text { font-family: 'Playfair Display', serif; font-size: 42px; color: var(--dark-green); font-weight:700; }
+        
+        .course-text { font-size:16px; color:#475569; margin-bottom:10px; }
+        .course-name-text { font-family: 'Playfair Display', serif; font-size:26px; font-weight:700; color:var(--dark-green); margin-bottom: 15px; text-transform:uppercase; }
+        
+        .issue-date { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 30px; }
+
+        /* Icons */
+        .icons-row { display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; }
+        .icon-box { text-align: center; }
+        .icon-circle { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--dark-green); display: flex; justify-content: center; align-items: center; font-size: 28px; margin: 0 auto 5px auto; background: white; }
+        .icon-box p { font-size: 11px; font-weight: 700; color: var(--dark-green); text-transform: uppercase; }
+
+        /* Signatures & Seal */
+        .bottom-area { display: flex; justify-content: space-between; align-items: flex-end; position: relative; margin-top: 20px;}
+        
+        .signature { text-align: center; width: 220px; }
+        .sig-name { font-family: 'Great Vibes', cursive; font-size: 34px; color: #1e3a8a; margin-bottom: 5px; transform: rotate(-5deg); }
+        .sig-line { border-top: 1px solid #1e293b; margin-bottom: 5px; width: 100%; }
+        .signature h4 { font-size: 16px; margin: 0; color: #1e293b; font-weight: 700;}
+        .signature p { font-size: 12px; color: var(--text-muted); margin: 0; font-style: italic;}
+
+        .center-seal { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); text-align: center; }
+        .seal-img { width: 110px; margin-bottom: -15px; }
+
+        /* QR Code & Cert Number */
+        .qr-section { text-align: center; width: 150px;}
+        #qrcode { background:white; padding:5px; display:inline-block; border: 1px solid #ccc;}
+        .qr-text { font-size:10px; color:var(--text-muted); margin-top:3px; font-weight: 600;}
+        
+        .cert-number { position: absolute; top: 10px; right: 20px; font-size: 12px; font-weight: 700; color: var(--dark-green); border-bottom: 1px solid #ccc; padding-bottom: 2px;}
 
         /* ================= LOGIN MODAL ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
@@ -152,7 +179,7 @@
         @media print {
             body * { visibility: hidden; }
             .cert-container, .cert-container * { visibility: visible; }
-            .cert-container { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; }
+            .cert-container { position: absolute; left: 0; top: 0; width: 100%; border-width: 10px; }
             .print-btn, .close-btn { display: none !important; }
         }
     </style>
@@ -194,14 +221,64 @@
             <div class="cert-wrapper" id="certWrapper">
                 <button class="print-btn" id="printBtn" onclick="window.print()">🖨️ Print / Download Certificate</button>
                 
-                <!-- CUSTOM CERTIFICATE DESIGN (PUBLIC VIEW) -->
+                <!-- CERTIFICATE DESIGN (PUBLIC VIEW) -->
                 <div class="cert-container" id="certificate">
-                    <div id="displayCertNoPublic" class="dyn-text cert-no-pos">Certificate No: IOCH-XXXX-XXXX</div>
-                    <div id="displayName" class="dyn-text student-name-pos">[Student Name]</div>
-                    <div id="displayCourse" class="dyn-text course-name-pos">[Course Name]</div>
-                    <div id="displayDate" class="dyn-text date-pos">Issued on: [DD/MM/YYYY]</div>
-                    
-                    <div class="qr-pos" id="qrcode"></div>
+                    <div class="cert-inner">
+                        <div class="watermark">IOCH</div>
+                        
+                        <div class="cert-number" id="displayCertNoPublic">Certificate No: IOCH-XXXX-XXXX</div>
+
+                        <div class="cert-content">
+                            <div class="cert-header">
+                                <h3>INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
+                            </div>
+                            <div class="cert-title">
+                                <h1>Certificate</h1>
+                                <h2>of Achievement</h2>
+                            </div>
+                            <div class="presented-text">This certificate is proudly presented to</div>
+                            
+                            <div class="student-name-box">
+                                <div class="student-name-text" id="displayName">[Student Name]</div>
+                            </div>
+                            
+                            <div class="course-text">for successfully completing the professional training program in</div>
+                            <div class="course-name-text" id="displayCourse">[Course Name]</div>
+                            
+                            <div class="issue-date">Issued on: <span id="displayDate">[DD/MM/YYYY]</span></div>
+
+                            <div class="icons-row">
+                                <div class="icon-box"><div class="icon-circle">🔥</div><p>Fire Safety</p></div>
+                                <div class="icon-box"><div class="icon-circle">➕</div><p>First Aid</p></div>
+                                <div class="icon-box"><div class="icon-circle">📟</div><p>Gas Monitor</p></div>
+                            </div>
+
+                            <div class="bottom-area">
+                                <div class="signature">
+                                    <div class="sig-name">Bilal Ahmed</div>
+                                    <div class="sig-line"></div>
+                                    <h4>Bilal Ahmed</h4>
+                                    <p>Course Instructor</p>
+                                </div>
+
+                                <div class="center-seal">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="Seal" class="seal-img" style="filter: sepia(1) hue-rotate(90deg);">
+                                </div>
+
+                                <div class="qr-section">
+                                    <div id="qrcode"></div>
+                                    <p class="qr-text">Scan to Verify</p>
+                                </div>
+
+                                <div class="signature">
+                                    <div class="sig-name" style="font-size:28px;">Director IOCH</div>
+                                    <div class="sig-line"></div>
+                                    <h4>Director</h4>
+                                    <p>Director, IOCH</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -379,18 +456,65 @@
                             </div>
                         </div>
 
-                        <!-- Print Button -->
                         <button class="print-btn" id="printBtnGen" onclick="window.print()" style="display:none;">🖨️ Print / Download Certificate</button>
 
-                        <!-- CUSTOM CERTIFICATE DESIGN (FOR GENERATION) -->
                         <div class="cert-wrapper" id="certWrapperGen">
                             <div class="cert-container" id="certificateGen">
-                                <div id="displayCertNoGen" class="dyn-text cert-no-pos">Certificate No: IOCH-XXXX-XXXX</div>
-                                <div id="displayNameGen" class="dyn-text student-name-pos">[Student Name]</div>
-                                <div id="displayCourseGen" class="dyn-text course-name-pos">[Course Name]</div>
-                                <div id="displayDateGen" class="dyn-text date-pos">Issued on: [DD/MM/YYYY]</div>
-                                
-                                <div class="qr-pos" id="qrcodeGen"></div>
+                                <div class="cert-inner">
+                                    <div class="watermark">IOCH</div>
+                                    <div class="cert-number" id="displayCertNoGen">Certificate No: IOCH-XXXX-XXXX</div>
+
+                                    <div class="cert-content">
+                                        <div class="cert-header">
+                                            <h3>INSTITUTION OF OCCUPATIONAL CAREER HUB</h3>
+                                        </div>
+                                        <div class="cert-title">
+                                            <h1>Certificate</h1>
+                                            <h2>of Achievement</h2>
+                                        </div>
+                                        <div class="presented-text">This certificate is proudly presented to</div>
+                                        
+                                        <div class="student-name-box">
+                                            <div class="student-name-text" id="displayNameGen">[Student Name]</div>
+                                        </div>
+                                        
+                                        <div class="course-text">for successfully completing the professional training program in</div>
+                                        <div class="course-name-text" id="displayCourseGen">[Course Name]</div>
+                                        
+                                        <div class="issue-date">Issued on: <span id="displayDateGen">[DD/MM/YYYY]</span></div>
+
+                                        <div class="icons-row">
+                                            <div class="icon-box"><div class="icon-circle">🔥</div><p>Fire Safety</p></div>
+                                            <div class="icon-box"><div class="icon-circle">➕</div><p>First Aid</p></div>
+                                            <div class="icon-box"><div class="icon-circle">📟</div><p>Gas Monitor</p></div>
+                                        </div>
+
+                                        <div class="bottom-area">
+                                            <div class="signature">
+                                                <div class="sig-name">Bilal Ahmed</div>
+                                                <div class="sig-line"></div>
+                                                <h4>Bilal Ahmed</h4>
+                                                <p>Course Instructor</p>
+                                            </div>
+
+                                            <div class="center-seal">
+                                                <img src="https://cdn-icons-png.flaticon.com/512/3003/3003308.png" alt="Seal" class="seal-img" style="filter: sepia(1) hue-rotate(90deg);">
+                                            </div>
+
+                                            <div class="qr-section">
+                                                <div id="qrcodeGen"></div>
+                                                <p class="qr-text">Scan to Verify</p>
+                                            </div>
+
+                                            <div class="signature">
+                                                <div class="sig-name" style="font-size:28px;">Director IOCH</div>
+                                                <div class="sig-line"></div>
+                                                <h4>Director</h4>
+                                                <p>Director, IOCH</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -408,17 +532,9 @@
                             <div style="overflow-x:auto;">
                                 <table id="recordsTable">
                                     <thead>
-                                        <tr>
-                                            <th>Cert No.</th>
-                                            <th>Student Name</th>
-                                            <th>Course</th>
-                                            <th>Issue Date</th>
-                                            <th>Action</th>
-                                        </tr>
+                                        <tr><th>Cert No.</th><th>Student Name</th><th>Course</th><th>Issue Date</th><th>Action</th></tr>
                                     </thead>
-                                    <tbody>
-                                        <!-- Records will load here -->
-                                    </tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
@@ -437,7 +553,7 @@
         let chats = JSON.parse(localStorage.getItem('ioch_chats')) || [];
         let savedCertificates = JSON.parse(localStorage.getItem('ioch_certificates')) || [];
 
-        // --- PUBLIC CERTIFICATE VERIFICATION LOGIC ---
+        // --- PUBLIC VERIFICATION ---
         let qrCodeObjPublic = null;
 
         function verifyCertificatePublic() {
@@ -454,7 +570,7 @@
                 document.getElementById('displayCertNoPublic').innerText = `Certificate No: ${certData.certNo}`;
                 document.getElementById('displayName').innerText = certData.name;
                 document.getElementById('displayCourse').innerText = certData.course;
-                document.getElementById('displayDate').innerText = `Issued on: ${certData.issueDate}`;
+                document.getElementById('displayDate').innerText = certData.issueDate;
 
                 certWrapper.style.display = 'block';
                 printBtn.style.display = 'inline-block';
@@ -476,7 +592,6 @@
             }
         }
 
-        // Auto-verify if QR Code is scanned
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const verifyId = urlParams.get('verify');
@@ -523,7 +638,7 @@
             document.getElementById('page-title').innerText = titles[pageId];
         }
 
-        // --- GENERATE & SAVE CERTIFICATE LOGIC ---
+        // --- GENERATE CERTIFICATE ---
         let qrCodeObjGen = null;
 
         function generateCertificate() {
@@ -558,7 +673,7 @@
             document.getElementById('displayCertNoGen').innerText = `Certificate No: ${certNo}`;
             document.getElementById('displayNameGen').innerText = name.toUpperCase();
             document.getElementById('displayCourseGen').innerText = course.toUpperCase();
-            document.getElementById('displayDateGen').innerText = `Issued on: ${formatDate(issueDate)}`;
+            document.getElementById('displayDateGen').innerText = formatDate(issueDate);
 
             document.getElementById('certWrapperGen').style.display = 'block';
             document.getElementById('printBtnGen').style.display = 'inline-block';
@@ -575,7 +690,7 @@
             renderRecords();
         }
 
-        // --- RENDER RECORDS ---
+        // --- RECORDS ---
         function renderRecords() {
             const tbody = document.querySelector('#recordsTable tbody');
             tbody.innerHTML = '';
@@ -594,9 +709,7 @@
                         <td>${c.name}</td>
                         <td>${c.course}</td>
                         <td>${c.issueDate}</td>
-                        <td>
-                            <button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="deleteRecord('${c.certNo}')">Delete</button>
-                        </td>
+                        <td><button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="deleteRecord('${c.certNo}')">Delete</button></td>
                     </tr>
                 `;
             });
@@ -614,7 +727,6 @@
             }
         }
 
-        // --- EXPORT RECORDS TO CSV ---
         function exportRecordsCSV() {
             if (savedCertificates.length === 0) {
                 alert("Koi record mojood nahi hai export karne ke liye!");
@@ -637,19 +749,9 @@
             document.body.removeChild(link);
         }
 
-        // --- BAAQI KA DASHBOARD CODE ---
-        function renderAll() {
-            renderBranches();
-            renderUsers();
-            renderInbox();
-            updateDashboard();
-            renderRecords();
-        }
-
-        function updateDashboard() {
-            document.getElementById('total-users').innerText = users.length;
-            document.getElementById('total-branches').innerText = branches.length;
-        }
+        // --- BAAQI KA CODE ---
+        function renderAll() { renderBranches(); renderUsers(); renderInbox(); updateDashboard(); renderRecords(); }
+        function updateDashboard() { document.getElementById('total-users').innerText = users.length; document.getElementById('total-branches').innerText = branches.length; }
 
         function addBranch() {
             const name = document.getElementById('b_name').value;
@@ -657,14 +759,9 @@
             const city = document.getElementById('b_city').value;
             const email = document.getElementById('b_email').value;
             if(!name || !number) return alert('Branch Name aur Phone zaroori hai!');
-            
             branches.push({ id: Date.now(), name, number, city, email });
             localStorage.setItem('ioch_branches', JSON.stringify(branches));
-            
-            document.getElementById('b_name').value = '';
-            document.getElementById('b_number').value = '';
-            document.getElementById('b_city').value = '';
-            document.getElementById('b_email').value = '';
+            document.getElementById('b_name').value = ''; document.getElementById('b_number').value = ''; document.getElementById('b_city').value = ''; document.getElementById('b_email').value = '';
             renderAll();
         }
 
@@ -672,24 +769,12 @@
             const tbody = document.querySelector('#branchesTable tbody');
             tbody.innerHTML = '';
             branches.forEach(b => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><b>${b.name}</b></td>
-                        <td>${b.number}</td>
-                        <td>${b.city}</td>
-                        <td>${b.email}</td>
-                        <td><button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="deleteBranch(${b.id})">Delete</button></td>
-                    </tr>
-                `;
+                tbody.innerHTML += `<tr><td><b>${b.name}</b></td><td>${b.number}</td><td>${b.city}</td><td>${b.email}</td><td><button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="deleteBranch(${b.id})">Delete</button></td></tr>`;
             });
         }
 
         function deleteBranch(id) {
-            if(confirm('Delete this branch?')) {
-                branches = branches.filter(b => b.id !== id);
-                localStorage.setItem('ioch_branches', JSON.stringify(branches));
-                renderAll();
-            }
+            if(confirm('Delete this branch?')) { branches = branches.filter(b => b.id !== id); localStorage.setItem('ioch_branches', JSON.stringify(branches)); renderAll(); }
         }
 
         function addUser() {
@@ -697,7 +782,6 @@
             const role = document.getElementById('u_role').value;
             const branch = document.getElementById('u_branch').value;
             if(!name) return alert('Name likhein!');
-
             users.push({ id: Date.now(), name, role, branch });
             localStorage.setItem('ioch_users', JSON.stringify(users));
             document.getElementById('u_name').value = '';
@@ -709,23 +793,12 @@
             tbody.innerHTML = '';
             users.forEach(u => {
                 const badgeClass = u.role === 'Admin' ? 'badge-admin' : 'badge-sales';
-                tbody.innerHTML += `
-                    <tr>
-                        <td><b>${u.name}</b></td>
-                        <td><span class="badge ${badgeClass}">${u.role}</span></td>
-                        <td>${u.branch}</td>
-                        <td><button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="deleteUser(${u.id})">Delete</button></td>
-                    </tr>
-                `;
+                tbody.innerHTML += `<tr><td><b>${u.name}</b></td><td><span class="badge ${badgeClass}">${u.role}</span></td><td>${u.branch}</td><td><button class="btn btn-danger" style="padding:5px 10px;font-size:12px;" onclick="deleteUser(${u.id})">Delete</button></td></tr>`;
             });
         }
 
         function deleteUser(id) {
-            if(confirm('Delete this user?')) {
-                users = users.filter(u => u.id !== id);
-                localStorage.setItem('ioch_users', JSON.stringify(users));
-                renderAll();
-            }
+            if(confirm('Delete this user?')) { users = users.filter(u => u.id !== id); localStorage.setItem('ioch_users', JSON.stringify(users)); renderAll(); }
         }
 
         let activeChat = null;
@@ -733,55 +806,26 @@
         function renderInbox() {
             const sidebar = document.getElementById('chat-sidebar');
             sidebar.innerHTML = '';
-            
-            if(branches.length === 0) {
-                sidebar.innerHTML = `<div class="empty-state"><p>Koi branch nahi hai. Pehle branch add karein.</p></div>`;
-                return;
-            }
-
+            if(branches.length === 0) { sidebar.innerHTML = `<div class="empty-state"><p>Koi branch nahi hai.</p></div>`; return; }
             branches.forEach(b => {
                 sidebar.innerHTML += `<div class="branch-title">📍 ${b.name} Branch</div>`;
-                sidebar.innerHTML += `
-                    <div class="number-item" onclick="loadChat(this, '${b.name}', '${b.number}')">
-                        <div>
-                            <h4>${b.name} Sales</h4>
-                            <p>${b.number}</p>
-                        </div>
-                        <span class="badge badge-connected">Active</span>
-                    </div>
-                    <div class="number-item" onclick="loadChat(this, '${b.name}', '${b.number}')">
-                        <div>
-                            <h4>${b.name} Admin</h4>
-                            <p>${b.number}</p>
-                        </div>
-                        <span class="badge badge-connected">Active</span>
-                    </div>
-                `;
+                sidebar.innerHTML += `<div class="number-item" onclick="loadChat(this, '${b.name}', '${b.number}')"><div><h4>${b.name} Sales</h4><p>${b.number}</p></div><span class="badge badge-connected">Active</span></div><div class="number-item" onclick="loadChat(this, '${b.name}', '${b.number}')"><div><h4>${b.name} Admin</h4><p>${b.number}</p></div><span class="badge badge-connected">Active</span></div>`;
             });
         }
 
         function loadChat(element, branchName, number) {
             document.querySelectorAll('.number-item').forEach(n => n.classList.remove('active'));
             element.classList.add('active');
-            
             activeChat = { branchName, number };
             document.getElementById('chat-title').innerText = element.querySelector('h4').innerText;
             document.getElementById('chat-number').innerText = number + ' | ' + branchName;
-            
             document.getElementById('chat-input').disabled = false;
             document.getElementById('send-btn').disabled = false;
             document.getElementById('toggle-btn').disabled = false;
-
             const savedMessages = chats.filter(c => c.number === number && c.branchName === branchName);
             const chatBox = document.getElementById('chat-box');
-            
-            if(savedMessages.length === 0) {
-                chatBox.innerHTML = `<div class="msg received">Assalam o Alaikum, mujhe details chahiye.</div>`;
-            } else {
-                chatBox.innerHTML = savedMessages.map(m => `
-                    <div class="msg ${m.sender}">${m.text}</div>
-                `).join('');
-            }
+            if(savedMessages.length === 0) { chatBox.innerHTML = `<div class="msg received">Assalam o Alaikum, mujhe details chahiye.</div>`; } 
+            else { chatBox.innerHTML = savedMessages.map(m => `<div class="msg ${m.sender}">${m.text}</div>`).join(''); }
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
@@ -789,36 +833,18 @@
             if(!activeChat) return;
             const input = document.getElementById('chat-input');
             if(input.value.trim() !== '') {
-                const newMsg = { 
-                    id: Date.now(), 
-                    branchName: activeChat.branchName, 
-                    number: activeChat.number, 
-                    sender: 'sent', 
-                    text: input.value 
-                };
-                chats.push(newMsg);
-                localStorage.setItem('ioch_chats', JSON.stringify(chats));
-                
+                const newMsg = { id: Date.now(), branchName: activeChat.branchName, number: activeChat.number, sender: 'sent', text: input.value };
+                chats.push(newMsg); localStorage.setItem('ioch_chats', JSON.stringify(chats));
                 const chatBox = document.getElementById('chat-box');
-                const div = document.createElement('div');
-                div.className = 'msg sent';
-                div.innerText = input.value;
-                chatBox.appendChild(div);
-                input.value = '';
-                chatBox.scrollTop = chatBox.scrollHeight;
+                const div = document.createElement('div'); div.className = 'msg sent'; div.innerText = input.value;
+                chatBox.appendChild(div); input.value = ''; chatBox.scrollTop = chatBox.scrollHeight;
             }
         }
 
         function toggleAccess(btn) {
             if(btn.innerText.includes('Hang')) {
-                if(confirm('Team access band karein?')) {
-                    btn.innerText = '▶️ Resume Chat';
-                    btn.style.background = 'var(--success)';
-                }
-            } else {
-                btn.innerText = '⏸️ Hang Chat';
-                btn.style.background = 'var(--warning)';
-            }
+                if(confirm('Team access band karein?')) { btn.innerText = '▶️ Resume Chat'; btn.style.background = 'var(--success)'; }
+            } else { btn.innerText = '⏸️ Hang Chat'; btn.style.background = 'var(--warning)'; }
         }
 
         function deleteChat() {
