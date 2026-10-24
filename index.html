@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IOCH - Super Admin Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -61,36 +61,7 @@
             border: 12px solid var(--dark-green);
             margin: 0 auto;
             text-align: left;
-            background-image: url('.cert-container { 
-    width: 1000px; 
-    height: 707px; /* Aapki tasveer ka size isse match karein */
-    position: relative;
-    margin: 0 auto;
-    background-size: 100% 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    /* 👇 YAHAN APNA NAYA LINK PASTE KAREIN 👇 */
-    background-image: url('https://raw.githubusercontent.com/aapka-naam/aapka-repo/main/naya-format.jpg'); 
-}
-
-/* Yeh text ki position set karta hai */
-.dyn-text {
-    position: absolute;
-    text-align: center;
-    left: 0;
-    width: 100%;
-    color: #000;
-}
-
-/* 👇 IN POSITIONS KO APNI NAYI TASVEER KE HISAB SE ADJUST KAREIN 👇 */
-.cert-no-pos { top: 40px; right: 50px; width: auto; left: auto; font-size: 14px; color: #333; font-weight: 600; }
-.student-name-pos { top: 330px; font-size: 45px; color: #064e3b; font-weight: 700; text-transform: uppercase; }
-.cnic-pos { top: 370px; font-size: 16px; color: #333; font-weight: 600; }
-.course-name-pos { top: 440px; font-size: 28px; color: #1e293b; font-weight: 700; text-transform: uppercase; }
-.dates-pos { top: 480px; font-size: 14px; color: #333; }
-.details-pos { top: 520px; font-size: 14px; color: #333; }
-.qr-pos { position: absolute; bottom: 40px; right: 60px; display: inline-block; background: white; padding: 5px; border: 1px solid #ccc;}
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
         }
         .cert-inner { border: 2px solid var(--gold); padding: 30px 40px; position: relative; background: rgba(253, 251, 247, 0.95); }
         
@@ -111,7 +82,7 @@
         .course-text { font-size:14px; color:#475569; margin-bottom:5px; }
         .course-name-text { font-family: 'Playfair Display', serif; font-size:24px; font-weight:700; color:var(--dark-green); margin-bottom: 15px; text-transform:uppercase; }
         
-        /* New Details Row (Duration, Grade, Date, ID) */
+        /* New Details Row */
         .details-row { display: flex; justify-content: center; gap: 20px; font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 20px; flex-wrap: wrap;}
         .details-row span { border-bottom: 1px solid #ccc; padding-bottom: 2px; }
 
@@ -577,7 +548,6 @@
             const certWrapper = document.getElementById('certWrapper');
             const printBtn = document.getElementById('printBtn');
 
-            // 1. Check in URL
             const urlParams = new URLSearchParams(window.location.search);
             const urlName = urlParams.get('name');
             const urlCourse = urlParams.get('course');
@@ -588,8 +558,6 @@
 
             if (urlCertNo === input && urlName && urlCourse) {
                 certData = { certNo: urlCertNo, name: urlName, course: urlCourse, issueDate: urlDate };
-                // Note: Baqi details (CNIC, Grade, Duration) URL se nahi aayengi, sirf name/course/date aayengi
-                // Agar aap chahte hain ke saari details URL se aayein to URL lamba ho jayega.
                 document.getElementById('displayCnic').innerText = "N/A";
                 document.getElementById('displayStartDate').innerText = "N/A";
                 document.getElementById('displayEndDate').innerText = "N/A";
