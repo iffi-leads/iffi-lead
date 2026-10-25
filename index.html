@@ -43,11 +43,11 @@ aside a{display:block;padding:11px 18px;cursor:pointer}aside a:hover,aside a.on{
 </style></head><body>
 <div id="root"></div><div id="pa"></div>
 <script>
-/* ===== EMAILJS CONFIG — replace these 3 values ===== */
+/* ===== EMAILJS CONFIG ===== */
 const EMAILJS_PUBLIC_KEY  = 'edtCos80Jut57JE3p';
 const EMAILJS_SERVICE_ID  = 'service_zll81e8';
 const EMAILJS_TEMPLATE_ID = 'template_xq6htlb';
-/* ==================================================== */
+/* ========================== */
 
 try{ if(window.emailjs) emailjs.init(EMAILJS_PUBLIC_KEY); }catch(e){}
 
@@ -60,7 +60,6 @@ let auth=false,view='dash',role='S',me=null;
 const NAV=[['dash','📊 Dashboard'],['leads','👥 Leads'],['certs','📜 Certificates'],['users','👨‍💼 Users'],['branches','🏢 Branches'],['settings','⚙️ Settings']];
 const br=()=>D.branches.map(b=>b.name);
 
-/* ====== CONFIG: Users now have email + mktnum (both optional) ====== */
 const CF={
   leads:{t:'Leads',f:[
     {k:'name',l:'Student name'},
@@ -120,6 +119,7 @@ function app(){$('#root').innerHTML=`<div class="shell"><aside><b>🎓 IOCH CRM<
 function go(v){view=v;document.querySelectorAll('aside a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));({dash,certs,settings,wa,log:logv}[v]||(()=>crud(v)))()}
 function dash(){const n=s=>D.leads.filter(l=>l.status===s).length;$('#view').innerHTML=`<h2>Dashboard</h2><div class="st"><div><small>Leads</small><b>${D.leads.length}</b></div><div><small>New leads</small><b>${n('New')}</b></div><div><small>Enrolled</small><b>${n('Enrolled')}</b></div><div><small>Certificates</small><b>${D.certs.length}</b></div><div><small>Users</small><b>${D.users.length}</b></div><div><small>Branches</small><b>${D.branches.length}</b></div></div>`}
 function crud(k){const C=CF[k];$('#view').innerHTML=`<h2>${C.t}</h2><div class="card"><div class="fg">${C.f.map(f=>f.s?`<label>${f.l}<select id="f_${f.k}"><option></option>${f.s().map(o=>`<option>${esc(o)}</option>`).join('')}</select></label>`:`<label>${f.l}${f.k==='email'?' <small style="color:#b08d2e">📧 auto-sends login</small>':''}${f.k==='mktnum'?' <small style="color:#b08d2e">📱</small>':''}<input id="f_${f.k}" ${f.k==='email'?'type="email" placeholder="user@example.com"':''} ${f.k==='mktnum'?'placeholder="923001234567"':''}></label>`).join('')}<button class="b" onclick="add('${k}')">+ Add</button></div></div><div class="card"><input id="q" placeholder="Search…" oninput="tbl('${k}')"><br><br><table><thead><tr>${C.f.map(f=>`<th>${f.l.split(' (')[0]}</th>`).join('')}<th></th></tr></thead><tbody id="tb"></tbody></table></div>`;tbl(k)}
+
 function add(k){
   const C=CF[k],r={id:Date.now()};
   C.f.forEach(f=>r[f.k]=$('#f_'+f.k).value.trim());
@@ -128,40 +128,37 @@ function add(k){
   if(k==='users'){
     if(!r.username||!r.pass)return alert('Username and password are required');
     if(D.users.some(u=>u.username===r.username))return alert('Username already exists');
-  if(r.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email))return alert('Invalid email format');
+    if(r.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email))return alert('Invalid email format');
   }
   D[k].push(r);save();
   C.f.forEach(f=>$('#f_'+f.k).value='');
   tbl(k);
-
-  if(r.email){
-    sendCredentials(r).then(ok=>{
-      if(ok){addLog('credentials emailed to '+r.email);alert('✅ User created & credentials emailed to '+r.email)}
-      else{alert('⚠️ User created but email could not be sent.\nCheck EmailJS settings or Internet connection.')}
-    });
-  } else {
-    addLog('user created without email: '+r.username);
-    alert('User created (no email provided — credentials not sent).');
+  
+  if(k==='users'){
+    if(r.email){
+      sendCredentials(r).then(ok=>{
+        if(ok){addLog('credentials emailed to '+r.email);alert('✅ User created & credentials emailed to '+r.email)}
+        else{alert('⚠️ User created but email could not be sent.\nCheck EmailJS settings or Internet connection.')}
+      });
+    } else {
+      addLog('user created without email: '+r.username);
+      alert('User created (no email provided — credentials not sent).');
+    }
   }
 }
-}
+
 async function sendCredentials(u){
   try{
     if(!window.emailjs||EMAILJS_PUBLIC_KEY==='YOUR_PUBLIC_KEY')return false;
     await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,{
-      to_email:u.email,
-      to_name:u.name,
-      username:u.username,
-      password:u.pass,
-      role:u.role||'',
-      branch:u.branch||'-',
-      mktnum:u.mktnum||'-',
-      org:D.set.org,
-      login_url:location.origin
+      to_email:u.email, to_name:u.name, username:u.username, password:u.pass,
+      role:u.role||'', branch:u.branch||'-', mktnum:u.mktnum||'-',
+      org:D.set.org, login_url:location.origin
     });
     return true;
   }catch(e){console.error('EmailJS error:',e);return false}
 }
+
 function tbl(k){const C=CF[k],q=($('#q').value||'').toLowerCase();
   $('#tb').innerHTML=D[k].filter(r=>JSON.stringify(r).toLowerCase().includes(q)).map(r=>`<tr>${C.f.map(f=>{
     if(f.k==='status'&&k==='leads')return `<td><select onchange="setSt(${r.id},this.value)">${f.s().map(o=>`<option${o===r.status?' selected':''}>${o}</option>`).join('')}</select></td>`;
@@ -170,6 +167,7 @@ function tbl(k){const C=CF[k],q=($('#q').value||'').toLowerCase();
     if(f.k==='mktnum'&&r.mktnum)return `<td><a href="https://wa.me/${r.mktnum.replace(/\D/g,'')}" target="_blank" rel="noopener">💬 ${esc(r.mktnum)}</a></td>`;
     return `<td>${esc(r[f.k])}</td>`;
   }).join('')}<td>${k==='leads'&&r.phone?`<a href="https://wa.me/${r.phone.replace(/\D/g,'')}" target="_blank" rel="noopener">💬</a> `:''}${k==='users'&&r.email?`<button class="b s" onclick="resend(${r.id})" title="Resend credentials">📧</button> `:''}<button class="b r s" onclick="del('${k}',${r.id})">Delete</button></td></tr>`).join('')||'<tr><td>No records.</td></tr>'}
+
 function resend(id){const u=D.users.find(x=>x.id===id);if(!u||!u.email)return alert('No email on this user');if(!confirm('Resend credentials to '+u.email+'?'))return;sendCredentials(u).then(ok=>alert(ok?'✅ Email sent':'❌ Failed to send'))}
 function setSt(id,v){D.leads.find(l=>l.id===id).status=v;save()}
 function del(k,id){if(confirm('Delete?')){D[k]=D[k].filter(r=>r.id!==id);save();tbl(k)}}
