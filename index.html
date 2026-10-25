@@ -165,7 +165,7 @@ async function sendCredentials(u){
 function tbl(k){const C=CF[k],q=($('#q').value||'').toLowerCase();
   $('#tb').innerHTML=D[k].filter(r=>JSON.stringify(r).toLowerCase().includes(q)).map(r=>`<tr>${C.f.map(f=>{
     if(f.k==='status'&&k==='leads')return `<td><select onchange="setSt(${r.id},this.value)">${f.s().map(o=>`<option${o===r.status?' selected':''}>${o}</option>`).join('')}</select></td>`;
-    if(f.k==='pass')return `<td>••••</td>`;
+    if(f.k==='pass')return `<td><b>${esc(r[f.k])}</b></td>`;
     if(f.k==='email'&&r.email)return `<td><a href="mailto:${esc(r.email)}" style="color:var(--pr)">${esc(r.email)}</a></td>`;
     if(f.k==='mktnum'&&r.mktnum)return `<td><a href="https://wa.me/${r.mktnum.replace(/\D/g,'')}" target="_blank" rel="noopener">💬 ${esc(r.mktnum)}</a></td>`;
     return `<td>${esc(r[f.k])}</td>`;
