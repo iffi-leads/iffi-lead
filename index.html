@@ -128,22 +128,22 @@ function add(k){
   if(k==='users'){
     if(!r.username||!r.pass)return alert('Username and password are required');
     if(D.users.some(u=>u.username===r.username))return alert('Username already exists');
-    if(r.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email))return alert('Invalid email format');
+  if(r.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email))return alert('Invalid email format');
   }
   D[k].push(r);save();
   C.f.forEach(f=>$('#f_'+f.k).value='');
   tbl(k);
-  if(f.k==='pass')return `{
-    if(r.email){
-      sendCredentials(r).then(ok=>{
-        if(ok){addLog('credentials emailed to '+r.email);alert('✅ User created & credentials emailed to '+r.email)}
-        else{alert('⚠️ User created but email could not be sent.\nCheck EmailJS settings or Internet connection.')}
-      });
-    } else {
-      addLog('user created without email: '+r.username);
-      alert('User created (no email provided — credentials not sent).');
-    }
+
+  if(r.email){
+    sendCredentials(r).then(ok=>{
+      if(ok){addLog('credentials emailed to '+r.email);alert('✅ User created & credentials emailed to '+r.email)}
+      else{alert('⚠️ User created but email could not be sent.\nCheck EmailJS settings or Internet connection.')}
+    });
+  } else {
+    addLog('user created without email: '+r.username);
+    alert('User created (no email provided — credentials not sent).');
   }
+}
 }
 async function sendCredentials(u){
   try{
