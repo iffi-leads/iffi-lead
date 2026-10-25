@@ -133,7 +133,7 @@ function add(k){
   D[k].push(r);save();
   C.f.forEach(f=>$('#f_'+f.k).value='');
   tbl(k);
-  if(f.k==='pass')return `<td><b>${esc(r[f.k])}</b></td>`;
+  if(f.k==='pass')return `{
     if(r.email){
       sendCredentials(r).then(ok=>{
         if(ok){addLog('credentials emailed to '+r.email);alert('✅ User created & credentials emailed to '+r.email)}
