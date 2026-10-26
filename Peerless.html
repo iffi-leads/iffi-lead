@@ -1,1 +1,676 @@
+require('dotenv').config(); const express = require('express'); const sqlite3 = require('sqlite3').verbose(); const bcrypt = require('bcryptjs'); const session = require('express-session'); const multer = require('multer'); const path = require('path'); const fs = require('fs'); const crypto = require('crypto'); const app = express(); const port = process.env.PORT || 3000; const PARTNER_COST = 20000; const STAFF_ROLES = ['Sales', 'Tutor', 'Accountant', 'Admin']; const UPLOAD_VIEW_ROLES = ['SuperAdmin', 'Admin', 'Tutor', 'Accountant']; // ================= SECURITY CONFIG ================= let SESSION_SECRET = process.env.SESSION_SECRET; if (!SESSION_SECRET) { SESSION_SECRET = crypto.randomBytes(32).toString('hex'); console.warn('⚠️ SESSION_SECRET set nahi hai. Random secret use ho raha hai. .env mein SESSION_SECRET zaroor lagayein.'); } if (!process.env.ADMIN_PASSWORD) { console.warn('⚠️ ADMIN_PASSWORD set nahi hai. Naya Super Admin "admin123" password se banega - foran badal dein.'); } // ================= UPLOADS ================= const uploadDir = path.join(__dirname, 'uploads'); if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true }); const ALLOWED_EXT = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf', '.doc', '.docx', '.csv', '.txt']; const storage = multer.diskStorage({ destination: (req, file, cb) => cb(null, uploadDir), filename: (req, file, cb) => cb(null, Date.now() + '-' + crypto.randomBytes(6).toString('hex') + path.extname(file.originalname).toLowerCase()) }); const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 }, fileFilter: (req, file, cb) => { const ok = ALLOWED_EXT.includes(path.extname(file.originalname).toLowerCase()); cb(ok ? null : new Error('File type not allowed'), ok); } }); // ================= MIDDLEWARE ================= app.use(express.urlencoded({ extended: true })); app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false, cookie: { httpOnly: true, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 8, secure: process.env.NODE_ENV === 'production' } })); // Uploads protected app.use('/uploads', async (req, res, next) => { const u = req.session.user; if (!u) return res.status(403).send('Access Denied'); if (UPLOAD_VIEW_ROLES.includes(u.role)) return next(); if (u.role !== 'Student') return res.status(403).send('Access Denied'); try { const name = path.basename(decodeURIComponent(req.path)); const st = await dbGet("SELECT photo FROM students WHERE id = ?", [u.id]); const cfg = await getSettings(); if ((st && st.photo === name) || Object.values(cfg).includes(name)) return next(); } catch (e) { /* fall through */ } res.status(403).send('Access Denied'); }, express.static(uploadDir)); app.use(express.static(path.join(__dirname, 'public'))); // ================= LOGIN RATE LIMIT ================= const LOGIN_MAX = 10, LOGIN_WINDOW = 15 * 60 * 1000; const loginAttempts = new Map(); setInterval(() => { const now = Date.now(); for (const [k, v] of loginAttempts) if (v.reset < now) loginAttempts.delete(k); }, 10 * 60 * 1000).unref(); function loginLimiter(req, res, next) { const key = req.ip || 'unknown'; const now = Date.now(); let e = loginAttempts.get(key); if (!e || e.reset < now) { e = { count: 0, reset: now + LOGIN_WINDOW }; loginAttempts.set(key, e); } if (e.count >= LOGIN_MAX) return res.status(429).send("
+Bohat zyada login attempts. 15 minute baad dobara koshish karein.
+"); e.count++; next(); } const clearLoginAttempts = req => loginAttempts.delete(req.ip || 'unknown'); const startSession = (req, data) => new Promise((resolve, reject) => { req.session.regenerate(err => { if (err) return reject(err); Object.assign(req.session, data); resolve(); }); }); // ================= DB ================= const db = new sqlite3.Database(path.join(__dirname, 'crm.db')); const dbGet = (sql, p = []) => new Promise((res, rej) => db.get(sql, p, (e, r) => e ? rej(e) : res(r))); const dbAll = (sql, p = []) => new Promise((res, rej) => db.all(sql, p, (e, r) => e ? rej(e) : res(r))); const dbRun = (sql, p = []) => new Promise((res, rej) => db.run(sql, p, function (e) { e ? rej(e) : res(this); })); db.serialize(() => { db.run(`ALTER TABLE students ADD COLUMN is_validated INTEGER DEFAULT 0`, () => { }); db.run(`CREATE TABLE IF NOT EXISTS users ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT UNIQUE, official_whatsapp TEXT, personal_phone TEXT, cnic TEXT, cnic_front TEXT, cnic_back TEXT, agreement_doc TEXT, username TEXT UNIQUE, password TEXT, role TEXT, branch TEXT, status TEXT DEFAULT 'Pending', join_date TEXT, agreement_status TEXT DEFAULT 'Pending', agreement_notes TEXT, ip_address TEXT, device_info TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP, account_status TEXT DEFAULT 'Active', salary TEXT DEFAULT '0' )`); db.run(`CREATE TABLE IF NOT EXISTS students ( id INTEGER PRIMARY KEY AUTOINCREMENT, first_name TEXT, surname TEXT, gender TEXT, dob TEXT, contact TEXT, email TEXT, address TEXT, city TEXT, postal_code TEXT, country TEXT, id_type TEXT, id_number TEXT, nationality TEXT, qualification TEXT, qualification_upload TEXT, course TEXT, fee_amount TEXT, fee_slip_upload TEXT, source TEXT, other_source TEXT, chat_upload TEXT, mode_of_learning TEXT DEFAULT 'Online', branch TEXT, assigned_tutor TEXT, status TEXT DEFAULT 'Pending', photo TEXT, id_front TEXT, id_back TEXT, declaration TEXT, declaration_date TEXT, terms_accepted TEXT, password TEXT, temp_password TEXT, course_status TEXT DEFAULT 'Assigned', ip_address TEXT, device_info TEXT, resit_details TEXT, resit_result_upload TEXT, custom_password TEXT, last_login TEXT )`); db.run(`CREATE TABLE IF NOT EXISTS leads ( id INTEGER PRIMARY KEY AUTOINCREMENT, student_name TEXT, phone TEXT, email TEXT, course_interested TEXT, status TEXT DEFAULT 'New', branch TEXT, assigned_to TEXT, enrolled_date TEXT, enrolled_time TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP )`); db.run(`CREATE TABLE IF NOT EXISTS whatsapp_accounts ( id INTEGER PRIMARY KEY AUTOINCREMENT, number TEXT UNIQUE, name TEXT, api_status TEXT DEFAULT 'Connected', assigned_to TEXT, access_status TEXT DEFAULT 'Active', role TEXT, location TEXT, fb_token TEXT, phone_id TEXT, waba_id TEXT )`); db.run(`CREATE TABLE IF NOT EXISTS chats ( id INTEGER PRIMARY KEY AUTOINCREMENT, wa_number TEXT, student_phone TEXT, sender TEXT, message TEXT, timestamp TEXT DEFAULT CURRENT_TIMESTAMP )`); db.run(`CREATE TABLE IF NOT EXISTS assignments ( id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, file_path TEXT, due_date TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP )`); db.run(`CREATE TABLE IF NOT EXISTS submissions ( id INTEGER PRIMARY KEY AUTOINCREMENT, assignment_id INTEGER, student_name TEXT, student_email TEXT, file_path TEXT, submitted_at TEXT DEFAULT CURRENT_TIMESTAMP )`); db.run(`CREATE TABLE IF NOT EXISTS expenses ( id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, category TEXT, amount REAL, date TEXT, description TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP )`); db.run(`CREATE TABLE IF NOT EXISTS branches ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, created_at TEXT DEFAULT CURRENT_TIMESTAMP )`); db.run(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`); db.run(`CREATE TABLE IF NOT EXISTS certificates ( id INTEGER PRIMARY KEY AUTOINCREMENT, student_name TEXT, course_name TEXT, duration TEXT, issue_date TEXT, cert_number TEXT UNIQUE, instructor_name TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP )`); // Safe ALTER TABLE (sirf tab jab column na ho) db.all("PRAGMA table_info(students)", (err, cols) => { if (err || !cols) return; const names = cols.map(c => c.name); if (!names.includes('card_no')) db.run(`ALTER TABLE students ADD COLUMN card_no TEXT`); db.run(`ALTER TABLE students ADD COLUMN is_validated INTEGER DEFAULT 0`, () => { }); if (!names.includes('card_issued')) db.run(`ALTER TABLE students ADD COLUMN card_issued TEXT`); }); }); // Default Super Admin db.get("SELECT * FROM users WHERE role = 'SuperAdmin'", [], async (err, row) => { if (!row) { const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'admin123', 10); db.run(`INSERT INTO users (name, email, official_whatsapp, personal_phone, cnic, username, password, role, branch, status, join_date, agreement_status, account_status) VALUES ('Super Admin', 'ioch.institute@gmail.com', '03051116660', '03051116660', '12345-6789012-3', 'ioch.institute@gmail.com', ?, 'SuperAdmin', 'Head Office', 'Active', '2024-01-01', 'Signed', 'Active')`, [hashedPassword]); } }); db.get("SELECT COUNT(*) as c FROM branches", [], (err, row) => { if (row && row.c === 0) db.run(`INSERT INTO branches (name) VALUES ('Rawalpindi'), ('Islamabad'), ('Lahore'), ('Karachi')`); }); // ================= HELPERS ================= const IMG_EXT = ['.jpg', '.jpeg', '.png', '.webp', '.gif']; const isImg = f => IMG_EXT.includes(path.extname(String(f || '')).toLowerCase()); const safeUnlink = f => { if (f) fs.unlink(path.join(uploadDir, path.basename(f)), () => { }); }; async function getSettings() { const rows = await dbAll("SELECT key, value FROM settings"); const o = {}; rows.forEach(r => { o[r.key] = r.value; }); return o; } const esc = v => String(v == null ? '' : v).replace(/&/g, '&').replace(//g, '>').replace(/"/g, '"').replace(/'/g, '''); const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next); const requireLogin = (req, res, next) => req.session.user ? next() : res.redirect('/login'); const requireRole = (...roles) => (req, res, next) => { const u = req.session.user; if (!u) return res.redirect('/login'); if (!roles.includes(u.role)) return res.status(403).send('Access Denied'); next(); }; const notStudent = (req, res, next) => { const u = req.session.user; if (!u) return res.redirect('/login'); if (u.role === 'Student') return res.status(403).send('Access Denied'); next(); }; function getIp(req) { return String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim(); } const pad = n => String(n).padStart(2, '0'); function nowStr() { const d = new Date(); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; } const MONTH_EXPR = "(substr(declaration_date,7,4) || '-' || substr(declaration_date,4,2))"; const validMonth = m => /^\d{4}-\d{2}$/.test(m || '') ? m : new Date().toISOString().slice(0, 7); const csvCell = v => { let s = String(v == null ? '' : v); if (/^[=+\-@]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; }; const cleanPipe = v => String(v == null ? '' : v).replace(/\|/g, '/').trim(); function parseExtra(str) { const m = {}; (str || '').split('|').forEach(p => { const i = p.indexOf(':'); if (i > 0) m[p.slice(0, i).trim()] = p.slice(i + 1).trim(); }); return m; } const postBtn = (action, label, cls = 'btn-danger', confirmMsg = '') => `
+${label}
+`; async function getFinance(month) { const first = month + '-01', last = month + '-31'; const fees = await dbGet(`SELECT COALESCE(SUM(CAST(fee_amount AS REAL)),0) AS t, COUNT(*) AS c FROM students WHERE status = 'Active' AND ${MONTH_EXPR} = ?`, [month]); const exp = await dbGet("SELECT COALESCE(SUM(amount),0) AS t FROM expenses WHERE date >= ? AND date <= ?", [first, last]); const sal = await dbGet("SELECT COALESCE(SUM(CAST(salary AS REAL)),0) AS t FROM users WHERE role != 'SuperAdmin'"); const partnerCost = fees.c * PARTNER_COST; return { totalFees: fees.t, learners: fees.c, totalExpenses: exp.t, totalSalaries: sal.t, partnerCost, net: fees.t - (exp.t + sal.t + partnerCost) }; } const money = n => 'PKR ' + Number(n || 0).toLocaleString(); const IMG = f => '/uploads/' + encodeURIComponent(f); // ================= STUDENT CARD RENDER (moved up so both routes can use) ================= async function ensureCard(s) { if (s.card_no) return; s.card_no = 'IOCH-' + new Date().getFullYear() + '-' + String(s.id).padStart(4, '0'); s.card_issued = nowStr().split(',')[0]; await dbRun("UPDATE students SET card_no = ?, card_issued = ? WHERE id = ?", [s.card_no, s.card_issued, s.id]); } function renderCard(s, cfg) { const x = parseExtra(s.device_info); const bg = cfg.card_bg ? `background:url('${IMG(cfg.card_bg)}') center/cover no-repeat;` : 'background:linear-gradient(135deg,#ecfdf5,#ffffff);'; const chip = (f, alt) => f ? `${alt}` : ''; const photo = s.photo ? `` : `
+${esc((s.first_name || '?').charAt(0))}
+`; const line = (k, v) => `
+${k}
+${esc(v || 'N/A')}
+`; return `
+IOCH
+LEARNER CARD
+${chip(cfg.logo_nebosh, 'NEBOSH')}${chip(cfg.logo_partner, 'Learner Partner')}
+${photo}
+${line('NAME', s.first_name + ' ' + s.surname)} ${line('COURSE', s.course)} ${line('EXAM DATE', x['CourseDate'])} ${line('MODE', x['Mode'] || s.mode_of_learning)}
+Card No: ${esc(s.card_no || 'Pending')}
+Issued: ${esc(s.card_issued || 'N/A')}
+${esc(cfg.card_footer || 'ioch.org.pk')}
+`; } // ================= PROFESSIONAL UI CSS ================= const commonCSS = ` `; const publicHeaderFooter = (contentHTML) => { return "" + "" + "" + commonCSS + "" + "" + "
+" + "
+📍 Property No 1056, 1st Floor, Sayed Pur Road, Satellite Town, Commercial Market, Rawalpindi - 46000
+" + "
+" + "
+✉️
+info@ioch.org.pk
+" + "
+📞 +92 305 1116660
+" + "
+📱 +92 305 1111855
+" + "
+" + "
+" + "
+" + "
+IOCH Logo
+" + "
+" + "
+Home
+" + "
+About Us
+" + "
+International Trainings
+" + "
+Gulf Trainings
+" + "
+Consultancy
+" + "
+Verification
+" + "
+" + "
+" + "
+Login
+" + "
+Register
+" + "
+" + "
+" + contentHTML + "
+" + "
+" + "
+" + "
+Peerless Logo
+" + "
+IOCH is under association with
+Peerless Training & Development
+(1818) for NEBOSH course.
+" + "
+" + "
+" + "
+Contact Us
+" + "
+Property No 1056, 1st Floor, Sayed Pur Road,
+Satellite Town, Commercial Market,
+Rawalpindi - Postal Code: 46000
 
+" + "
+Phone: +92 305 1116660
+
+" + "
+Email: info@ioch.org.pk
+
+" + "
+" + "
+" + "
+© " + new Date().getFullYear() + " IOCH. All Rights Reserved.
+" + "
+" + "" + "" + ""; }; const renderDashboard = (user, contentHTML, activeMenu = 'dashboard') => { const is = (...roles) => roles.includes(user.role); const link = (href, key, label) => `
+${label}
+`; const menu = user.role === 'Student' ? ` ${link('/dashboard', 'dashboard', '🏠 Overview')} ${link('/lms', 'lms', '📚 My Courses')} ${link('/courses', 'courses', '📖 Course Library')} ${link('/my-card', 'mycard', '🆔 My Student Card')} ${link('/my-grades', 'grades', '🏆 My Grades')} ${link('/change-password', 'password', '🔒 Change Password')} ` : ` ${link('/dashboard', 'dashboard', '📊 Dashboard')} ${is('SuperAdmin', 'Admin', 'Tutor') ? link('/students', 'students', '🎓 Students Details') : ''} ${is('SuperAdmin', 'Admin') ? link('/manage-users', 'users', '👥 Employees') : ''} ${is('SuperAdmin', 'Admin') ? link('/certificates', 'certificates', '🏆 Certificates') : ''} ${is('SuperAdmin', 'Admin', 'Sales') ? link('/leads', 'leads', '🎯 Leads & CRM') : ''} ${is('SuperAdmin', 'Tutor') ? link('/lms', 'lms', '🎓 LMS & Assignments') : ''} ${is('SuperAdmin', 'Accountant') ? link('/finance', 'accounts', '💰 Accounts') : ''} ${is('SuperAdmin') ? link('/card-settings', 'cardset', '🆔 Card Settings') : ''} ${link('/live-chat', 'livechat', '💬 Live Chat')} ${is('SuperAdmin') ? link('/reports', 'reports', '📊 Reports') : ''} ${is('SuperAdmin') ? link('/whatsapp-setup', 'wa_setup', '⚙️ WhatsApp Setup') : ''} ${link('/chats', 'chats', '💬 WhatsApp Inbox')} ${is('SuperAdmin', 'Admin', 'Tutor') ? link('/courses', 'courses', '📖 Courses (LMS)') + link('/grading', 'grading', '📝 Grading') : ''} `; return ` ${commonCSS}
+Logo
+IOCH Portal
+${menu}
+🚪 Logout
+${esc(activeMenu.toUpperCase())}
+${esc(user.name)}
+${esc(user.role)} | ${esc(user.branch)}
+${esc((user.name || '?').charAt(0))}
+${contentHTML}
+`; }; // ================= TERMS & CONDITIONS ================= const TERMS_HTML = `
+Course Registration, Attendance and Refund Policy
+Institution of Occupational Career Hub (IOCH)
+
+All learners must read this policy carefully before completing their registration. In this policy, "IOCH" refers to the Institution of Occupational Career Hub. "Working days" means Monday to Friday, excluding official public holidays in Pakistan. All other references to days mean calendar days.
+
+1. Registration
+Early registration is recommended, as seats are limited. Registration is confirmed only after IOCH receives the required documents and agreed payment. Learners must complete the Course Registration Form and provide valid identification, as required for course or examination registration. Learners are responsible for ensuring that their name, identification details, contact information and other registration details are accurate. Names must match the identification required by the relevant awarding body. Any third-party correction or reissue fees resulting from incorrect information supplied by the learner shall be payable by the learner, subject to prior notification. The registration confirmation or quotation shall specify the course, agreed fees, delivery method, scheduled dates and included services.
+
+2. Attendance and Examination Eligibility
+IOCH requires learners to attend at least 90% of the scheduled training hours, together with any additional mandatory requirements specified for the course or by the awarding body. Absence exceeding 10% of the scheduled training hours, or a lower absence limit expressly specified for the course, will make the learner ineligible to sit the examination through IOCH for that intake until the attendance requirements are fulfilled. Fees paid will not be refundable where examination ineligibility results from the learner's failure to meet the attendance requirements, subject to applicable law. Attendance is calculated by training hours. Late arrival and early departure may be recorded as missed time. Learners arriving more than 15 minutes late may be marked absent for the session, as explained in the course attendance instructions. Learners must attend on time, participate actively and complete required coursework and assessments. Accessing recordings does not replace mandatory attendance unless expressly approved. Any approved make-up sessions, repeat training or examination re-registration may incur additional fees, which will be disclosed before confirmation. Documented exceptional circumstances may be considered individually, subject to applicable law and awarding-body requirements.
+
+3. Cancellation and Refunds
+Cancellation requests must be submitted in writing to Support@ioch.org.pk or through another official written communication channel stated in the registration confirmation. A telephone call alone does not constitute a cancellation request. The cancellation date is the date the written request is received through an official channel. For learner-requested cancellations received more than 7 calendar days before the scheduled course commencement date, and before registration with the relevant awarding body, a 50% refund of the agreed course fee may be issued, subject to the third-party fee provisions below. The refund shall not exceed the amount actually paid. No refund will be issued for learner-requested cancellations received 7 calendar days or less before the scheduled course commencement date, on the commencement date, or after the course has started. Following registration with the relevant awarding body, learner-requested cancellations are non-refundable, except for any recoverable third-party amounts or refunds required by applicable law. Non-attendance, withdrawal, failure to complete the course or failure to pass an assessment does not create an entitlement to a refund. Fees are not automatically transferable to another learner, course or intake. Any transfer requires written approval from IOCH and, where applicable, the awarding body. These cancellation restrictions do not override mandatory statutory cancellation or refund rights, including any applicable rights relating to online purchases. Refunds arising from cancellation by IOCH are governed by Section 5.
+
+4. Third-Party Fees and Refund Processing
+Third-party charges may include awarding-body registration, examination bookings, externally supplied learning resources, activated software licences, payment-provider charges and courier services. Where legally permitted, actual third-party costs incurred for the learner that cannot be recovered shall be borne by the learner and may be deducted from an otherwise eligible refund. Such charges must have been disclosed before the learner committed to the relevant purchase. IOCH will provide an itemised explanation of deductions. No cost shall be deducted twice or charged again if it is already covered by an amount retained under the cancellation policy. Any amount recovered from a third party on the learner's behalf shall be included in the refund calculation or passed on to the learner, as applicable. IOCH is not required to advance a refund that remains subject to a third party's approval and payment, unless applicable law requires otherwise. Refunds payable by IOCH will be processed within 14 calendar days after entitlement is established and the necessary payment details are available, or within any shorter period required by law. Refunds will normally be returned through the original payment method. Instalment and buy-now-pay-later transactions will be adjusted through the relevant provider's process. No additional refund-processing charge will be imposed where prohibited by law. This section does not limit refunds owed because IOCH cancels or fails to provide the contracted service.
+
+5. Course Rescheduling and Cancellation by IOCH
+IOCH reserves the right to postpone the course commencement date by up to 10 working days from the originally confirmed commencement date due to operational requirements, trainer availability, minimum enrolment requirements or circumstances beyond its reasonable control. Learners will be notified through their registered contact details as soon as reasonably practicable. The 10-working-day limit is cumulative and cannot be restarted through successive postponements. A postponement within this period does not, by itself, create a contractual entitlement to a refund, without prejudice to any applicable statutory rights. IOCH may appoint a suitably qualified replacement trainer while maintaining the agreed course scope and training hours. A material change to the delivery method or location requires the learner's agreement. If IOCH cancels the course without delivering it, the learner may choose an available alternative course or receive a full refund of the fees paid for the cancelled course. If postponement exceeds 10 working days, the learner may accept the revised schedule or cancel and receive a refund for the undelivered course. The learner-cancellation penalties will not apply. Where only part of a course has been delivered, any refund will reflect the undelivered services and applicable legal rights.
+
+6. Discontinuation, Absence and Deferral
+A learner who needs to discontinue training must notify IOCH promptly in writing. IOCH may approve a one-time deferral of up to 2 months from the original course commencement date, subject to seat availability, course scheduling and awarding-body deadlines. A deferral is valid only when confirmed in writing. It does not automatically extend an examination registration, assessment deadline or awarding-body registration period. Additional third-party fees or fees for repeat training may apply and will be disclosed before the deferral is accepted. If the learner fails to resume within the approved period despite an appropriate intake being available, the course credit will expire and a new registration at the applicable course fee will be required. Where IOCH cannot offer an appropriate intake within the approved period, a revised arrangement will be agreed with the learner.
+
+7. Payments
+Learners must pay the full agreed course fee at least 20 calendar days before the examination registration deadline notified by IOCH, unless a different payment arrangement is agreed in writing. Learners who fail to complete the required payment by the notified deadline will not be registered for the examination. Payments must be made only through bank accounts, payment links or other payment methods officially approved by IOCH. Learners must not transfer funds to employees' or other individuals' personal accounts. IOCH does not authorise such payments. Learners must retain their payment receipts and provide them when requested for reconciliation. Examination resits, repeat training, optional services and other exclusions are payable separately unless expressly included in the written quotation. All additional charges and applicable taxes must be disclosed before the learner agrees to the relevant service.
+
+8. Course Materials and Printed Books
+Included learning materials will be supplied in the format specified in the course quotation or registration confirmation. Printed textbooks, workbooks and other physical learning materials are subject to additional charges unless expressly included in the course fee. Printing, purchase and delivery charges must be paid before the materials are ordered or dispatched. Materials are owned by IOCH, the relevant awarding body, publisher or other rights holder, as applicable. Learners may use the materials for their personal studies only. Unauthorised reproduction, resale, distribution or sharing is prohibited, subject to any permissions granted by the relevant rights holder. Learning-platform credentials are personal and must not be shared.
+
+9. Certificates and Delivery Charges
+Certificates are issued only after the relevant attendance, assessment and awarding-body requirements have been satisfied. Certificate format and availability depend on the course and issuing body. A printed certificate is not available for every qualification. Where a learner requests a physical certificate, any applicable printing or issuing charges, together with shipping and courier charges, shall be payable by the learner unless expressly included in the course fee. These charges will be disclosed and agreed before the order or dispatch. Learners must provide an accurate delivery address and contact number. Additional delivery costs resulting from incorrect details supplied by the learner or a failed delivery attributable to the learner shall be payable by the learner. Replacement certificates and corrections resulting from learner-supplied errors may incur the issuing body's applicable charges. IOCH will assist with delivery enquiries. Any responsibility for loss, damage or delay will be determined in accordance with the relevant service terms and applicable law.
+
+10. NEBOSH Enquiries About Results — EAR
+This section applies to NEBOSH learners only. Learners may submit an Enquiry About Results directly to NEBOSH or request assistance from IOCH, in accordance with the current NEBOSH procedures. Applications and payments must be completed before the applicable NEBOSH deadline. Learners requesting assistance must also meet the submission deadline communicated by IOCH. EAR eligibility, fees, outcomes and refunds are governed by the current NEBOSH EAR policy. Where an EAR is successful under NEBOSH's policy, the applicable EAR fee will be refunded in accordance with that policy. An unsuccessful EAR does not normally qualify for a fee refund. If IOCH receives an EAR refund on behalf of the learner, it will pass the amount received to the learner without an additional deduction. IOCH does not guarantee an improved result or a particular processing time by NEBOSH.
+
+11. Assessment Integrity, Plagiarism and Collusion
+All assessment work submitted must be the learner's own and must comply with the relevant awarding body's assessment instructions. Learners must not share answers, collude with others, impersonate another candidate, purchase assessment answers or submit another person's work as their own. Artificial intelligence and other assistance may be used only to the extent expressly permitted by the relevant assessment instructions and awarding-body policy. Suspected malpractice will be reported to the relevant awarding body for investigation. Penalties, invalidated results and any future assessment eligibility will be determined under the relevant awarding body's procedures. Where misconduct is established through the applicable process, it does not itself entitle the learner to a refund. Any permitted resit or re-registration may require additional payment.
+
+12. NEBOSH Closing Interviews
+This section applies where the relevant NEBOSH assessment requires a closing interview. Learners must attend the mandatory closing interview following submission of the relevant assessment, including GIC1 or the applicable equivalent unit. IOCH will communicate the interview arrangements and identity-verification requirements. The closing interview is an authenticity check and is not a separately graded examination. Failure to attend or complete the required interview may prevent release of the learner's result under NEBOSH procedures. Suspected malpractice identified during the interview will be referred to NEBOSH for investigation.
+
+13. Training Conduct and Learner Responsibilities
+Learners must behave professionally, respect trainers and other learners, and follow health, safety and venue requirements. Disruptive, abusive or unsafe behaviour may result in removal from a session or suspension, subject to a documented review. Learners must bring the materials advised by the trainer and complete required activities and assessments. For online training, learners are responsible for providing a suitable device, stable internet connection and the necessary access arrangements communicated before registration. Recording or distributing training sessions without permission is prohibited. Course attendance or payment does not guarantee an examination pass, qualification, employment or professional licence.
+
+14. Communications, Complaints and Applicable Terms
+Learners must keep their registered contact details up to date and monitor official course communications. All enquiries, complaints and refund requests must be submitted in writing to Support@ioch.org.pk, including the learner's name, course name and relevant details. Learners may request a review of attendance records, fee calculations or administrative decisions and provide supporting evidence. Personal information will be handled in accordance with applicable data-protection requirements and the IOCH privacy notice. This policy is subject to the applicable laws and regulatory requirements of Pakistan. Mandatory legal rights prevail over any conflicting provision. Any agreed exception must be recorded in writing by an authorised IOCH representative. Changes to this policy will not retrospectively reduce the rights of learners already registered.
+
+`; // ================= PUBLIC ROUTES ================= app.get('/', (req, res) => { res.send(publicHeaderFooter(`
+IOCH Logo
+Institution of Occupational Career Hub
+Empowering Careers through Quality Education & International Training. Join us to build a brighter future with globally recognized certifications.
+
+Why Choose IOCH?
+We provide top-tier international training and consultancy services.
+
+🌐
+International Trainings
+Get certified with globally recognized courses like NEBOSH, IOSH.
+
+🏝️
+Gulf Trainings
+Specialized training for the Gulf region's safety standards.
+
+📈
+Consultancy Services
+Expert consultation for businesses to ensure occupational safety.
+
+`)); }); app.get('/verify', wrap(async (req, res) => { const num = (req.query.cert || '').trim(); let result = ''; if (num) { const c = await dbGet("SELECT * FROM certificates WHERE cert_number = ?", [num]); result = c ? `
+✔️ Valid Certificate
+Name: ${esc(c.student_name)}
+
+Course: ${esc(c.course_name)}
+
+Duration: ${esc(c.duration)}
+
+Issue Date: ${esc(c.issue_date)}
+
+Instructor: ${esc(c.instructor_name)}
+
+` : `
+❌ Certificate not found.
+`; } res.send(publicHeaderFooter(`
+Certificate Verification
+${esc(num)}
+Verify
+${result}
+`)); })); // ================= LOGIN ================= app.get('/verify-document', wrap(async (req, res) => { const docNo = req.query.doc || ''; let isValid = false, s = null, msg = 'Invalid Document Number.'; if (docNo.startsWith('IOCH-')) { const parts = docNo.split('-'); if (parts.length >= 2) { const studentId = Number(parts[1]); // String ko Number mein convert kiya s = await dbGet("SELECT first_name, surname, course, status, is_validated FROM students WHERE id = ?", [studentId]); if (s) { if (s.status === 'Active' && s.is_validated == 1) { isValid = true; } else { msg = 'This document is currently not validated or the student is suspended. Please contact IOCH Admin.'; } } } } res.send(publicHeaderFooter(`
+
+Document Verification
+${isValid ? `
+✅
+Document is Valid
+Name: ${esc(s.first_name)} ${esc(s.surname)}
+Course: ${esc(s.course)}
+Issued & Validated by IOCH
+` : `
+❌
+Verification Failed
+${msg}
+
+`}
+`)); })); // ================= DASHBOARD ================= app.get('/dashboard', requireLogin, wrap(async (req, res) => { const user = req.session.user; if (user.role === 'Student') { return res.send(renderDashboard(user, `
+Welcome, ${esc(user.name)}! 👋
+Continue your learning journey.
+
+Check your Assignments
+Go to LMS
+`, 'dashboard')); } if (!['SuperAdmin', 'Admin'].includes(user.role)) { return res.send(renderDashboard(user, `
+Welcome ${esc(user.name)}
+`, 'dashboard')); } const isSuper = user.role === 'SuperAdmin'; const month = validMonth(req.query.month); const theme = ['purple', 'green', 'blue'].includes(req.query.theme) ? req.query.theme : 'purple'; const fin = await getFinance(month); const totalUsers = (await dbGet("SELECT COUNT(*) AS c FROM users")).c; const totalStudents = (await dbGet("SELECT COUNT(*) AS c FROM students")).c; const pendingStudents = (await dbGet("SELECT COUNT(*) AS c FROM students WHERE status = 'Pending'")).c; const totalSalaries = fin.totalSalaries; const branches = await dbAll("SELECT * FROM branches"); const admins = await dbAll("SELECT * FROM users WHERE role = 'Admin'"); const branchOptions = branches.map(b => `${esc(b.name)}`).join(''); const adminRows = admins.map(a => `${esc(a.name)}${esc(a.email)}
+${esc(a.branch)}
+`).join(''); const branchRows = branches.map(b => `
+${esc(b.name)}
+Update
+${postBtn('/delete-branch/' + b.id, 'Delete', 'btn-danger', 'Kya aap waqai is branch ko delete karna chahte hain?')}`).join(''); const trend = []; for (let i = 5; i >= 0; i--) { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); const m = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; const tf = await getFinance(m); trend.push({ label: d.toLocaleString('en-GB', { month: 'short' }), inc: tf.totalFees, out: tf.totalExpenses + tf.totalSalaries + tf.partnerCost }); } const maxVal = Math.max(1, ...trend.flatMap(t => [t.inc, t.out])); const graphHtml = trend.map(t => `
+${esc(t.label)}
+`).join(''); const hr = new Date().getHours(); const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening'; const themes = { purple: { bg: 'linear-gradient(135deg, #3b0764 0%, #6b21a8 100%)', icon: '#9333ea', bgLight: '#f3e8ff', text: '#6b21a8' }, green: { bg: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)', icon: '#10b981', bgLight: '#d1fae5', text: '#047857' }, blue: { bg: 'linear-gradient(135deg, #172554 0%, #2563eb 100%)', icon: '#3b82f6', bgLight: '#dbeafe', text: '#1e40af' } }; const currentTheme = themes[theme]; const superCards = isSuper ? `
+🌐 Add New Branch
+e.g. Faisalabad
+Add Branch
+👁️ Assign Branch Admin
+Select Branch
+
+-- Select Branch --
+Admin Details
+Full Name
+Email (Username)
+WhatsApp No
+Password (min 6)
+Create & Assign Admin
+🌐 Manage Branches (Edit / Delete)
+${branchRows || ""}
+Branch Name	Action
+No branches found.
+Current Branch Admins
+${adminRows}
+Name	Email	Branch Assigned
+` : ''; const superActions = isSuper ? `
+💼
+Collect Fee
+` : ''; const superActions2 = isSuper ? `
+📎
+Assignments
+` : ''; const superActions3 = isSuper ? `
+💬
+WhatsApp
+` : ''; const content = `
+${greet}, ${esc(user.name)}
+Here is what's happening at your institute today.
+
+
+--------- ----
+Filter
+📜 Export
+👨‍🎓
+${totalStudents}
+Total Students
+👥
+${totalUsers}
+Staff Members
+💼
+PKR ${fin.totalFees.toLocaleString()}
+Fees (${esc(month)})
+📲
+PKR ${(fin.totalExpenses + fin.totalSalaries + fin.partnerCost).toLocaleString()}
+Expenses (${esc(month)})
+👨‍🎓
+Add Student
+${superActions}
+👥
+Add Staff
+${superActions2}
+🏆
+Certificates
+${superActions3}
+🎓
+Enrolled Students
+${totalStudents}
+${pendingStudents} pending
+approvals
+👥
+Total Staff
+${totalUsers}
+Across all branches
+📈
+Staff Salaries
+PKR ${totalSalaries.toLocaleString()}
+Monthly fixed
+📊
+Net Profit / Loss
+PKR ${fin.net.toLocaleString()}
+For ${esc(month)}
+📉 Income vs Expense (Last 6 Months)
+◉ Income   ◉ Expense
+${graphHtml}
+${superCards} `; res.send(renderDashboard(user, content, 'dashboard')); })); app.get('/login', (req, res) => { res.send(publicHeaderFooter(`
+IOCH Logo
+Portal Login
+Email / Username
+Password
+Log in
+Student? Create an account here
+`)); }); const loginFail = (msg) => `
+${msg} Try again
+`; app.post('/login', loginLimiter, wrap(async (req, res) => { const username = String(req.body.username || '').trim(); const password = String(req.body.password || ''); const ip = getIp(req); const device = req.headers['user-agent']; const user = await dbGet("SELECT * FROM users WHERE lower(username) = lower(?) OR lower(email) = lower(?)", [username, username]); if (!user) return studentLogin(req, res, username, password); if (!user.password || !(await bcrypt.compare(password, user.password))) return res.send(loginFail('Wrong Password!')); if (user.account_status === 'Suspended') return res.send("
+Account suspended. Contact admin.
+"); if (!user.ip_address) await dbRun(`UPDATE users SET ip_address = ?, device_info = ? WHERE id = ?`, [ip, device, user.id]); if (user.role !== 'SuperAdmin' && user.status === 'Pending') { clearLoginAttempts(req); await startSession(req, { pendingUserId: user.id }); return res.redirect(`/complete-profile/${user.id}`); } if (user.role !== 'SuperAdmin' && user.status === 'Pending Review') { return res.send("
+Aapka profile admin review mein hai. Approval ke baad login kar sakenge.
+"); } clearLoginAttempts(req); await startSession(req, { user: { id: user.id, name: user.name, email: user.email, role: user.role, branch: user.branch } }); res.redirect('/dashboard'); })); async function studentLogin(req, res, username, password) { const notFound = loginFail('User not found!'); const st = await dbGet("SELECT * FROM students WHERE lower(email) = lower(?)", [username]); if (!st) return res.send(notFound); const hash = st.custom_password || st.password; const ok = hash ? await bcrypt.compare(password, hash) : false; if (!ok) return res.send(notFound); // Status Checks (Pending aur Suspended) if (st.status === 'Pending') { return res.send("
+Aapka account abhi admin approval ka intezar kar raha hai.
+"); } if (st.status === 'Suspended') { return res.send("
+Aapka account suspend kar diya gaya hai. Baraye meharbani admin se rabta karein.
+"); } await dbRun(`UPDATE students SET last_login = ? WHERE id = ?`, [`${nowStr()} (IP: ${getIp(req)})`, st.id]); clearLoginAttempts(req); await startSession(req, { user: { id: st.id, name: st.first_name + ' ' + st.surname, email: st.email, role: 'Student', branch: st.branch || 'Online' } }); res.redirect('/dashboard'); } async function studentLogin(req, res, username, password) { const notFound = loginFail('User not found!'); const st = await dbGet("SELECT * FROM students WHERE lower(email) = lower(?)", [username]); if (!st) return res.send(notFound); const hash = st.custom_password || st.password; const ok = hash ? await bcrypt.compare(password, hash) : false; if (!ok) return res.send(notFound); async function studentLogin(req, res, username, password) { const notFound = loginFail('User not found!'); const st = await dbGet("SELECT * FROM students WHERE lower(email) = lower(?)", [username]); if (!st) return res.send(notFound); const hash = st.custom_password || st.password; const ok = hash ? await bcrypt.compare(password, hash) : false; if (!ok) return res.send(notFound); // 👇 YAHAN CHECK LAGAYA HAI 👇 if (st.status === 'Pending') return res.send("
+Aapka account abhi admin approval ka intezar kar raha hai.
+"); if (st.status === 'Suspended') return res.send("
+Aapka account suspend kar diya gaya hai. Baraye meharbani admin se rabta karein.
+"); // 👆 YAHAN TAK 👆 await dbRun(`UPDATE students SET last_login = ? WHERE id = ?`, [`${nowStr()} (IP: ${getIp(req)})`, st.id]); clearLoginAttempts(req); await startSession(req, { user: { id: st.id, name: st.first_name + ' ' + st.surname, email: st.email, role: 'Student', branch: st.branch || 'Online' } }); res.redirect('/dashboard'); } if (st.status === 'Suspended') return res.send("
+Aapka account suspend kar diya gaya hai. Baraye meharbani admin se rabta karein.
+"); await dbRun(`UPDATE students SET last_login = ? WHERE id = ?`, [`${nowStr()} (IP: ${getIp(req)})`, st.id]); clearLoginAttempts(req); await startSession(req, { user: { id: st.id, name: st.first_name + ' ' + st.surname, email: st.email, role: 'Student', branch: st.branch || 'Online' } }); res.redirect('/dashboard'); } app.get('/logout', (req, res) => { req.session.destroy(() => res.redirect('/')); }); // ================= COMPLETE PROFILE (staff) ================= const ownsPendingProfile = (req, res, next) => { if (!req.session.pendingUserId || String(req.session.pendingUserId) !== String(req.params.id)) return res.redirect('/login'); next(); }; app.get('/complete-profile/:id', ownsPendingProfile, wrap(async (req, res) => { const user = await dbGet("SELECT * FROM users WHERE id = ?", [req.params.id]); if (!user) return res.redirect('/login'); res.send(publicHeaderFooter(`
+Action Required: Complete Profile
+CNIC Number
+${esc(user.cnic || '')}
+No file chosen
+📫 CNIC Front
+No file chosen
+📫 CNIC Back
+No file chosen
+✍️ Agreement
+Submit
+`)); })); app.post('/complete-profile/:id', ownsPendingProfile, upload.fields([{ name: 'cnic_front', maxCount: 1 }, { name: 'cnic_back', maxCount: 1 }, { name: 'agreement_doc', maxCount: 1 }]), wrap(async (req, res) => { const files = req.files || {}; const fn = k => files[k] ? files[k][0].filename : null; await dbRun(`UPDATE users SET cnic=?, cnic_front=?, cnic_back=?, agreement_doc=?, status='Pending Review' WHERE id=?`, [req.body.cnic, fn('cnic_front'), fn('cnic_back'), fn('agreement_doc'), req.params.id]); delete req.session.pendingUserId; res.send(`
+✔️ Submitted!
+Pending admin approval.
+
+Login
+`); })); // ================= STUDENT REGISTRATION ================= const EDIT_FILES = ['photo', 'id_front', 'id_back', 'qualification_upload', 'fee_slip_upload']; const editUpload = upload.fields(EDIT_FILES.map(name => ({ name, maxCount: 1 }))); // ======================= STUDENTS LIST ======================= const monthOfStudent = s => { const m = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(s.declaration_date || ''); return m ? `${m[3]}-${m[2]}` : 'Unknown'; }; const monthLabel = m => { const p = m.split('-'); return p.length === 2 && p[0] !== 'Unknown' ? new Date(Number(p[0]), Number(p[1]) - 1, 1).toLocaleString('en-GB', { month: 'long', year: 'numeric' }) : m; }; app.get('/students', requireRole('SuperAdmin', 'Admin', 'Tutor'), wrap(async (req, res) => { const user = req.session.user; let query = "SELECT * FROM students", params = []; if (user.role === 'Admin') { query += " WHERE branch = ? OR branch IS NULL"; params.push(user.branch); } if (user.role === 'Tutor') { query += " WHERE assigned_tutor = ?"; params.push(user.name); } query += " ORDER BY id DESC"; const all = await dbAll(query, params); const counts = {}; all.forEach(s => { const m = monthOfStudent(s); counts[m] = (counts[m] || 0) + 1; }); const months = Object.keys(counts).sort().reverse(); const sel = req.query.month && counts[req.query.month] ? req.query.month : 'all'; const students = sel === 'all' ? all : all.filter(s => monthOfStudent(s) === sel); const chips = [`
+All (${all.length})
+`] .concat(months.map(m => `
+${esc(monthLabel(m))} (${counts[m]})
+`)).join(''); const rows = students.map(s => { const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, ''); const docNo = `IOCH-${String(s.id).padStart(2, '0')}-${dateStr}`; let statusColor = '#fef3c7'; // Pending let statusTextColor = '#92400e'; let statusDot = '#f59e0b'; if (s.status === 'Active') { statusColor = '#ecfdf5'; statusTextColor = '#047857'; statusDot = '#10b981'; } if (s.status === 'Suspended') { statusColor = '#fef2f2'; statusTextColor = '#b91c1c'; statusDot = '#ef4444'; } let suspendBtn = ''; if (s.status !== 'Pending' && user.role === 'SuperAdmin') { const btnText = s.status === 'Suspended' ? 'Activate' : 'Suspend'; const btnIcon = s.status === 'Suspended' ? '🔄' : '🚫'; const btnColor = s.status === 'Suspended' ? '#10b981' : '#ef4444'; const confirmMsg = s.status === 'Suspended' ? 'Student ko wapas active karna hai?' : 'Student ko suspend karna hai? Uska login band ho jayega.'; suspendBtn = `
+${btnIcon} ${btnText}
+`; } return `
+${s.photo ? `` : `
+👤
+`}
+${esc(s.first_name)} ${esc(s.surname)}
+${docNo}
+${esc(monthLabel(monthOfStudent(s)))}
+${esc(s.course || '-')}
+${esc(s.contact || '-')}
+${esc(s.status || 'Pending').toUpperCase()}
+👁️ View
+📂 Docs
+${user.role === 'SuperAdmin' ? `
+✏️ Edit
+${suspendBtn}
+🗑️ Delete
+` : ''}
+`; }).join(''); const topBox = ['SuperAdmin', 'Admin'].includes(user.role) ? `
+📤 Export CSV
+${user.role === 'SuperAdmin' ? '
+🆔 Card Settings
+' : ''}
+` : ''; res.send(renderDashboard(user, ` ${topBox}
+📅
+Filter by Month
+${chips}
+🎓
+Students List ${sel === 'all' ? '(All)' : ' - ' + esc(monthLabel(sel))}
+Total: ${students.length}
+${rows || ""}
+Student	Month	Course	Contact	Status	Actions
+No students found.
+`, 'students')); })); // Card Render Function (Jo neechay diya gaya hai) // ======================= STUDENT DETAILS & EXPORT ======================= app.post('/toggle-suspend/:id', requireRole('SuperAdmin', 'Admin'), wrap(async (req, res) => { const s = await dbGet("SELECT status FROM students WHERE id = ?", [req.params.id]); if (s) { const newStatus = s.status === 'Suspended' ? 'Active' : 'Suspended'; await dbRun("UPDATE students SET status = ? WHERE id = ?", [newStatus, req.params.id]); } res.redirect('/student/' + req.params.id); })); app.post('/validate-student/:id', requireRole('SuperAdmin', 'Admin'), wrap(async (req, res) => { const s = await dbGet("SELECT is_validated FROM students WHERE id = ?", [req.params.id]); if (s) { const newVal = s.is_validated ? 0 : 1; await dbRun("UPDATE students SET is_validated = ? WHERE id = ?", [newVal, req.params.id]); } res.redirect('/student/' + req.params.id); })); app.post('/approve-student/:id', requireRole('SuperAdmin', 'Admin'), wrap(async (req, res) => { const st = await dbGet("SELECT * FROM students WHERE id = ?", [req.params.id]); if (!st) return res.send("Student not found."); if (!canManageStudent(req.session.user, st)) return res.status(403).send('Access Denied'); if (st.status === 'Pending') { const tempPass = 'Ioch@' + crypto.randomInt(100000, 1000000); const hashed = await bcrypt.hash(tempPass, 10); // Tutor name agar select kiya gaya hai const tutorName = req.body.tutor_name || null; await dbRun(`UPDATE students SET status = 'Active', password = ?, temp_password = ?, assigned_tutor = ? WHERE id = ?`, [hashed, tempPass, tutorName, st.id]); console.log(`\n📧 Student approved: ${st.email} | Temp Password: ${tempPass}\n`); } res.redirect('/student/' + st.id); })); app.post('/toggle-suspend/:id', requireRole('SuperAdmin', 'Admin'), wrap(async (req, res) => { const s = await dbGet("SELECT status FROM students WHERE id = ?", [req.params.id]); if (s) { const newStatus = s.status === 'Suspended' ? 'Active' : 'Suspended'; await dbRun("UPDATE students SET status = ? WHERE id = ?", [newStatus, req.params.id]); } res.redirect('/student/' + req.params.id); })); app.post('/validate-student/:id', requireRole('SuperAdmin', 'Admin'), wrap(async (req, res) => { const s = await dbGet("SELECT is_validated FROM students WHERE id = ?", [req.params.id]); if (s) { const newVal = s.is_validated ? 0 : 1; await dbRun("UPDATE students SET is_validated = ? WHERE id = ?", [newVal, req.params.id]); } res.redirect('/student/' + req.params.id); })); app.post('/approve-student/:id', requireRole('SuperAdmin', 'Admin'), wrap(async (req, res) => { const st = await dbGet("SELECT * FROM students WHERE id = ?", [req.params.id]); if (!st) return res.send("Student not found."); if (!canManageStudent(req.session.user, st)) return res.status(403).send('Access Denied'); if (st.status === 'Pending') { const tempPass = 'Ioch@' + crypto.randomInt(100000, 1000000); const hashed = await bcrypt.hash(tempPass, 10); // Tutor name agar select kiya gaya hai const tutorName = req.body.tutor_name || null; await dbRun(`UPDATE students SET status = 'Active', password = ?, temp_password = ?, assigned_tutor = ? WHERE id = ?`, [hashed, tempPass, tutorName, st.id]); console.log(`\n📧 Student approved: ${st.email} | Temp Password: ${tempPass}\n`); } res.redirect('/student/' + st.id); })); const canAccessStudent = (user, s) => user.role === 'SuperAdmin' || (user.role === 'Admin' && (!s.branch || s.branch === user.branch)) || (user.role === 'Tutor' && s.assigned_tutor === user.name); const canManageStudent = (user, s) => user.role === 'SuperAdmin' || (user.role === 'Admin' && (!s.branch || s.branch === user.branch)); // ======================= HELPER FUNCTION (Card Render) ======================= function renderCardInline(s, cfg) { const bg = cfg.card_bg ? `background:url('${IMG(cfg.card_bg)}') center/cover no-repeat;` : 'background:linear-gradient(135deg,#ecfdf5,#ffffff);'; const chip = (f, alt) => f ? `${alt}` : ''; const photo = s.photo ? `` : `
+${esc((s.first_name || '?').charAt(0))}
+`; return `
+IOCH
+LEARNER CARD
+${chip(cfg.logo_nebosh, 'NEBOSH')}${chip(cfg.logo_partner, 'Learner Partner')}
+${photo}
+NAME
+${esc(s.first_name + ' ' + s.surname)}
+COURSE
+${esc(s.course)}
+PHONE
+${esc(s.contact)}
+EMAIL
+${esc(s.email)}
+Card No: ${esc(s.card_no || 'Pending')}
+Issued: ${esc(s.card_issued || 'N/A')}
+${esc(cfg.card_footer || 'ioch.org.pk')}
+`; } // Helper to render card function renderCardInline(s, cfg) { const bg = cfg.card_bg ? `background:url('${IMG(cfg.card_bg)}') center/cover no-repeat;` : 'background:linear-gradient(135deg,#ecfdf5,#ffffff);'; const chip = (f, alt) => f ? `${alt}` : ''; const photo = s.photo ? `` : `
+${esc((s.first_name || '?').charAt(0))}
+`; return `
+IOCH
+LEARNER CARD
+${chip(cfg.logo_nebosh, 'NEBOSH')}${chip(cfg.logo_partner, 'Learner Partner')}
+${photo}
+NAME
+${esc(s.first_name + ' ' + s.surname)}
+COURSE
+${esc(s.course)}
+PHONE
+${esc(s.contact)}
+EMAIL
+${esc(s.email)}
+Card No: ${esc(s.card_no || 'Pending')}
+Issued: ${esc(s.card_issued || 'N/A')}
+${esc(cfg.card_footer || 'ioch.org.pk')}
+`; }app.post('/student/:id/edit', requireRole('SuperAdmin'), editUpload, wrap(async (req, res) => { const s = await dbGet("SELECT * FROM students WHERE id = ?", [req.params.id]); const f = req.files || {}; const discard = () => Object.values(f).forEach(a => safeUnlink(a[0].filename)); if (!s) { discard(); return res.send('Student not found.'); } const b = req.body; b.email = String(b.email || '').trim().toLowerCase(); const dup = await dbGet("SELECT id FROM students WHERE lower(email) = lower(?) AND id != ?", [b.email, s.id]); if (dup) { discard(); return res.send("Yeh email kisi aur student ke paas hai.
+Back
+"); } if (f.photo && !isImg(f.photo[0].filename)) { discard(); return res.send("Photo sirf JPG / PNG / WEBP honi chahiye.
+Back
+"); } const x = parseExtra(s.device_info); const info = `Location: ${cleanPipe(x['Location'] || 'Unknown')} | Device: ${cleanPipe(x['Device'] || '')} | Title: ${cleanPipe(b.title)} | Reason: ${cleanPipe(b.course_reason)} | Mode: ${cleanPipe(b.mode_of_learning)} | Paid By: ${cleanPipe(b.paid_by)} | Bank: ${cleanPipe(b.bank_selected)} | English: ${cleanPipe(b.english_level)} | CourseDate: ${cleanPipe(b.course_date)} | DeclName: ${cleanPipe(b.declaration_name)}`; const cols = ['first_name', 'surname', 'gender', 'dob', 'nationality', 'contact', 'email', 'address', 'city', 'postal_code', 'country', 'course', 'fee_amount', 'qualification', 'id_type', 'id_number', 'mode_of_learning']; const vals = cols.map(c => b[c] == null ? null : b[c]); cols.push('branch'); vals.push(b.branch || null); cols.push('device_info'); vals.push(info); EDIT_FILES.forEach(n => { if (f[n]) { cols.push(n); vals.push(f[n][0].filename); safeUnlink(s[n]); } }); await dbRun(`UPDATE students SET ${cols.map(c => c + ' = ?').join(', ')} WHERE id = ?`, [...vals, s.id]); res.redirect('/student/' + s.id); })); // ================= DELETE STUDENT ================= app.post('/delete-student/:id', requireRole('SuperAdmin'), wrap(async (req, res) => { const s = await dbGet("SELECT * FROM students WHERE id = ?", [req.params.id]); if (s) { ['photo', 'id_front', 'id_back', 'qualification_upload', 'fee_slip_upload', 'chat_upload', 'resit_result_upload'].forEach(k => safeUnlink(s[k])); await dbRun("DELETE FROM students WHERE id = ?", [s.id]); } res.redirect('/students'); })); // ================= STUDENT DETAILS & REGISTRATION (FINAL) ================= // 1. Student Details & Export function renderCardInline(s, cfg) { const bg = cfg.card_bg ? `background:url('${IMG(cfg.card_bg)}') center/cover no-repeat;` : 'background:linear-gradient(135deg,#ecfdf5,#ffffff);'; const chip = (f, alt) => f ? `${alt}` : ''; const photo = s.photo ? `` : `
+${esc((s.first_name || '?').charAt(0))}
+`; return `
+IOCH
+LEARNER CARD
+${chip(cfg.logo_nebosh, 'NEBOSH')}${chip(cfg.logo_partner, 'Learner Partner')}
+${photo}
+NAME
+${esc(s.first_name + ' ' + s.surname)}
+COURSE
+${esc(s.course)}
+PHONE
+${esc(s.contact)}
+EMAIL
+${esc(s.email)}
+Card No: ${esc(s.card_no || 'Pending')}
+Issued: ${esc(s.card_issued || 'N/A')}
+${esc(cfg.card_footer || 'ioch.org.pk')}
+`; } // 2. Registration Form (GET) app.get('/student-register', (req, res) => { const realTime = nowStr(); const regContent = `
+Online Registration
+Step 1: Personal Details
+Title
+
+Mr
+First Name
+Surname
+Gender
+
+Male
+Date of Birth
+
+dd/mm/yyyy
+Nationality
+e.g. Pakistani
+Step 2: Mailing Address & Contact
+Address
+City
+Postal Code
+Country
+Mobile Number
+Email Address
+Step 3: Courses
+Select Course
+e.g. NEBOSH IGC
+Reason for taking this Course
+Exam Date
+
+dd/mm/yyyy
+Mode of Study
+
+Virtual Learning on Zoom Meeting
+Are you a Resit Student?
+
+No
+Step 4: Education & Documents
+Highest Qualification
+English Language Proficiency
+
+Beginner
+No file chosen
+📐 Upload Last Degree / Certificate
+Step 5: Identification Documents
+Select ID Document Type
+
+Select...
+Step 6: Payment Proof
+Bank Account Details
+🇵🇰 Pakistan Bank
+🇸🇦 Saudi Arabia Bank
+Account Title: Institution of occupational career hub (IOCH)
+
+Bank Name: Faysal Bank
+
+Account No.: 3819499000001603
+
+IBAN: PK26FAYS3819499000001603
+
+Paid Amount (min PKR ${PARTNER_COST.toLocaleString()})
+Paid By
+
+Select...
+Step 7: Communication Evidence
+How did you communicate with us?
+
+Social media (Facebook, WhatsApp)
+Upload communication evidence
+No file chosen
+Step 8: Terms and Conditions
+${TERMS_HTML}
+I have read and agree to the Terms and Conditions mentioned above.
+Step 9: Declaration
+Name (As per ID)
+Submission Date & Time (Auto)
+${realTime}
+I hereby declare that the information is true and I agree to the Student Privacy and Institute Policies.
+
+ Yes, I Agree
+ No
+Submit Registration
+`; res.send(publicHeaderFooter(regContent)); }); // ======================= STUDENT DETAILS (ADVANCED) ======================= // ======================= STUDENT DETAILS (ADVANCED & ERROR-FREE) ======================= // ======================= STUDENT DOCUMENTS (FULL SIZE) ======================= app.get('/student/:id', requireRole('SuperAdmin', 'Admin', 'Tutor'), wrap(async (req, res) => { const user = req.session.user; const s = await dbGet("SELECT * FROM students WHERE id = ?", [req.params.id]); if (!s) return res.send("Student not found."); if (!canAccessStudent(user, s)) return res.status(403).send('Access Denied'); const cfg = await getSettings(); const x = parseExtra(s.device_info); const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, ''); const docNo = `IOCH-${String(s.id).padStart(2, '0')}-${dateStr}`; const isDocValid = s.status === 'Active' && s.is_validated == 1; const docTitle = `IOCH-Registration-${s.first_name}-${s.surname}`.replace(/\s+/g, '-').toUpperCase(); // ======================= ADVANCED UI HELPERS ======================= const pageHeader = (title) => `
+Printed: ${nowStr()}
+${title}
+.
+`; const pageBreak = `
+`; const evidenceFile = (f, label) => { if (!f) return `
+No File Attached
+`; const ext = f.split('.').pop().toLowerCase(); const url = '/uploads/' + encodeURIComponent(f); // Header with Title and "Open Full Size" button const titleHtml = `
+${label}
+🔗 Open Full Size
+`; if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) { return `
+${titleHtml} 
+`; } return `
+${titleHtml}
+📄
+Click to Open Document
+`; }; const cardWrap = (icon, title, bodyContent, bg = '#ffffff') => `
+${icon}
+${title}
+${bodyContent}
+`; const grid = (inner) => `
+${inner}
+`; const advField = (label, value) => `
+${label}
+${esc(value || 'N/A')}
+`; // PAGE 1: Section 1, 2 & Card const sec1_2_html = ` ${pageHeader('Student Registration (Page 1)')}
+${cardWrap('👤', 'Step 1: Personal Details', grid( advField('Title', x['Title']) + advField('First Name', s.first_name) + advField('Surname', s.surname) + advField('Gender', s.gender) + advField('Date of Birth', s.dob) + advField('Nationality', s.nationality) ))}
+${cardWrap('📞', 'Step 2: Contact Information', grid( advField('Email', s.email) + advField('Mobile', s.contact) + advField('City', s.city) + advField('Postal Code', s.postal_code) + advField('Country', s.country) ) + `
+${advField('Full Address', s.address)}
+`)}
+🆔 Learner Card
+${renderCardInline(s, cfg)}
+`; // PAGE 2: Section 3 const resitLogic = (s.resit_details && s.resit_details.trim() !== '' && s.resit_details !== 'null') ? `
+Resit Details: ${esc(s.resit_details)}
+` : `
+Status: Fresh student - first time enrolment in NEBOSH course
+`; const sec3_html = ` ${pageBreak}
+${pageHeader('Course Details (Page 2)')} ${cardWrap('📚', 'Step 3: Course Details', grid(advField('Course', s.course) + advField('Mode of Study', x['Mode'] || s.mode_of_learning) + advField('Exam Date', x['CourseDate']) + advField('Reason for Course', x['Reason'])) + resitLogic )} ${s.resit_result_upload ? `
+${evidenceFile(s.resit_result_upload, 'Old Result Card')}
+` : ''}
+`; // PAGE 3: Section 4 const sec4_html = ` ${pageBreak}${pageHeader('Education Details (Page 3)')} ${cardWrap('🎓', 'Step 4: Education & Documents', grid(advField('Highest Qualification', s.qualification) + advField('English Proficiency', x['English'])))}
+${evidenceFile(s.qualification_upload, 'Degree / Certificate')}
+`; // PAGE 4: Section 5 const sec5_html = ` ${pageBreak}${pageHeader('ID Documents (Page 4)')} ${cardWrap('🪪', 'Step 5: Identification Documents', grid(advField('ID Type', s.id_type) + advField('ID Number', s.id_number)))}
+${evidenceFile(s.id_front, s.id_type === 'Passport' ? 'Passport First Page' : 'National ID Front')} ${evidenceFile(s.id_back, s.id_type === 'Passport' ? 'Passport Second Page' : 'National ID Back')}
+`; // PAGE 5: Section 6 & 7 const sec6_7_html = ` ${pageBreak}${pageHeader('Payment & Communication (Page 5)')} ${cardWrap('💰', 'Step 6: Payment Proof', grid(advField('Paid Amount', 'PKR ' + (s.fee_amount || '0')) + advField('Payment Method', x['Paid By']) + advField('Deposited In Bank', x['Bank'])))}
+${evidenceFile(s.fee_slip_upload, 'Bank Slip / Receipt')}
+${cardWrap('💬', 'Step 7: Communication Evidence', grid(advField('Source', s.source)))}
+${evidenceFile(s.chat_upload, 'Chat / Evidence')}
+`; // PAGE 6: Section 8, 9 & QR const verifyUrl = `${req.protocol}://${req.get('host')}/verify-document?doc=${docNo}`; const qrCodeHtml = `
+Document Verification
+Status: ${isDocValid ? '✅ Valid & Approved' : '❌ Pending Validation'}
+Doc No: ${docNo}
+
+${isDocValid ? `` : `
+QR Locked
+(Pending)
+`}
+`; const sec8_9_html = ` ${pageBreak}${pageHeader('Terms & Declaration (Page 6)')} ${cardWrap('📜', 'Step 8: Terms and Conditions', grid(advField('Status', s.terms_accepted || 'Not Recorded') + advField('Date', s.declaration_date)))}
+${cardWrap('✍️', 'Step 9: Declaration', grid(advField('Agreed', s.declaration === 'Yes' ? 'Yes, I Agree' : 'No') + advField('Name (As per ID)', x['DeclName']) + advField('Date', s.declaration_date)) + `
+I hereby declare that the information is true and I agree to the Student Privacy and Institute Policies.
+` + qrCodeHtml )}
+`; // ======================= APPROVAL & BUTTONS ======================= let approvalSection = ''; if (canManageStudent(user, s)) { const tutors = await dbAll("SELECT id, name FROM users WHERE role = 'Tutor'"); const tutorOptions = tutors.map(t => `${esc(t.name)}`).join(''); if (s.status === 'Pending') { approvalSection = `
+Action Required
+Select a tutor and approve this student to activate their account.
+
+
+-- Select Tutor --
+✔️ Approve
+`; } else { const suspendBtn = s.status === 'Suspended' ? `
+🔄 Re-Approve (Activate)
+` : `
+🚫 Suspend
+`; const validateBtn = s.is_validated == 1 ? `
+❌ Remove Validation
+` : `
+✅ Validate Document
+`; approvalSection = `
+Status: ${esc(s.status)} ${s.is_validated == 1 ? '| Validated ✔️' : ''}
+Assigned Tutor: ${esc(s.assigned_tutor || 'None')}
+
+${suspendBtn} ${validateBtn}
+Change Tutor:
+
+-- Select Tutor --
+Update
+`; } } // ======================= MAIN CONTENT ======================= const content = `
+Student Profile: ${esc(s.first_name)} ${esc(s.surname)}
+${user.role === 'SuperAdmin' ? `
+✏️ Edit
+` + postBtn('/delete-student/' + s.id, '🗑️ Delete', 'btn-danger', 'Pakka delete karna hai?') : ''}🖶 Export / Print PDF
+📂 View Documents
+← Back
+File Name: ${docTitle} (Use this name to save PDF)
+${approvalSection}
+
+IOCH Registration Form
+${sec1_2_html} ${sec3_html} ${sec4_html} ${sec5_html} ${sec6_7_html} ${sec8_9_html}
+`; res.send(renderDashboard(user, content, 'students')); })); // ======================= HELPER FUNCTION (Card Render) ======================= function renderCardInline(s, cfg) { const bg = cfg.card_bg ? `background:url('${IMG(cfg.card_bg)}') center/cover no-repeat;` : 'background:linear-gradient(135deg,#ecfdf5,#ffffff);'; const chip = (f, alt) => f ? `${alt}` : ''; const photo = s.photo ? `` : `
+${esc((s.first_name || '?').charAt(0))}
+`; return `
+IOCH
+LEARNER CARD
+${chip(cfg.logo_nebosh, 'NEBOSH')}${chip(cfg.logo_partner, 'Learner Partner')}
+${photo}
+NAME
+${esc(s.first_name + ' ' + s.surname)}
+COURSE
+${esc(s.course)}
+PHONE
+${esc(s.contact)}
+EMAIL
+${esc(s.email)}
+Card No: ${esc(s.card_no || 'Pending')}
+Issued: ${esc(s.card_issued || 'N/A')}
+${esc(cfg.card_footer || 'ioch.org.pk')}
+`; } // ======================= HELPER FUNCTION ======================= function renderCardInline(s, cfg) { const bg = cfg.card_bg ? `background:url('${IMG(cfg.card_bg)}') center/cover no-repeat;` : 'background:linear-gradient(135deg,#ecfdf5,#ffffff);'; const chip = (f, alt) => f ? `${alt}` : ''; const photo = s.photo ? `` : `
+${esc((s.first_name || '?').charAt(0))}
+`; return `
+IOCH
+LEARNER CARD
+${chip(cfg.logo_nebosh, 'NEBOSH')}${chip(cfg.logo_partner, 'Learner Partner')}
+${photo}
+NAME
+${esc(s.first_name + ' ' + s.surname)}
+COURSE
+${esc(s.course)}
+PHONE
+${esc(s.contact)}
+EMAIL
+${esc(s.email)}
+Card No: ${esc(s.card_no || 'Pending')}
+Issued: ${esc(s.card_issued || 'N/A')}
+${esc(cfg.card_footer || 'ioch.org.pk')}
+`; } // 3. Registration Form (POST) & Upload Setup const regUpload = upload.fields([ { name: 'qualification_upload', maxCount: 1 }, { name: 'fee_slip_upload', maxCount: 1 }, { name: 'chat_upload', maxCount: 1 }, { name: 'resit_result_upload', maxCount: 1 }, { name: 'passport_front', maxCount: 1 }, { name: 'passport_back', maxCount: 1 }, { name: 'cnic_front', maxCount: 1 }, { name: 'cnic_back', maxCount: 1 }, { name: 'photo', maxCount: 1 } ]); app.post('/student-register', regUpload, wrap(async (req, res) => { const b = req.body; const f = req.files || {}; b.email = String(b.email || '').trim().toLowerCase(); const back = "
+Go Back
+"; const discard = () => Object.values(f).forEach(a => safeUnlink(a[0].filename)); const msg = (text, color = '#000') => { discard(); return res.send(`
+${esc(text)} ${back}
+`); }; if (b.declaration !== 'Yes') return msg('Please accept declaration.'); if (b.terms_accepted !== 'Yes') return msg('Please accept the Terms and Conditions.'); if (b.paid_by === 'Third Party') return msg('Third Party payments are not accepted.', 'red'); if (!['Passport', 'National Identification Card'].includes(b.id_type)) return msg('Please select a valid ID type.'); if (!(parseFloat(b.fee_amount) >= PARTNER_COST)) return msg(`Minimum fee PKR ${PARTNER_COST.toLocaleString()} honi chahiye.`, 'red'); if (!f['fee_slip_upload']) return msg('Bank slip / receipt is required.'); if (!f['photo'] || !isImg(f['photo'][0].filename)) return msg('Please upload a valid recent photo (JPG / PNG / WEBP).'); const dup = await dbGet("SELECT id FROM students WHERE lower(email) = lower(?)", [b.email]); if (dup) return msg('Is email se pehle hi registration ho chuki hai.', '#b91c1c'); const fn = k => f[k] ? f[k][0].filename : null; let idFront, idBack, idNumber; if (b.id_type === 'Passport') { idFront = fn('passport_front'); idBack = fn('passport_back'); idNumber = b.passport_no; } else { idFront = fn('cnic_front'); idBack = fn('cnic_back'); idNumber = b.cnic_no; } if (!String(idNumber || '').trim()) return msg('ID number zaroori hai.'); if (!idFront || !idBack) return msg('ID ki dono sides / pages upload karein.'); const ip = getIp(req); const device = cleanPipe(b.device_info || req.headers['user-agent']); const location = cleanPipe(b.device_location && b.device_location !== 'Fetching...' ? b.device_location : 'Unknown'); const extra = ` | Title: ${cleanPipe(b.title)} | Reason: ${cleanPipe(b.course_reason)} | Mode: ${cleanPipe(b.mode_of_learning)} | Paid By: ${cleanPipe(b.paid_by)} | Bank: ${cleanPipe(b.bank_selected)} | English: ${cleanPipe(b.english_level)} | CourseDate: ${cleanPipe(b.course_date)} | DeclName: ${cleanPipe(b.declaration_name)}`; const combinedDeviceInfo = `Location: ${location} | Device: ${device}${extra}`; const resitDetails = b.resit === 'Yes' ? `Learner No: ${cleanPipe(b.learner_number)} | Institute: ${cleanPipe(b.institute_name)}` : null; try { await dbRun(`INSERT INTO students ( first_name, surname, gender, dob, contact, email, address, city, postal_code, country, id_type, id_number, nationality, id_front, id_back, qualification, qualification_upload, course, fee_amount, fee_slip_upload, source, chat_upload, declaration, declaration_date, terms_accepted, status, ip_address, device_info, resit_details, resit_result_upload, mode_of_learning, photo ) VALUES (?,?,?,?,?,?,?,?,?,?, ?,?,?,?,?,?,?, ?,?,?,?,?,?,?, ?,'Pending',?,?,?,?,?,?)`, [ b.first_name, b.surname, b.gender, b.dob, b.contact, b.email, b.address, b.city, b.postal_code, b.country, b.id_type, idNumber, b.nationality, idFront, idBack, b.qualification, fn('qualification_upload'), b.course, b.fee_amount, fn('fee_slip_upload'), b.source, fn('chat_upload'), b.declaration, nowStr(), b.terms_accepted, ip, combinedDeviceInfo, resitDetails, fn('resit_result_upload'), b.mode_of_learning, fn('photo') ]); } catch (err) { console.error('=== REGISTRATION ERROR ===', err.message); discard(); return res.send(`
+❌ Registration Failed
+Please check all fields and try again.
+
+← Go Back to Form
+`); } res.send(publicHeaderFooter(`
+🎉 Application Submitted!
+Pending approval. Credentials will be sent via Email.
+
+Home
+`)); })); // 4. Card Render Helper function renderCardInline(s, cfg) { const bg = cfg.card_bg ? `background:url('${IMG(cfg.card_bg)}') center/cover no-repeat;` : 'background:linear-gradient(135deg,#ecfdf5,#ffffff);'; const chip = (f, alt) => f ? `${alt}` : ''; const photo = s.photo ? `` : `
+${esc((s.first_name || '?').charAt(0))}
+`; return `
+IOCH
+LEARNER CARD
+${chip(cfg.logo_nebosh, 'NEBOSH')}${chip(cfg.logo_partner, 'Learner Partner')}
+${photo}
+NAME
+${esc(s.first_name + ' ' + s.surname)}
+COURSE
+${esc(s.course)}
+PHONE
+${esc(s.contact)}
+EMAIL
+${esc(s.email)}
+Card No: ${esc(s.card_no || 'Pending')}
+Issued: ${esc(s.card_issued || 'N/A')}
+${esc(cfg.card_footer || 'ioch.org.pk')}
+`; } // ================= ERROR HANDLER ================= app.use((err, req, res, next) => { console.error(err); const safe = (err instanceof multer.MulterError || err.message === 'File type not allowed') ? err.message : 'Server error. Please try again.'; res.status(500).send(`
+${esc(safe)} Go Back
+`); }); // ================= SERVER START (FIX: safe extras load) ================= const http = require('http'); const { Server } = require('socket.io'); const server = http.createServer(app); const io = new Server(server); try { require('./extras')({ app, io, db, dbGet, dbAll, dbRun, wrap, esc, requireLogin, requireRole, notStudent, renderDashboard, publicHeaderFooter, upload, safeUnlink, isImg, csvCell, postBtn, getIp, validMonth, MONTH_EXPR, PARTNER_COST, STAFF_ROLES, bcrypt, crypto, path, fs, getFinance, nowStr, uploadDir }); console.log('✅ extras.js loaded successfully'); } catch (err) { console.warn('⚠️ extras.js load nahi hua:', err.message); } server.listen(port, () => { console.log(`\n🚀 IOCH Portal running at http://localhost:${port}\n`); });
